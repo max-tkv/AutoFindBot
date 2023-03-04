@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RootNamespace>AutoFindBot</RootNamespace>
+        <PackageId>AutoFindBot.Web</PackageId>
+        <UserSecretsId>29fcca43-5108-472b-9e49-c868a5646ca9</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Logs\**" />
+      <Content Remove="Logs\**" />
+      <EmbeddedResource Remove="Logs\**" />
+      <None Remove="Logs\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+      <PackageReference Include="IdentityModel" Version="6.0.0" />
+      <PackageReference Include="IdentityModel.AspNetCore" Version="4.3.0" />
+      <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.10">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+      <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.2.2" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.2" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.2" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.2.2" />
+      <PackageReference Include="Telegram.Bot" Version="16.0.2" />
+      <PackageReference Include="TMDbLib" Version="1.9.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AutoFindBot.Controllers\AutoFindBot.Controllers.csproj" />
+      <ProjectReference Include="..\AutoFindBot.Integration\AutoFindBot.Integration.csproj" />
+      <ProjectReference Include="..\AutoFindBot.Storage\AutoFindBot.Storage.csproj" />
+      <ProjectReference Include="..\AutoFindBot\AutoFindBot.csproj" />
+    </ItemGroup>
+
+</Project>

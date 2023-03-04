@@ -1,0 +1,16 @@
+﻿.vs
+.idea
+AutoFindBot/bin
+AutoFindBot/obj
+AutoFindBot.Controllers/bin
+AutoFindBot.Controllers/obj
+AutoFindBot.Integration/bin
+AutoFindBot.Integration/obj
+AutoFindBot.Storage/bin
+AutoFindBot.Storage/obj
+AutoFindBot.Utils/bin
+AutoFindBot.Utils/obj
+AutoFindBot.Web/bin
+AutoFindBot.Web/obj
+AutoFindBot.Web/Logs
+AutoFindBot.Web/.config
