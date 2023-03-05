@@ -28,6 +28,7 @@ public static class Entry
         services.AddTransient<IPaymentService, PaymentService>();
         services.AddTransient<ICheckerNewAutoService, CheckerNewAutoService>();
         services.AddTransient<IUserFilterService, UserFilterService>();
+        services.AddTransient<ICarService, CarService>();
 
         // commands
         services.AddTransient<BaseCommand, StartCommand>();

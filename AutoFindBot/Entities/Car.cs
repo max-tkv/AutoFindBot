@@ -6,6 +6,8 @@ public class Car : BaseEntity
     
     public virtual long UserFilterId { get; set; }
     
+    public string OriginId { get; set; }
+    
     public string Title { get; set; }
     
     public Source Source { get; set; }

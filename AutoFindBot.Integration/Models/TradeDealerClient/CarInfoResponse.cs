@@ -30,4 +30,13 @@ public class CarInfoResponse
 
         [JsonProperty("vin_full")]
         public string VinFull { get; set; }
+        
+        [JsonProperty("brand")]
+        public BrandResponse Brand { get; set; }
+        
+        [JsonProperty("generation")]
+        public GenerationResponse Generation { get; set; }
+        
+        [JsonProperty("model")]
+        public ModelResponse Model { get; set; }
 }

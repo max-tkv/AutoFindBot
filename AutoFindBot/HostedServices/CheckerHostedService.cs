@@ -8,7 +8,6 @@ namespace AutoFindBot.HostedServices;
 
 public class CheckerHostedService : IHostedService, IDisposable
 {
-    private int executionCount = 0;
     private readonly ILogger<CheckerHostedService> _logger;
     private Timer? _timer;
     private readonly IAppUserService _appUserService;
@@ -16,6 +15,7 @@ public class CheckerHostedService : IHostedService, IDisposable
     private readonly IMessageService _messageService;
     private readonly IUserFilterService _userFilterService;
     private readonly TelegramBotClient _botClient;
+    private readonly ICarService _carService;
 
     public CheckerHostedService(ILogger<CheckerHostedService> logger)
     {
@@ -24,6 +24,7 @@ public class CheckerHostedService : IHostedService, IDisposable
         _messageService = ServiceLocator.GetService<IMessageService>();
         _checkerNewAutoService = ServiceLocator.GetService<ICheckerNewAutoService>();
         _userFilterService = ServiceLocator.GetService<IUserFilterService>();
+        _carService = ServiceLocator.GetService<ICarService>();
         
         var telegramBot = ServiceLocator.GetService<TelegramBot>();
         _botClient = telegramBot.GetBot().Result;
@@ -46,11 +47,20 @@ public class CheckerHostedService : IHostedService, IDisposable
             var users = await _appUserService.GetAllAsync();
             foreach (var user in users)
             {
+                _logger.LogInformation($"Select User ID: {user.Id}");
+                
                 var filters = await _userFilterService.GetByUserAsync(user);
                 foreach (var filter in filters)
                 {
-                    var newAutoList = await _checkerNewAutoService.GetNewAutoAsync(user, filter);
-                    await _messageService.SendNewAutoMessageAsync(_botClient, user, filter, newAutoList);
+                    _logger.LogInformation($"User ID: {user.Id}. Select Filter ID: {filter.Id}");
+                    
+                    var newAutoList = await _checkerNewAutoService.GetAutoByFilterAsync(user, filter);
+                    var newCars = await _carService.GetNewCarsAndSaveAsync(newAutoList.CarInfos, user, filter);
+                    if (newCars.Any())
+                    {
+                        await _messageService.SendNewAutoMessageAsync(_botClient, user, filter, newCars);   
+                    }
+                    _logger.LogInformation($"Find new cars: {newCars.Count}");
                 }
             }
         }

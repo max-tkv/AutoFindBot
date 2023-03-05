@@ -17,5 +17,11 @@ public class TradeDealerMappingProfile : Profile
              .ForMember(x => x.Сity, o => o.MapFrom(x => x.City));
          
          CreateMap<СityResponse, Сity>(MemberList.Destination);
+         
+         CreateMap<BrandResponse, Brand>(MemberList.Destination);
+         
+         CreateMap<GenerationResponse, Generation>(MemberList.Destination);
+         
+         CreateMap<ModelResponse, Model>(MemberList.Destination);
     }
 }

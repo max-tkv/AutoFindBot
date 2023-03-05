@@ -47,6 +47,7 @@ namespace AutoFindBot.Web
                 mc.AddProfile(new TradeDealerMappingProfile());
                 mc.AddProfile(new TracksServiceMappingProfile());
                 mc.AddProfile(new CheckerNewAutoServiceMappingProfile());
+                mc.AddProfile(new CarServiceMappingProfile());
             }).CreateMapper());
 
             services.AddDomain();
@@ -90,7 +91,7 @@ namespace AutoFindBot.Web
                 app.UseSwaggerWithVersion(apiVersionDescriptionProvider);
             }
 
-            serviceProvider.GetRequiredService<TelegramBot>().GetBot().Wait();
+            //serviceProvider.GetRequiredService<TelegramBot>().GetBot().Wait();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

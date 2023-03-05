@@ -1,4 +1,5 @@
-﻿using AutoFindBot.Entities;
+﻿using System.Linq.Expressions;
+using AutoFindBot.Entities;
 using AutoFindBot.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,5 +25,10 @@ public class CarRepository : Repository<Entities.Car>, ICarRepository
     public async Task<Entities.Car> GetByUserAndSourceAsync(AppUser user, Source source) =>
         await DbSet.AsNoTracking().Where(x => x.User == user && x.Source == source)
             .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync();
+
+    public async Task<Entities.Car?> GetByFilterAsync(Expression<Func<Car, bool>> predicate) =>
+        await DbSet.AsNoTracking()
+            .Where(predicate)
             .FirstOrDefaultAsync();
 }

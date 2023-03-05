@@ -5,9 +5,11 @@ using AutoFindBot.Lookups;
 using AutoFindBot.Extensions;
 using AutoFindBot.Models.TradeDealer;
 using AutoFindBot.Utils.Helpers;
+using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using Emoji = AutoFindBot.Lookups.Emoji;
 
 namespace AutoFindBot.Services;
@@ -16,11 +18,16 @@ public class MessageService : IMessageService
 {
     private readonly IKeyboardService _keyboardService;
     private readonly ILogger<MessageService> _logger;
+    private readonly IConfiguration _configuration;
 
-    public MessageService(IKeyboardService keyboardService, ILogger<MessageService> logger)
+    public MessageService(
+        IKeyboardService keyboardService, 
+        ILogger<MessageService> logger,
+        IConfiguration configuration)
     {
         _logger = logger;
         _keyboardService = keyboardService;
+        _configuration = configuration;
     }
     
     public async Task SendStartMessage(TelegramBotClient botClient, AppUser user)
@@ -54,26 +61,27 @@ public class MessageService : IMessageService
         await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, message, true);
     }
 
-    public async Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, TradeDealerResult newAutoList)
+    public async Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, List<CarInfo> newAutoList)
     {
-        if (!newAutoList.CarInfos.Any())
+        if (!newAutoList.Any())
         {
             return;
         }
 
-        var message = $"По вашему фильтру \"{userFilter.Title}\" найдено *{newAutoList.CarInfos.Count}* новых автомобилей.\n\n\n";
-        foreach (var carInfo in newAutoList.CarInfos)
+        var message = $"По вашему фильтру \"{userFilter.Title}\" найдено *{newAutoList.Count}* новых автомобилей.\n\n\n";
+        foreach (var carInfo in newAutoList)
         {
             message = message + 
                       $"*{carInfo.Title}*\n" +
                       $"Год: {carInfo.Year}\n" +
                       $"Цена: {carInfo.Price} руб.\n" +
                       $"Город: {carInfo.Company.Сity.Title}\n" +
-                      $"Дата добавления: {carInfo.PublishedAt}";
+                      $"Дата добавления: {carInfo.PublishedAt}\n" +
+                      $"Ссылка: {_configuration["TradeDealerClient:SiteUrl"]}{carInfo.Brand.Alias}/{carInfo.Generation?.Alias ?? carInfo.Model?.Alias}/{carInfo.Id}";
             message += "\n\n\n";
         }
         
-        await botClient.SendTextMessageAsync(user.ChatId, message);
+        await botClient.SendTextMessageAsync(user.ChatId, message, ParseMode.Markdown, replyMarkup: new ReplyKeyboardRemove());
     }
 
     #region Приватные методы

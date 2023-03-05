@@ -1,6 +1,6 @@
 ﻿namespace AutoFindBot.Models.TradeDealer;
 
-public class CarInfo
+public class CarInfo : BaseCarInfo
 {
     public int Year { get; set; }
 
@@ -19,4 +19,10 @@ public class CarInfo
     public Company Company { get; set; }
     
     public string VinFull { get; set; }
+    
+    public Brand Brand { get; set; }
+    
+    public Generation? Generation { get; set; }
+    
+    public Model? Model { get; set; }
 }

@@ -23,7 +23,7 @@ public class CheckerNewAutoService : ICheckerNewAutoService
         _mapper = mapper;
     }
 
-    public async Task<TradeDealerResult> GetNewAutoAsync(AppUser user, UserFilter userFilter)
+    public async Task<TradeDealerResult> GetAutoByFilterAsync(AppUser user, UserFilter userFilter)
     {
         var getAutoByFilter = _mapper.Map<GetAutoByFilter>(userFilter);
         var newAuto = await _tradeDealerClient.GetAutoByFilterAsync(getAutoByFilter);
