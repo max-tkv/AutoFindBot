@@ -11,5 +11,6 @@
         public virtual List<Action> Actions { get; set; } = new List<Action>();
         public virtual List<Payment> Payments { get; set; } = new List<Payment>();
         public virtual List<Car> Cars { get; set; } = new List<Car>();
+        public virtual List<UserFilter> UserFilters { get; set; } = new List<UserFilter>();
     }
 }

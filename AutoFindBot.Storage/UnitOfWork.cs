@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     public IActionRepository Actions { get; }
     public IPaymentRepository Payments { get; }
     public ICarRepository Cars { get; }
+    public IUserFilterRepository UserFilter { get; }
     
     private readonly AppDbContext _appDbContext;
     private bool _isDisposed;
@@ -24,6 +25,7 @@ public class UnitOfWork : IUnitOfWork
         Actions = new ActionRepository(appDbContext);
         Payments = new PaymentRepository(appDbContext);
         Cars = new CarRepository(appDbContext);
+        UserFilter = new UserFilterRepository(appDbContext);
     }
 
     public void Dispose()

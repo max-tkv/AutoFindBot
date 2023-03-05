@@ -23,7 +23,8 @@ public static class Entry
             .AddTransient<IAppUserRepository, AppUserRepository>()
             .AddTransient<IActionRepository, ActionRepository>()
             .AddTransient<IPaymentRepository, PaymentRepository>()
-            .AddTransient<ICarRepository, CarRepository>();
+            .AddTransient<ICarRepository, CarRepository>()
+            .AddTransient<IUserFilterRepository, UserFilterRepository>();
         return serviceCollection;
     }
 }

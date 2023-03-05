@@ -20,7 +20,8 @@ namespace AutoFindBot.Storage
                 .ApplyConfiguration(new ActionConfiguration())
                 .ApplyConfiguration(new AppUserConfiguration())
                 .ApplyConfiguration(new PaymentConfiguration())
-                .ApplyConfiguration(new CarConfiguration());
+                .ApplyConfiguration(new CarConfiguration())
+                .ApplyConfiguration(new UserFilterConfiguration());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
