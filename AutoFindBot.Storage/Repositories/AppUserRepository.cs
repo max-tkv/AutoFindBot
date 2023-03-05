@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoFindBot.Entities;
+using Microsoft.EntityFrameworkCore;
 using AutoFindBot.Repositories;
 
 namespace AutoFindBot.Storage.Repositories;
@@ -19,5 +20,10 @@ public class AppUserRepository : Repository<Entities.AppUser>, IAppUserRepositor
     {
         return await DbSet.AsNoTracking().Where(x => x.ChatId == chatId)
             .SingleOrDefaultAsync();
+    }
+
+    public async Task<List<AppUser>> GetAllAsync()
+    {
+        return await DbSet.AsNoTracking().ToListAsync();
     }
 }

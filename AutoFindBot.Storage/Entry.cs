@@ -22,7 +22,8 @@ public static class Entry
             .AddTransient<IUnitOfWork, UnitOfWork>()
             .AddTransient<IAppUserRepository, AppUserRepository>()
             .AddTransient<IActionRepository, ActionRepository>()
-            .AddTransient<IPaymentRepository, PaymentRepository>();
+            .AddTransient<IPaymentRepository, PaymentRepository>()
+            .AddTransient<ICarRepository, CarRepository>();
         return serviceCollection;
     }
 }

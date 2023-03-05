@@ -10,4 +10,5 @@ public interface IAppUserService
     Entities.AppUser GetByUpdate(Update update);
     Task CheckFreeRequestAsync(AppUser user);
     Task CheckRequiredSubscriptionsAsync(AppUser user);
+    Task<List<Entities.AppUser>> GetAllAsync();
 }

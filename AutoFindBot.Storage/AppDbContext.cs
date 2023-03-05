@@ -19,7 +19,8 @@ namespace AutoFindBot.Storage
             builder
                 .ApplyConfiguration(new ActionConfiguration())
                 .ApplyConfiguration(new AppUserConfiguration())
-                .ApplyConfiguration(new PaymentConfiguration());
+                .ApplyConfiguration(new PaymentConfiguration())
+                .ApplyConfiguration(new CarConfiguration());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

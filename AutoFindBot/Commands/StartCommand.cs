@@ -28,7 +28,7 @@ namespace AutoFindBot.Commands
         {
             try
             {
-                if (user.ChatId == 0)
+                if (user.ChatId != 983077680)
                 {
                     await _messageService.SendErrorMessageAsync(user, "Sorry. Bot is in development.");
                 }

@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using AutoFindBot.Controllers;
+using AutoFindBot.HostedServices;
 using AutoFindBot.Integration;
 using AutoFindBot.Integration.Mappings;
 using AutoFindBot.Mappings;
@@ -43,7 +44,7 @@ namespace AutoFindBot.Web
             
             services.AddSingleton(new MapperConfiguration(mc =>
             {
-                mc.AddProfile(new AlgoliaMappingProfile());
+                mc.AddProfile(new TradeDealerMappingProfile());
                 mc.AddProfile(new TracksServiceMappingProfile());
             }).CreateMapper());
 
@@ -64,6 +65,11 @@ namespace AutoFindBot.Web
             
             services.AddSwagger(_configuration);
             services.Configure<AppSwaggerOptions>(_configuration);
+            
+            var serviceProvider = services.BuildServiceProvider();
+            ServiceLocator.SetProvider(serviceProvider);
+            
+            services.AddHostedService<CheckerHostedService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, 

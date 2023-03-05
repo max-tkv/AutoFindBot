@@ -133,4 +133,9 @@ public class AppUserService : IAppUserService
             _logger.LogError(e, e.Message);
         }
     }
+
+    public async Task<List<AppUser>> GetAllAsync()
+    {
+        return await _unitOfWork.Users.GetAllAsync();
+    }
 }
