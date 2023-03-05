@@ -29,9 +29,9 @@ public class TradeDealerClient : JsonHttpApiClient, ITradeDealerClient
     {
         try
         {
-            var path = $"{GetMethodPath("ProductVersionsFindMethod")}" +
-                       $"?priceMin=600000" +
-                       $"&priceMax=800000" +
+            var path = $"{GetMethodPath("GetByFilterMethod")}" +
+                       $"?priceMin={filter.PriceMin}" +
+                       $"&priceMax={filter.PriceMax}" +
                        $"&order=publishedAt" +
                        $"&reversed=true" +
                        $"&page=1" +
@@ -47,11 +47,10 @@ public class TradeDealerClient : JsonHttpApiClient, ITradeDealerClient
             }
             
             var tradeDealerResponse = GetObjectFromResponse<TradeDealerResponse>(content);
-            var result = tradeDealerResponse.CarInfoResponses;
-            
-            ArgumentNullException.ThrowIfNull(result);
+
+            ArgumentNullException.ThrowIfNull(tradeDealerResponse.CarInfoResponses);
     
-            return _mapper.Map<TradeDealerResult>(result);
+            return _mapper.Map<TradeDealerResult>(tradeDealerResponse);
         }
         catch (Exception e)
         {

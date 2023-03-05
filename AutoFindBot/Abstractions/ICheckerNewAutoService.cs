@@ -5,5 +5,5 @@ namespace AutoFindBot.Abstractions;
 
 public interface ICheckerNewAutoService
 {
-    Task<TradeDealerResult> GetNewAutoAsync(AppUser user);
+    Task<TradeDealerResult> GetNewAutoAsync(AppUser user, UserFilter userFilter);
 }

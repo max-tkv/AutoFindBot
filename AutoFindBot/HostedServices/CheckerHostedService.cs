@@ -1,7 +1,8 @@
 ﻿using AutoFindBot.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
+using AutoFindBot.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 
 namespace AutoFindBot.HostedServices;
 
@@ -9,11 +10,12 @@ public class CheckerHostedService : IHostedService, IDisposable
 {
     private int executionCount = 0;
     private readonly ILogger<CheckerHostedService> _logger;
-    private Timer? _timer = null;
+    private Timer? _timer;
     private readonly IAppUserService _appUserService;
     private readonly ICheckerNewAutoService _checkerNewAutoService;
     private readonly IMessageService _messageService;
-    private int count;
+    private readonly IUserFilterService _userFilterService;
+    private readonly TelegramBotClient _botClient;
 
     public CheckerHostedService(ILogger<CheckerHostedService> logger)
     {
@@ -21,6 +23,10 @@ public class CheckerHostedService : IHostedService, IDisposable
         _appUserService = ServiceLocator.GetService<IAppUserService>();
         _messageService = ServiceLocator.GetService<IMessageService>();
         _checkerNewAutoService = ServiceLocator.GetService<ICheckerNewAutoService>();
+        _userFilterService = ServiceLocator.GetService<IUserFilterService>();
+        
+        var telegramBot = ServiceLocator.GetService<TelegramBot>();
+        _botClient = telegramBot.GetBot().Result;
     }
 
     public Task StartAsync(CancellationToken stoppingToken)
@@ -28,7 +34,7 @@ public class CheckerHostedService : IHostedService, IDisposable
         _logger.LogInformation($"{nameof(CheckerHostedService)} running.");
 
         _timer = new Timer(DoWork, null, TimeSpan.Zero,
-            TimeSpan.FromSeconds(5)); //900 - 15min
+            TimeSpan.FromSeconds(60)); //900 - 15min
 
         return Task.CompletedTask;
     }
@@ -40,13 +46,12 @@ public class CheckerHostedService : IHostedService, IDisposable
             var users = await _appUserService.GetAllAsync();
             foreach (var user in users)
             {
-                var newAutoList = await _checkerNewAutoService.GetNewAutoAsync(user);
-                if (newAutoList.CarInfos.Any())
+                var filters = await _userFilterService.GetByUserAsync(user);
+                foreach (var filter in filters)
                 {
-                    //if()
+                    var newAutoList = await _checkerNewAutoService.GetNewAutoAsync(user, filter);
+                    await _messageService.SendNewAutoMessageAsync(_botClient, user, filter, newAutoList);
                 }
-                
-                count = Interlocked.Increment(ref executionCount);
             }
         }
         catch (Exception ex)

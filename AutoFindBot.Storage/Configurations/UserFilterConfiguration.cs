@@ -10,6 +10,10 @@ public class UserFilterConfiguration : IEntityTypeConfiguration<Entities.UserFil
     {
         builder.ToTable("UserFilters")
             .HasKey(x => x.Id);
+        builder.Property(x => x.PriceMin)
+            .HasColumnType("decimal(10,2)");
+        builder.Property(x => x.PriceMax)
+            .HasColumnType("decimal(10,2)");
         builder.HasIndex(x => new { x.Title });
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.CreatedAt)

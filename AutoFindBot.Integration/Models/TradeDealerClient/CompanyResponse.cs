@@ -4,6 +4,6 @@ namespace AutoFindBot.Integration.Models.TradeDealerClient;
 
 public class CompanyResponse
 {
-    [JsonProperty("title")]
-    public string Title { get; set; }
+    [JsonProperty("city")]
+    public СityResponse City { get; set; }
 }

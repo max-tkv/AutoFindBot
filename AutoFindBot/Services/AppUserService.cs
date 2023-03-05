@@ -13,19 +13,19 @@ namespace AutoFindBot.Services;
 public class AppUserService : IAppUserService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly TelegramBotClient _botClient;
     private readonly IOptions<PaymentsOptions> _paymentsOptions;
     private readonly IOptions<RequiredSubscriptionsOptions> _requiredSubscriptionsOptions;
     private readonly ILogger<AppUserService> _logger;
 
-    public AppUserService(IUnitOfWork unitOfWork, IOptions<PaymentsOptions> paymentsOptions,
-        IOptions<RequiredSubscriptionsOptions> requiredSubscriptionsOptions, TelegramBot telegramBot,
+    public AppUserService(
+        IUnitOfWork unitOfWork, 
+        IOptions<PaymentsOptions> paymentsOptions,
+        IOptions<RequiredSubscriptionsOptions> requiredSubscriptionsOptions,
         ILogger<AppUserService> logger)
     {
         _logger = logger;
         _unitOfWork = unitOfWork;
         _paymentsOptions = paymentsOptions;
-        _botClient = telegramBot.GetBot().Result;
         _requiredSubscriptionsOptions = requiredSubscriptionsOptions;
     }
     
@@ -103,7 +103,7 @@ public class AppUserService : IAppUserService
         }
     }
     
-    public async Task CheckRequiredSubscriptionsAsync(AppUser user)
+    public async Task CheckRequiredSubscriptionsAsync(TelegramBotClient botClient, AppUser user)
     {
         try
         {
@@ -112,7 +112,7 @@ public class AppUserService : IAppUserService
             {
                 foreach (var group in value.Groups)
                 {
-                    var chatMember = await _botClient.GetChatMemberAsync(group.Id, user.ChatId);
+                    var chatMember = await botClient.GetChatMemberAsync(group.Id, user.ChatId);
                     if (chatMember.Status != ChatMemberStatus.Left)
                     {
                         continue;

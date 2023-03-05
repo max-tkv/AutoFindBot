@@ -1,13 +1,16 @@
 ﻿using AutoFindBot.Entities;
+using AutoFindBot.Models.TradeDealer;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace AutoFindBot.Abstractions;
 
 public interface IMessageService
 {
-    Task SendStartMessage(AppUser user);
-    Task SendErrorMessageAsync(AppUser user, string message);
-    Task SendErrorMessageAsync(AppUser user, int messageId, string message);
-    Task SendRequiredSubscriptionsAsync(AppUser user);
-    Task SendPopupMessageAsync(AppUser user, Update update, string getDescription);
+    Task SendStartMessage(TelegramBotClient botClient, AppUser user);
+    Task SendErrorMessageAsync(TelegramBotClient botClient, AppUser user, string message);
+    Task SendErrorMessageAsync(TelegramBotClient botClient, AppUser user, int messageId, string message);
+    Task SendRequiredSubscriptionsAsync(TelegramBotClient botClient, AppUser user);
+    Task SendPopupMessageAsync(TelegramBotClient botClient, AppUser user, Update update, string getDescription);
+    Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, TradeDealerResult newAutoList);
 }

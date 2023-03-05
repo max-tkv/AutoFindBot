@@ -46,6 +46,7 @@ namespace AutoFindBot.Web
             {
                 mc.AddProfile(new TradeDealerMappingProfile());
                 mc.AddProfile(new TracksServiceMappingProfile());
+                mc.AddProfile(new CheckerNewAutoServiceMappingProfile());
             }).CreateMapper());
 
             services.AddDomain();

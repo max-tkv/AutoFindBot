@@ -2,5 +2,5 @@
 
 public class Company
 {
-    public string Title { get; set; }
+    public Сity Сity { get; set; }
 }
