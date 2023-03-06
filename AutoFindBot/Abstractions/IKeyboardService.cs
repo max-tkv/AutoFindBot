@@ -8,4 +8,5 @@ public interface IKeyboardService
     IReplyMarkup GetStartMenuKeyboard();
     IReplyMarkup GetRemovedKeyboard();
     IReplyMarkup GetRequiredSubscriptionsKeyboard();
+    IReplyMarkup GetUserSettingsKeyboard();
 }

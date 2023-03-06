@@ -26,12 +26,14 @@ public static class Entry
         services.AddTransient<IActionService, ActionService>();
         services.AddTransient<IPaginationService, PaginationService>();
         services.AddTransient<IPaymentService, PaymentService>();
-        services.AddTransient<ICheckerNewAutoService, CheckerNewAutoService>();
+        services.AddTransient<ICheckingNewAutoService, CheckingNewAutoService>();
         services.AddTransient<IUserFilterService, UserFilterService>();
         services.AddTransient<ICarService, CarService>();
 
         // commands
         services.AddTransient<BaseCommand, StartCommand>();
+        services.AddTransient<BaseCommand, CheckNewAutoCommand>();
+        services.AddTransient<BaseCommand, SettingsCommand>();
 
         return services;
     }

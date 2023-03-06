@@ -63,11 +63,6 @@ public class MessageService : IMessageService
 
     public async Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, List<CarInfo> newAutoList)
     {
-        if (!newAutoList.Any())
-        {
-            return;
-        }
-
         var message = $"По вашему фильтру \"{userFilter.Title}\" найдено *{newAutoList.Count}* новых автомобилей.\n\n\n";
         foreach (var carInfo in newAutoList)
         {
@@ -82,6 +77,13 @@ public class MessageService : IMessageService
         }
         
         await botClient.SendTextMessageAsync(user.ChatId, message, ParseMode.Markdown, replyMarkup: new ReplyKeyboardRemove());
+    }
+
+    public async Task SendSettingsCommands(TelegramBotClient botClient, Update update, AppUser user)
+    {
+        var keyboard = _keyboardService.GetUserSettingsKeyboard();
+        await botClient.SendTextMessageAsync(user.ChatId, Messages.UserSettings.GetDescription(), 
+            ParseMode.Markdown, replyMarkup: keyboard);
     }
 
     #region Приватные методы

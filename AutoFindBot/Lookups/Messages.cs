@@ -14,5 +14,8 @@ public enum Messages
     RequiredSubscriptions,
     
     [Description("Вы не подписались на каналы!")]
-    RequiredSubscriptionsPopupError
+    RequiredSubscriptionsPopupError,
+    
+    [Description("Настройки")]
+    UserSettings
 }

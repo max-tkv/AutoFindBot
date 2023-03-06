@@ -62,6 +62,18 @@ namespace AutoFindBot.Services
                     await ExecuteCommand(CommandNames.StartCommand, update, user);
                     return;
                 }
+                
+                if (update.Message.Text.StartsWith(CommandNames.CheckNewAutoCommand))
+                {
+                    await ExecuteCommand(CommandNames.CheckNewAutoCommand, update, user);
+                    return;
+                }
+                
+                if (update.Message.Text.StartsWith(CommandNames.SettingsCommand))
+                {
+                    await ExecuteCommand(CommandNames.SettingsCommand, update, user);
+                    return;
+                }
             }
             
             var lastAction = await _actionService.GetLastByUserAsync(user);

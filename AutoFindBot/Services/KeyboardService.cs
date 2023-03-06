@@ -71,6 +71,24 @@ public class KeyboardService : IKeyboardService
         return resultInlineKeyboard;
     }
 
+    public IReplyMarkup GetUserSettingsKeyboard()
+    {
+        return new InlineKeyboardMarkup(new List<IEnumerable<InlineKeyboardButton>>()
+        {
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(
+                    text: "Фильтры",
+                    callbackData: CommandNames.ChangeFiltersCommand
+                ),
+                InlineKeyboardButton.WithCallbackData(
+                    text: "Источники",
+                    callbackData: CommandNames.ChangeSourcesCommand
+                )
+            }
+        });
+    }
+
 
     #region Приватные методы
     
