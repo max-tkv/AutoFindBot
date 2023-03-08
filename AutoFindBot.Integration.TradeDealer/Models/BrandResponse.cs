@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace AutoFindBot.Integration.Models.TradeDealerClient;
+namespace AutoFindBot.Integration.Models;
 
-public class GenerationResponse
+public class BrandResponse
 {
     [JsonProperty("alias")]
     public string Alias { get; set; }

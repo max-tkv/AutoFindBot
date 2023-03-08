@@ -2,5 +2,6 @@
 
 public enum Source
 {
-    TradeDealer
+    TradeDealer,
+    KeyAutoProbeg
 }

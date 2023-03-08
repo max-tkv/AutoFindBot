@@ -1,6 +1,6 @@
-﻿namespace AutoFindBot.Models.TradeDealer;
+﻿namespace AutoFindBot.Models.KeyAutoProbeg;
 
-public class GetAutoByFilter
+public class KeyAutoProbegFilter
 {
     public string PriceMin { get; set; }
     public string PriceMax { get; set; }

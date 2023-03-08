@@ -24,6 +24,9 @@ public class CarConfiguration : IEntityTypeConfiguration<Entities.Car>
         builder.Property(x => x.Vin)
             .IsRequired(false);
         
+        builder.Property(x => x.Url)
+            .IsRequired(false);
+        
         builder.HasOne(x => x.User)
             .WithMany(x => x.Cars)
             .HasForeignKey(x => x.UserId)

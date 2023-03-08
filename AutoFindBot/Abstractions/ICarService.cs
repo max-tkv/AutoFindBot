@@ -5,6 +5,6 @@ namespace AutoFindBot.Abstractions;
 
 public interface ICarService
 {
-    Task<List<CarInfo>> GetNewCarsAndSaveAsync(List<CarInfo> cars, AppUser user, UserFilter userFilter);
+    Task<List<Car>> GetNewCarsAndSaveAsync(List<Car> cars, AppUser user, UserFilter userFilter);
     Task AddCarRangeAsync(List<Car> cars);
 }

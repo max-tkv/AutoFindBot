@@ -10,35 +10,31 @@ public class CarService : ICarService
 {
     private readonly ILogger<PaymentService> _logger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public CarService(
         ILogger<PaymentService> logger, 
-        IUnitOfWork unitOfWork,
-        IMapper mapper)
+        IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
     
-    public async Task<List<CarInfo>> GetNewCarsAndSaveAsync(List<CarInfo> carsInput, AppUser user, UserFilter userFilter)
+    public async Task<List<Car>> GetNewCarsAndSaveAsync(List<Car> carsInput, AppUser user, UserFilter userFilter)
     {
-        var newCars = new List<CarInfo>();
+        var newCars = new List<Car>();
         foreach (var carData in carsInput)
         {
-            var carInfo = _mapper.Map<CarInfo, Car>(carData);
             var car = await _unitOfWork.Cars
-                .GetByFilterAsync(x => x.OriginId == carInfo.OriginId 
+                .GetByFilterAsync(x => x.OriginId == carData.OriginId 
                                        && x.UserFilterId == userFilter.Id 
                                        && x.UserId == user.Id);
             if (car == null)
             {
                 newCars.Add(carData);
                 
-                carInfo.UserId = user.Id;
-                carInfo.UserFilterId = userFilter.Id;
-                await _unitOfWork.Cars.AddAsync(carInfo);
+                carData.UserId = user.Id;
+                carData.UserFilterId = userFilter.Id;
+                await _unitOfWork.Cars.AddAsync(carData);
             }
         }
 

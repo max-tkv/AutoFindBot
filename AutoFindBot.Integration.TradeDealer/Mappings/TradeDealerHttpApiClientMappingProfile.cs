@@ -1,12 +1,12 @@
-﻿using AutoFindBot.Integration.Models.TradeDealerClient;
+﻿using AutoFindBot.Integration.Models;
 using AutoFindBot.Models.TradeDealer;
 using AutoMapper;
 
 namespace AutoFindBot.Integration.Mappings;
 
-public class TradeDealerMappingProfile : Profile
+public class TradeDealerHttpApiClientMappingProfile : Profile
 {
-    public TradeDealerMappingProfile()
+    public TradeDealerHttpApiClientMappingProfile()
     {
          CreateMap<TradeDealerResponse, TradeDealerResult>()
              .ForMember(x => x.CarInfos, o => o.MapFrom(x => x.CarInfoResponses));

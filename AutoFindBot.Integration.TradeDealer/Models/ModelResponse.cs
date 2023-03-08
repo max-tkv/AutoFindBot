@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace AutoFindBot.Integration.Models.TradeDealerClient;
+namespace AutoFindBot.Integration.Models;
 
 public class ModelResponse
 {

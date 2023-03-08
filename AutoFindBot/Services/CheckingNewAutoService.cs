@@ -1,6 +1,7 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
+using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Models.TradeDealer;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -11,22 +12,25 @@ namespace AutoFindBot.Services;
 public class CheckingNewAutoService : ICheckingNewAutoService
 {
     private readonly ILogger<CheckingNewAutoService> _logger;
-    private readonly ITradeDealerClient _tradeDealerClient;
+    private readonly ITradeDealerHttpApiClient _tradeDealerHttpApiClient;
     private readonly IUserFilterService _userFilterService;
     private readonly IMessageService _messageService;
     private readonly ICarService _carService;
     private readonly IMapper _mapper;
+    private readonly IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClient;
 
     public CheckingNewAutoService(
-        ILogger<CheckingNewAutoService> logger, 
-        ITradeDealerClient tradeDealerClient,
+        ILogger<CheckingNewAutoService> logger,
+        IKeyAutoProbegHttpApiClient keyAutoProbegHttpApiClient,
+        ITradeDealerHttpApiClient tradeDealerHttpApiClient,
         IUserFilterService userFilterService,
         IMessageService messageService,
         ICarService carService,
         IMapper mapper)
     {
         _logger = logger;
-        _tradeDealerClient = tradeDealerClient;
+        _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
+        _tradeDealerHttpApiClient = tradeDealerHttpApiClient;
         _userFilterService = userFilterService;
         _messageService = messageService;
         _carService = carService;
@@ -43,7 +47,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             _logger.LogInformation($"User ID: {user.Id}. Select Filter ID: {filter.Id}");
                     
             var newAutoList = await GetAutoByFilterAsync(filter);
-            var newCars = await _carService.GetNewCarsAndSaveAsync(newAutoList.CarInfos, user, filter);
+            var newCars = await _carService.GetNewCarsAndSaveAsync(newAutoList, user, filter);
             if (newCars.Any() || sendEmptyResultMessage)
             {
                 await _messageService.SendNewAutoMessageAsync(botClient, user, filter, newCars);   
@@ -53,9 +57,18 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
         
     }
-    private async Task<TradeDealerResult> GetAutoByFilterAsync(UserFilter userFilter)
+    private async Task<List<Car>> GetAutoByFilterAsync(UserFilter userFilter)
     {
-        var getAutoByFilter = _mapper.Map<GetAutoByFilter>(userFilter);
-        return await _tradeDealerClient.GetAutoByFilterAsync(getAutoByFilter);
+        var cars = new List<Car>();
+        
+        var tradeDealerFilter = _mapper.Map<TradeDealerFilter>(userFilter);
+        var tradeDealerResult = await _tradeDealerHttpApiClient.GetAutoByFilterAsync(tradeDealerFilter);
+        cars.AddRange(_mapper.Map<List<Car>>(tradeDealerResult.CarInfos));
+        
+        var keyAutoProbeg = _mapper.Map<KeyAutoProbegFilter>(userFilter);
+        var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAutoByFilterAsync(keyAutoProbeg);
+        cars.AddRange(_mapper.Map<List<Car>>(keyAutoProbegResult));
+        
+        return cars;
     }
 }

@@ -14,10 +14,10 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using AutoFindBot.Controllers;
 using AutoFindBot.HostedServices;
-using AutoFindBot.Integration;
+using AutoFindBot.Integration.Extensions;
+using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
 using AutoFindBot.Mappings;
-using AutoFindBot.Services;
 using AutoFindBot.Storage;
 using AutoFindBot.Web.Configuration;
 using AutoFindBot.Web.Configuration.Swagger;
@@ -44,15 +44,16 @@ namespace AutoFindBot.Web
             
             services.AddSingleton(new MapperConfiguration(mc =>
             {
-                mc.AddProfile(new TradeDealerMappingProfile());
+                mc.AddProfile(new TradeDealerHttpApiClientMappingProfile());
                 mc.AddProfile(new TracksServiceMappingProfile());
                 mc.AddProfile(new CheckerNewAutoServiceMappingProfile());
-                mc.AddProfile(new CarServiceMappingProfile());
             }).CreateMapper());
 
             services.AddDomain();
             services.AddConfig(_configuration);
-            services.AddIntegration(_configuration);
+            
+            services.AddTradeDealerHttpApiClient(_configuration);
+            services.AddKeyAutoProbegHttpApiClient(_configuration);
             
             services.AddMvc()
                 .AddApi()

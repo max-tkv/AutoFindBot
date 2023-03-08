@@ -4,5 +4,5 @@ namespace AutoFindBot.Models.TradeDealer;
 
 public class Generation
 {
-    public string Alias { get; set; }
+    public string? Alias { get; set; }
 }

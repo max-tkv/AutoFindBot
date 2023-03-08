@@ -43,7 +43,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AutoFindBot.Controllers\AutoFindBot.Controllers.csproj" />
-      <ProjectReference Include="..\AutoFindBot.Integration\AutoFindBot.Integration.csproj" />
+      <ProjectReference Include="..\AutoFindBot.Integration.KeyAutoProbeg\AutoFindBot.Integration.KeyAutoProbeg.csproj" />
+      <ProjectReference Include="..\AutoFindBot.Integration.TradeDealer\AutoFindBot.Integration.TradeDealer.csproj" />
       <ProjectReference Include="..\AutoFindBot.Storage\AutoFindBot.Storage.csproj" />
       <ProjectReference Include="..\AutoFindBot\AutoFindBot.csproj" />
     </ItemGroup>

@@ -61,18 +61,18 @@ public class MessageService : IMessageService
         await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, message, true);
     }
 
-    public async Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, List<CarInfo> newAutoList)
+    public async Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, List<Car> newCarList)
     {
-        var message = $"По вашему фильтру \"{userFilter.Title}\" найдено *{newAutoList.Count}* новых автомобилей.\n\n\n";
-        foreach (var carInfo in newAutoList)
+        var message = $"По вашему фильтру \"{userFilter.Title}\" найдено *{newCarList.Count}* новых автомобилей.\n\n\n";
+        foreach (var newCar in newCarList)
         {
             message = message + 
-                      $"*{carInfo.Title}*\n" +
-                      $"Год: {carInfo.Year}\n" +
-                      $"Цена: {carInfo.Price} руб.\n" +
-                      $"Город: {carInfo.Company.Сity.Title}\n" +
-                      $"Дата добавления: {carInfo.PublishedAt}\n" +
-                      $"Ссылка: {_configuration["TradeDealerClient:SiteUrl"]}{carInfo.Brand.Alias}/{carInfo.Generation?.Alias ?? carInfo.Model?.Alias}/{carInfo.Id}";
+                      $"*{newCar.Title}*\n" +
+                      $"Год: {newCar.Year}\n" +
+                      $"Цена: {newCar.Price} руб.\n" +
+                      $"Город: {newCar.Сity}\n" +
+                      $"Дата добавления: {newCar.PublishedAt}\n" +
+                      $"Ссылка: {_configuration["Integration:TradeDealer:SiteUrl"]}{newCar.Url}";
             message += "\n\n\n";
         }
         
