@@ -38,14 +38,19 @@ public class CheckerHostedService : IHostedService, IDisposable
     {
         try
         {
-            _logger.LogInformation($"{nameof(CheckerHostedService)}: Start DoWork method.");
+            _logger.LogInformation($"{nameof(CheckerHostedService)}: Start CheckerHostedService.DoWork method.");
             
             var users = await _appUserService.GetAllAsync();
+            
+            _logger.LogInformation($"{nameof(CheckerHostedService)}: Find {users.Count} users.");
+            
             foreach (var user in users)
             {
                 _logger.LogInformation($"Select User ID: {user.Id}");
                 await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user);
             }
+            
+            _logger.LogInformation($"{nameof(CheckerHostedService)}: End CheckerHostedService.DoWork method.");
         }
         catch (Exception ex)
         {
