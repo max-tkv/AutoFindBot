@@ -14,7 +14,6 @@ namespace AutoFindBot.Integration;
 
 public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiClient
 {
-    private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
     private readonly ILogger<TradeDealerHttpApiClient> _logger;
     private readonly TradeDealerHttpApiClientOptions? _options;
@@ -23,10 +22,8 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
         HttpClient httpClient, 
         IConfiguration configuration, 
         IMapper mapper,
-        ILogger<TradeDealerHttpApiClient> logger,
-        IOptions<TradeDealerHttpApiClientOptions> options) : base(httpClient)
+        ILogger<TradeDealerHttpApiClient> logger) : base(httpClient)
     {
-        _configuration = configuration;
         _options = configuration
             .GetSection(RegisterTradeDealerHttpApiClientInvariants.OptionsSectionPath)
             .Get<TradeDealerHttpApiClientOptions>();

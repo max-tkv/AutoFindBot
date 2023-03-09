@@ -22,6 +22,13 @@ public static class TradeDealerHttpApiClientOptionsExtensions
                 RegisterTradeDealerHttpApiClientInvariants.OptionNotFound, 
                 nameof(options.BaseUrl)));
         }
+        
+        if (string.IsNullOrWhiteSpace(options.SiteUrl))
+        {
+            errors.Add(string.Format(
+                RegisterTradeDealerHttpApiClientInvariants.OptionNotFound, 
+                nameof(options.SiteUrl)));
+        }
             
         if (string.IsNullOrWhiteSpace(options.GetAutoByFilterQuery))
         {

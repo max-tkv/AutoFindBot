@@ -4,17 +4,14 @@ using AutoFindBot.Integration.KeyAutoProbeg.Invariants;
 using AutoFindBot.Integration.KeyAutoProbeg.Options;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Utils.Http;
-using AutoMapper;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace AutoFindBot.Integration.KeyAutoProbeg;
 
 public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpApiClient
 {
-    private readonly IConfiguration _configuration;
     private readonly ILogger<KeyAutoProbegHttpApiClient> _logger;
     private readonly KeyAutoProbegHttpApiClientOptions? _options;
 
@@ -26,7 +23,6 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
         ILogger<KeyAutoProbegHttpApiClient> logger) : base(httpClient)
     {
         _logger = logger;
-        _configuration = configuration;
         _options = configuration
             .GetSection(RegisterKeyAutoProbegHttpApiClientInvariants.OptionsSectionPath)
             .Get<KeyAutoProbegHttpApiClientOptions>();
@@ -38,7 +34,7 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
         {
             ArgumentNullException.ThrowIfNull(filter);
 
-            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
+            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
                 .Replace(KeyAutoProbegHttpApiClientInvariants.PriceMin, filter.PriceMin)
                 .Replace(KeyAutoProbegHttpApiClientInvariants.PriceMax, filter.PriceMax);
             var response = await SendAsync(path, HttpMethod.Get);
