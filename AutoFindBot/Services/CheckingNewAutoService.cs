@@ -1,6 +1,7 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
+using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Models.TradeDealer;
 using AutoMapper;
@@ -18,11 +19,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly ICarService _carService;
     private readonly IMapper _mapper;
     private readonly IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClient;
+    private readonly IAvitoHttpApiClient _avitoHttpApiClient;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
         IKeyAutoProbegHttpApiClient keyAutoProbegHttpApiClient,
         ITradeDealerHttpApiClient tradeDealerHttpApiClient,
+        IAvitoHttpApiClient avitoHttpApiClient,
         IUserFilterService userFilterService,
         IMessageService messageService,
         ICarService carService,
@@ -31,6 +34,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         _logger = logger;
         _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
         _tradeDealerHttpApiClient = tradeDealerHttpApiClient;
+        _avitoHttpApiClient = avitoHttpApiClient;
         _userFilterService = userFilterService;
         _messageService = messageService;
         _carService = carService;
@@ -68,6 +72,10 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         var keyAutoProbeg = _mapper.Map<KeyAutoProbegFilter>(userFilter);
         var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAutoByFilterAsync(keyAutoProbeg);
         cars.AddRange(_mapper.Map<List<Car>>(keyAutoProbegResult));
+        
+        var avitoFilter = _mapper.Map<AvitoFilter>(userFilter);
+        var avitoResult = await _avitoHttpApiClient.GetAutoByFilterAsync(avitoFilter);
+        cars.AddRange(_mapper.Map<List<Car>>(avitoResult));
         
         return cars;
     }

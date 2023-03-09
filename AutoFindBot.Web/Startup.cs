@@ -14,6 +14,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using AutoFindBot.Controllers;
 using AutoFindBot.HostedServices;
+using AutoFindBot.Integration.Avito.Extensions;
 using AutoFindBot.Integration.Extensions;
 using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
@@ -54,6 +55,7 @@ namespace AutoFindBot.Web
             
             services.AddTradeDealerHttpApiClient(_configuration);
             services.AddKeyAutoProbegHttpApiClient(_configuration);
+            services.AddAvitoHttpApiClient(_configuration);
             
             services.AddMvc()
                 .AddApi()
