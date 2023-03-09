@@ -72,7 +72,7 @@ public class MessageService : IMessageService
                       $"Цена: {newCar.Price} руб.\n" +
                       $"Город: {newCar.Сity}\n" +
                       $"Дата добавления: {newCar.PublishedAt}\n" +
-                      $"Ссылка: {_configuration["Integration:TradeDealer:SiteUrl"]}{newCar.Url}";
+                      $"Ссылка: {_configuration["Integration:TradeDealer:SiteUrl"]}/{newCar.Url}";
             message += "\n\n\n";
         }
         

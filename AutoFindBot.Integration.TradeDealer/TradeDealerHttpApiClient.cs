@@ -38,7 +38,7 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
     {
         try
         {
-            var path = _options.BaseUrl + _options.GetAutoByFilterMethod
+            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
                 .Replace(TradeDealerHttpApiClientInvariants.PriceMin, filter.PriceMin)
                 .Replace(TradeDealerHttpApiClientInvariants.PriceMax, filter.PriceMax);
             var response = await SendAsync(path, HttpMethod.Get);
