@@ -14,7 +14,8 @@ AutoFindBot.Web/bin
 AutoFindBot.Web/obj
 AutoFindBot.Web/Logs
 AutoFindBot.Web/.config
-AutoFindBot.Integration.KeyAutoProbeg
 AutoFindBot.Integration.TradeDealer/obj
 AutoFindBot.Integration.TradeDealer/bin
 AutoFindBot.Web/Properties/PublishProfiles
+AutoFindBot.Integration.KeyAutoProbeg/bin
+AutoFindBot.Integration.KeyAutoProbeg/obj

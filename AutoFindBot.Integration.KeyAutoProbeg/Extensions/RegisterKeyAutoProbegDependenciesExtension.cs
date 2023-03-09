@@ -1,15 +1,15 @@
 ﻿using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Helpers;
-using AutoFindBot.Integration.Invariants;
-using AutoFindBot.Integration.Options;
+using AutoFindBot.Integration.KeyAutoProbeg.Invariants;
+using AutoFindBot.Integration.KeyAutoProbeg.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AutoFindBot.Integration.Extensions;
+namespace AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 
-public static class RegisterTradeDealerDependenciesExtension
+public static class RegisterKeyAutoProbegDependenciesExtension
 {
-    public static IServiceCollection AddTradeDealerHttpApiClient(
+    public static IServiceCollection AddKeyAutoProbegHttpApiClient(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -18,37 +18,37 @@ public static class RegisterTradeDealerDependenciesExtension
 
         return services
             .RegisterApplicationsApiClient()
-            .RegisterTradeDealerHttpApiClientOptions(
+            .RegisterKeyAutoProbegHttpApiClientOptions(
                 configuration,
-                RegisterTradeDealerHttpApiClientInvariants.OptionsSectionPath);
+                RegisterKeyAutoProbegHttpApiClientInvariants.OptionsSectionPath);
     }
 
-    private static IServiceCollection RegisterTradeDealerHttpApiClientOptions(
+    private static IServiceCollection RegisterKeyAutoProbegHttpApiClientOptions(
         this IServiceCollection services,
         IConfiguration configuration,
         string optionsSectionPath)
     {
         var options = configuration
             .GetSection(optionsSectionPath)
-            .Get<TradeDealerHttpApiClientOptions>();
+            .Get<KeyAutoProbegHttpApiClientOptions>();
         
         if (options is null)
         {
             throw new InvalidOperationException(
-                RegisterTradeDealerHttpApiClientInvariants.OptionsSectionNotDefined);
+                RegisterKeyAutoProbegHttpApiClientInvariants.OptionsSectionNotDefined);
         }
         
         options.Validate();
-        
+
         return services.AddSingleton(options);
     }
 
     private static IServiceCollection RegisterApplicationsApiClient(
         this IServiceCollection services)
     {
-        services.AddHttpClient<ITradeDealerHttpApiClient, TradeDealerHttpApiClient>((serviceProvider, httpClient) =>
+        services.AddHttpClient<IKeyAutoProbegHttpApiClient, KeyAutoProbegHttpApiClient>((serviceProvider, httpClient) =>
         {
-            var options = serviceProvider.GetService<TradeDealerHttpApiClientOptions>();
+            var options = serviceProvider.GetService<KeyAutoProbegHttpApiClientOptions>();
             httpClient.BaseAddress = new Uri(options.BaseUrl);
         });
 
