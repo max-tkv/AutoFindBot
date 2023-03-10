@@ -29,6 +29,14 @@ public static class AvitoHttpApiClientOptionsExtensions
                 RegisterAvitoHttpApiClientInvariants.OptionNotFoundError, 
                 nameof(options.GetAutoByFilterQuery)));
         }
+        
+        if (options?.ProxyData == null || (options.ProxyData.Active && 
+                                          string.IsNullOrWhiteSpace(options.ProxyData.Proxy)))
+        {
+            errors.Add(string.Format(
+                RegisterAvitoHttpApiClientInvariants.OptionNotFoundError, 
+                nameof(options.GetAutoByFilterQuery)));
+        }
 
         if (errors.Count != 0)
         {

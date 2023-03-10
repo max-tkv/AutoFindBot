@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
+using System.Net.Http;
 
 namespace AutoFindBot.Integration.Avito.Extensions;
 
@@ -51,19 +52,32 @@ public static class RegisterAvitoDependenciesExtension
     private static IServiceCollection RegisterAvitoApiClient(
         this IServiceCollection services)
     {
-        var retryPolicy = CreateRetryPolicy(services);
+        var retryPolicy = CreateRetryPolicy(services).Result;
         services
             .AddHttpClient<IAvitoHttpApiClient, AvitoHttpApiClient>((serviceProvider, httpClient) => 
             {
                 var options = serviceProvider.GetService<AvitoHttpApiClientOptions>();
-                httpClient.BaseAddress = new Uri(options.BaseUrl); 
+                if (options.ProxyData.Active)
+                {
+                    var handler = new HttpClientHandler()
+                    {
+                        Proxy = new WebProxy(options?.ProxyData.Proxy),
+                        // // установка учетных данных для аутентификации на прокси (если требуется)
+                        // UseDefaultCredentials = false,
+                        // Credentials = new NetworkCredential("username", "password")
+                    };
+
+                    httpClient = new HttpClient(handler);
+                }
+                
+                httpClient.BaseAddress = new Uri(options.BaseUrl);
             })
             .AddPolicyHandler(retryPolicy);
 
         return services;
     }
     
-    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy(IServiceCollection services)
+    private async static Task<AsyncRetryPolicy<HttpResponseMessage>> CreateRetryPolicy(IServiceCollection services)
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
@@ -75,12 +89,14 @@ public static class RegisterAvitoDependenciesExtension
                 TimeSpan.FromSeconds(3),
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(8)
-            }, (exception, timeSpan, retryCount, context) =>
+            }, async (exception, timeSpan, retryCount, context) =>
             {
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<AvitoHttpApiClient>>();
                 logger!.LogWarning(
-                    $"{nameof(AvitoHttpApiClient)}: Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception.Exception.Message}");
+                    $"{nameof(AvitoHttpApiClient)}: " +
+                    $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: " +
+                    $"{exception?.Exception?.Message ?? await exception?.Result?.Content.ReadAsStringAsync()}");
             });
     }
 }
