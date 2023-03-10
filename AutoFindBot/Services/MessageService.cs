@@ -66,13 +66,24 @@ public class MessageService : IMessageService
         var message = $"По вашему фильтру \"{userFilter.Title}\" найдено *{newCarList.Count}* новых автомобилей.\n\n\n";
         foreach (var newCar in newCarList)
         {
-            message = message + 
+            message = message +
                       $"*{newCar.Title}*\n" +
                       $"Год: {newCar.Year}\n" +
                       $"Цена: {newCar.Price} руб.\n" +
                       $"Город: {newCar.Сity}\n" +
-                      $"Дата добавления: {newCar.PublishedAt}\n" +
-                      $"Ссылка: {_configuration["Integration:TradeDealer:SiteUrl"]}/{newCar.Url}";
+                      $"Дата добавления: {newCar.PublishedAt}\n";
+            switch (newCar.Source)
+            {
+                case Source.Avito:
+                    message += $"Ссылка: [Открыть]({_configuration["Integration:Avito:BaseUrl"]}{newCar.Url})";
+                    break;
+                case Source.TradeDealer:
+                    message += $"Ссылка: [Открыть]({_configuration["Integration:TradeDealer:SiteUrl"]}/{newCar.Url})";
+                    break;
+                case Source.KeyAutoProbeg:
+                    message += $"Ссылка: [Открыть]({newCar.Url})";
+                    break;
+            }
             message += "\n\n\n";
         }
         

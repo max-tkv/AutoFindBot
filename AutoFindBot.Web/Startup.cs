@@ -15,6 +15,7 @@ using Newtonsoft.Json.Serialization;
 using AutoFindBot.Controllers;
 using AutoFindBot.HostedServices;
 using AutoFindBot.Integration.Avito.Extensions;
+using AutoFindBot.Integration.Avito.Mappings;
 using AutoFindBot.Integration.Extensions;
 using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
@@ -48,6 +49,7 @@ namespace AutoFindBot.Web
                 mc.AddProfile(new TradeDealerHttpApiClientMappingProfile());
                 mc.AddProfile(new TracksServiceMappingProfile());
                 mc.AddProfile(new CheckerNewAutoServiceMappingProfile());
+                mc.AddProfile(new AvitoHttpApiClientMappingProfile());
             }).CreateMapper());
 
             services.AddDomain();

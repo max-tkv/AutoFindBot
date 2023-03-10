@@ -1,4 +1,5 @@
-﻿using AutoFindBot.Abstractions.HttpClients;
+﻿using System.Net;
+using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Helpers;
 using AutoFindBot.Integration.Avito.Invariants;
 using AutoFindBot.Integration.Avito.Options;
@@ -66,11 +67,14 @@ public static class RegisterAvitoDependenciesExtension
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
+            .OrResult(response => response.StatusCode == HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(new[]
             {
                 TimeSpan.FromSeconds(3),
-                TimeSpan.FromMinutes(5),
-                TimeSpan.FromMinutes(8)
+                TimeSpan.FromSeconds(3),
+                TimeSpan.FromSeconds(3),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(8)
             }, (exception, timeSpan, retryCount, context) =>
             {
                 var serviceProvider = services.BuildServiceProvider();

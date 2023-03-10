@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Mappings" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\AutoFindBot.Utils\AutoFindBot.Utils.csproj" />
       <ProjectReference Include="..\AutoFindBot\AutoFindBot.csproj" />
     </ItemGroup>
