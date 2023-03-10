@@ -20,6 +20,7 @@ using AutoFindBot.Integration.Extensions;
 using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
 using AutoFindBot.Mappings;
+using AutoFindBot.Services;
 using AutoFindBot.Storage;
 using AutoFindBot.Web.Configuration;
 using AutoFindBot.Web.Configuration.Swagger;
@@ -77,6 +78,8 @@ namespace AutoFindBot.Web
             ServiceLocator.SetProvider(serviceProvider);
             
             services.AddHostedService<CheckerHostedService>();
+            
+            serviceProvider.GetRequiredService<TelegramBot>().GetBot().Wait();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, 
