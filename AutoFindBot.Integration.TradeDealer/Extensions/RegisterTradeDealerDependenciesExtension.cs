@@ -78,7 +78,7 @@ public static class RegisterTradeDealerDependenciesExtension
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<TradeDealerHttpApiClient>>();
                 logger!.LogWarning(
-                    $"{nameof(TradeDealerHttpApiClient)}: Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
+                    $"{nameof(TradeDealerHttpApiClient)}: Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception.Exception.Message}");
             });
     }
 }

@@ -40,7 +40,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         {
             ArgumentNullException.ThrowIfNull(filter);
 
-            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
+            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
                 .Replace(AvitoHttpApiClientInvariants.PriceMin, filter.PriceMin)
                 .Replace(AvitoHttpApiClientInvariants.PriceMax, filter.PriceMax);
             var response = await SendAsync(path, HttpMethod.Get);
@@ -55,86 +55,11 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
             ArgumentNullException.ThrowIfNull(tradeDealerResponse.Result.Items);
             
             return _mapper.Map<List<AvitoResult>>(tradeDealerResponse.Result.Items);
-            
-            // var response = await GetApiResponseAsync(filter);
-            //
-            // var doc = new HtmlDocument();
-            // doc.LoadHtml(response);
-            //
-            // var carNodes = doc.DocumentNode.SelectNodes(CarNodePath);
-            // if (carNodes == null || !carNodes.Any())
-            // {
-            //     throw new Exception(
-            //         $"Nodes {CarNodePath}: не удалось получить.");
-            // }
-            //
-            // var result = new List<AvitoResult>();
-            // foreach (var carNode in carNodes)
-            // {
-            //     var bodyNode = carNode
-            //         .SelectSingleNode("div[contains(@class, 'iva-item-body-')]");
-            //
-            //     var titleFull = bodyNode
-            //         .SelectSingleNode("div[contains(@class, 'iva-item-titleStep-')]")
-            //         .InnerText.Trim();
-            //
-            //     var title = titleFull.Split(",",
-            //         StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).First();
-            //
-            //     var nodes = bodyNode
-            //         .SelectNodes("div[contains(@class, '')]");
-            //     var address = nodes[nodes.Count - 2]
-            //         .InnerText?.Trim();
-            //
-            //     var priceOrigin = bodyNode
-            //         .SelectSingleNode("div[contains(@class, 'iva-item-priceStep-')]")
-            //         .InnerText.Trim().Replace("₽", string.Empty);
-            //     var price = Regex.Replace(priceOrigin, @"\s+", "");
-            //
-            //     var href = bodyNode
-            //         .SelectSingleNode("div[contains(@class, 'iva-item-titleStep-')]/a")
-            //         .Attributes["href"].Value;
-            //
-            //     var year = titleFull.Split(",",
-            //         StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Last();
-            //
-            //     result.Add(new AvitoResult()
-            //     {
-            //         Source = Source.KeyAutoProbeg,
-            //         OriginId = href
-            //             .Split("/", StringSplitOptions.RemoveEmptyEntries).Last()
-            //             .Split("_", StringSplitOptions.RemoveEmptyEntries).Last(),
-            //         Title = title,
-            //         Сity = address ?? "",
-            //         Price = Int32.Parse(price),
-            //         PublishedAt = DateTime.Now,
-            //         Url = href,
-            //         Year = Int32.Parse(year)
-            //     });
-            // }
-            //
-            // return result;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: Ошибка: {e.Message}");
+            _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
             return new List<AvitoResult>();
         }
     }
-
-    #region Приватные методы
-
-    public async Task<string> GetApiResponseAsync(AvitoFilter filter)
-    {
-        var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
-            .Replace(AvitoHttpApiClientInvariants.PriceMin, filter.PriceMin)
-            .Replace(AvitoHttpApiClientInvariants.PriceMax, filter.PriceMax);
-
-        using var response = await SendAsync(path, HttpMethod.Get);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadAsStringAsync();
-    }
-
-    #endregion
 }
