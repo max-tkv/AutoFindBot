@@ -80,7 +80,7 @@ public static class RegisterAvitoDependenciesExtension
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<AvitoHttpApiClient>>();
                 logger!.LogWarning(
-                    $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
+                    $"{nameof(AvitoHttpApiClient)}: Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
             });
     }
 }

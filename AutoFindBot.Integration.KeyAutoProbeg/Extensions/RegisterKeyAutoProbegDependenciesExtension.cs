@@ -76,7 +76,7 @@ public static class RegisterKeyAutoProbegDependenciesExtension
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<KeyAutoProbegHttpApiClient>>();
                 logger!.LogWarning(
-                    $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
+                    $"{nameof(KeyAutoProbegHttpApiClient)}: Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
             });
     }
 }
