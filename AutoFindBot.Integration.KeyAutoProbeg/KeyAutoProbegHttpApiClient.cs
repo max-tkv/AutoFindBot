@@ -18,14 +18,12 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
     private const string CarNodePath = "//a[contains(@class, 'w-full py-8 flex flex-col sm:flex-row justify-between blank car-hor')]";
 
     public KeyAutoProbegHttpApiClient(
-        HttpClient httpClient, 
-        IConfiguration configuration, 
+        HttpClient httpClient,
+        KeyAutoProbegHttpApiClientOptions options, 
         ILogger<KeyAutoProbegHttpApiClient> logger) : base(httpClient)
     {
         _logger = logger;
-        _options = configuration
-            .GetSection(RegisterKeyAutoProbegHttpApiClientInvariants.OptionsSectionPath)
-            .Get<KeyAutoProbegHttpApiClientOptions>();
+        _options = options;
     }
 
     public async Task<List<KeyAutoProbegResult>> GetAutoByFilterAsync(KeyAutoProbegFilter filter)

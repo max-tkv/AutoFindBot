@@ -19,14 +19,12 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
     private readonly TradeDealerHttpApiClientOptions? _options;
 
     public TradeDealerHttpApiClient(
-        HttpClient httpClient, 
-        IConfiguration configuration, 
+        HttpClient httpClient,
         IMapper mapper,
+        TradeDealerHttpApiClientOptions options,
         ILogger<TradeDealerHttpApiClient> logger) : base(httpClient)
     {
-        _options = configuration
-            .GetSection(RegisterTradeDealerHttpApiClientInvariants.OptionsSectionPath)
-            .Get<TradeDealerHttpApiClientOptions>();
+        _options = options;
         _mapper = mapper;
         _logger = logger;
     }
