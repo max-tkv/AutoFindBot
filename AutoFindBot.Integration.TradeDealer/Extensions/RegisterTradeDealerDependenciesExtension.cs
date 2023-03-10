@@ -4,6 +4,10 @@ using AutoFindBot.Integration.Invariants;
 using AutoFindBot.Integration.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Retry;
 
 namespace AutoFindBot.Integration.Extensions;
 
@@ -17,7 +21,7 @@ public static class RegisterTradeDealerDependenciesExtension
         Guard.NotNull(configuration, nameof(configuration));
 
         return services
-            .RegisterApplicationsApiClient()
+            .RegisterTradeDealerApiClient()
             .RegisterTradeDealerHttpApiClientOptions(
                 configuration,
                 RegisterTradeDealerHttpApiClientInvariants.OptionsSectionPath);
@@ -43,15 +47,36 @@ public static class RegisterTradeDealerDependenciesExtension
         return services.AddSingleton(options);
     }
 
-    private static IServiceCollection RegisterApplicationsApiClient(
+    private static IServiceCollection RegisterTradeDealerApiClient(
         this IServiceCollection services)
     {
-        services.AddHttpClient<ITradeDealerHttpApiClient, TradeDealerHttpApiClient>((serviceProvider, httpClient) =>
-        {
-            var options = serviceProvider.GetService<TradeDealerHttpApiClientOptions>();
-            httpClient.BaseAddress = new Uri(options.BaseUrl);
-        });
+        var retryPolicy = CreateRetryPolicy(services);
+        services
+            .AddHttpClient<ITradeDealerHttpApiClient, TradeDealerHttpApiClient>((serviceProvider, httpClient) =>
+            {
+                var options = serviceProvider.GetService<TradeDealerHttpApiClientOptions>();
+                httpClient.BaseAddress = new Uri(options.BaseUrl);
+            })
+            .AddPolicyHandler(retryPolicy);
 
         return services;
+    }
+    
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy(IServiceCollection services)
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(new[]
+            {
+                TimeSpan.FromSeconds(3),
+                TimeSpan.FromMinutes(5),
+                TimeSpan.FromMinutes(8)
+            }, (exception, timeSpan, retryCount, context) =>
+            {
+                var serviceProvider = services.BuildServiceProvider();
+                var logger = serviceProvider.GetService<ILogger<TradeDealerHttpApiClient>>();
+                logger!.LogWarning(
+                    $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
+            });
     }
 }

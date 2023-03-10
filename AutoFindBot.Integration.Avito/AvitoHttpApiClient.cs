@@ -8,8 +8,6 @@ using AutoFindBot.Utils.Http;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
 
 namespace AutoFindBot.Integration.Avito;
 
@@ -37,7 +35,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         {
             ArgumentNullException.ThrowIfNull(filter);
 
-            var response = await GetApiResponse(filter);
+            var response = await GetApiResponseAsync(filter);
 
             var doc = new HtmlDocument();
             doc.LoadHtml(response);
@@ -105,37 +103,16 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
 
     #region Приватные методы
 
-    public async Task<string> GetApiResponse(AvitoFilter filter)
+    public async Task<string> GetApiResponseAsync(AvitoFilter filter)
     {
         var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
             .Replace(AvitoHttpApiClientInvariants.PriceMin, filter.PriceMin)
             .Replace(AvitoHttpApiClientInvariants.PriceMax, filter.PriceMax);
 
-        var retryPolicy = CreateRetryPolicy();
-        var response = await retryPolicy.ExecuteAsync(async () =>
-        {
-            using var response = await SendAsync(path, HttpMethod.Get);
-            response.EnsureSuccessStatusCode();
+        using var response = await SendAsync(path, HttpMethod.Get);
+        response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStringAsync();
-        });
-
-        return response;
-    }
-    
-
-    private AsyncRetryPolicy CreateRetryPolicy()
-    {
-        return Policy.Handle<HttpRequestException>()
-            .WaitAndRetryAsync(new[]
-            {
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(3)
-            }, (exception, timeSpan, retryCount, context) =>
-            {
-                _logger.LogWarning($"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception}");
-            });
+        return await response.Content.ReadAsStringAsync();
     }
 
     #endregion
