@@ -62,9 +62,8 @@ public static class RegisterAvitoDependenciesExtension
                     var handler = new HttpClientHandler()
                     {
                         Proxy = new WebProxy(options?.ProxyData.Proxy),
-                        // // установка учетных данных для аутентификации на прокси (если требуется)
-                        // UseDefaultCredentials = false,
-                        // Credentials = new NetworkCredential("username", "password")
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(options?.ProxyData.Login, options?.ProxyData.Password)
                     };
 
                     httpClient = new HttpClient(handler);

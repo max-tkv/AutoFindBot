@@ -14,5 +14,10 @@ public class AvitoHttpApiClientOptions : HttpApiClientOptions
 public class ProxyData
 {
     public bool Active { get; set; }
+    
     public string Proxy { get; set; }
+    
+    public string Login { get; set; }
+    
+    public string Password { get; set; }
 }
