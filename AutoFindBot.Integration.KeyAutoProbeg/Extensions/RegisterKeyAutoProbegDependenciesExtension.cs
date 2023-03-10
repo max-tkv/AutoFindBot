@@ -67,6 +67,8 @@ public static class RegisterKeyAutoProbegDependenciesExtension
             .WaitAndRetryAsync(new[]
             {
                 TimeSpan.FromSeconds(3),
+                TimeSpan.FromSeconds(3),
+                TimeSpan.FromSeconds(3),
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(8)
             }, (exception, timeSpan, retryCount, context) =>
