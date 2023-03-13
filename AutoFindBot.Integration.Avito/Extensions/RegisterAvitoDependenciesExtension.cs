@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
-using System.Net.Http;
 
 namespace AutoFindBot.Integration.Avito.Extensions;
 
@@ -56,20 +55,26 @@ public static class RegisterAvitoDependenciesExtension
         services
             .AddHttpClient<IAvitoHttpApiClient, AvitoHttpApiClient>((serviceProvider, httpClient) => 
             {
-                var options = serviceProvider.GetService<AvitoHttpApiClientOptions>();
+                var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
+                httpClient.BaseAddress = new Uri(options.BaseUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
+            {
+                var handler = new HttpClientHandler();
+                var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
                 if (options.ProxyData.Active)
                 {
-                    var handler = new HttpClientHandler()
+                    handler.Proxy = new WebProxy(options?.ProxyData.Proxy);
+                    if (!string.IsNullOrWhiteSpace(options?.ProxyData.Login))
                     {
-                        Proxy = new WebProxy(options?.ProxyData.Proxy),
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential(options?.ProxyData.Login, options?.ProxyData.Password)
-                    };
-
-                    httpClient = new HttpClient(handler);
+                        handler.UseDefaultCredentials = false;
+                        handler.Credentials = new NetworkCredential(
+                            options?.ProxyData.Login, 
+                            options?.ProxyData.Password);   
+                    }
                 }
                 
-                httpClient.BaseAddress = new Uri(options.BaseUrl);
+                return handler;
             })
             .AddPolicyHandler(retryPolicy);
 
