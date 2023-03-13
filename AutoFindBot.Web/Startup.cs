@@ -54,6 +54,7 @@ namespace AutoFindBot.Web
             }).CreateMapper());
 
             services.AddDomain();
+            services.AddHostedServices();
             services.AddConfig(_configuration);
             
             services.AddTradeDealerHttpApiClient(_configuration);
@@ -76,9 +77,7 @@ namespace AutoFindBot.Web
             
             var serviceProvider = services.BuildServiceProvider();
             ServiceLocator.SetProvider(serviceProvider);
-            
-            services.AddHostedService<CheckerHostedService>();
-            
+
             serviceProvider.GetRequiredService<TelegramBot>().GetBot().Wait();
         }
 

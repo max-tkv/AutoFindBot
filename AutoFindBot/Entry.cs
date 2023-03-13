@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Commands;
+using AutoFindBot.HostedServices;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Services;
 
@@ -35,6 +36,17 @@ public static class Entry
         services.AddTransient<BaseCommand, CheckNewAutoCommand>();
         services.AddTransient<BaseCommand, SettingsCommand>();
 
+        return services;
+    }
+    
+    /// <summary>
+    /// Регистрация фоновых заданий
+    /// </summary>
+    /// <param name="serviceCollection">serviceCollection</param>
+    /// <returns>IServiceCollection</returns>
+    public static IServiceCollection AddHostedServices(this IServiceCollection services)
+    {
+        services.AddHostedService<CheckerHostedService>();
         return services;
     }
     
