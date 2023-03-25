@@ -63,6 +63,16 @@ public class MessageService : IMessageService
 
     public async Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, List<Car> newCarList)
     {
+        if (!newCarList.Any())
+        {
+            await botClient.SendTextMessageAsync(
+                user.ChatId, 
+                "Новых объявлений не найдено!", 
+                ParseMode.Markdown, 
+                replyMarkup: new ReplyKeyboardRemove());
+            return;
+        }
+        
         foreach (var newCar in newCarList)
         {
             var message =
@@ -73,7 +83,11 @@ public class MessageService : IMessageService
                       $"Дата добавления: {newCar.PublishedAt}\n" +
                       $"Ссылка: [Открыть]({GetUrlBySource(newCar)})";
 
-            await botClient.SendTextMessageAsync(user.ChatId, message, ParseMode.Markdown, replyMarkup: new ReplyKeyboardRemove());
+            await botClient.SendTextMessageAsync(
+                user.ChatId, 
+                message, 
+                ParseMode.Markdown, 
+                replyMarkup: new ReplyKeyboardRemove());
         }
     }
 
