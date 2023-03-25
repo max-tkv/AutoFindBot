@@ -57,6 +57,7 @@ public static class RegisterAvitoDependenciesExtension
             {
                 var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
                 httpClient.BaseAddress = new Uri(options.BaseUrl);
+                httpClient.DefaultRequestHeaders.Add("Host", options.Host);
             })
             .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
             {
@@ -75,8 +76,8 @@ public static class RegisterAvitoDependenciesExtension
                 }
                 
                 return handler;
-            })
-            .AddPolicyHandler(retryPolicy);
+            });
+            // .AddPolicyHandler(retryPolicy)
 
         return services;
     }

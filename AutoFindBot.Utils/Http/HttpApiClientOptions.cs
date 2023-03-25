@@ -8,7 +8,12 @@ public class HttpApiClientOptions
     /// <summary>
     /// Базовый адрес сервиса
     /// </summary>
-    public virtual string? BaseUrl { get; set; }
+    public virtual string BaseUrl { get; set; }
+    
+    /// <summary>
+    /// Host
+    /// </summary>
+    public virtual string Host { get; set; }
 
     /// <summary>
     /// Http timeout
@@ -18,5 +23,5 @@ public class HttpApiClientOptions
     /// <summary>
     /// Token
     /// </summary>
-    public virtual string? Token { get; set; }
+    public virtual string Token { get; set; }
 }
