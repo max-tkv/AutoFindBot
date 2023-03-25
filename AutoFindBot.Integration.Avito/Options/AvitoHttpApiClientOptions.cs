@@ -9,6 +9,8 @@ public class AvitoHttpApiClientOptions : HttpApiClientOptions
     public string GetAutoByFilterQuery { get; set; }
 
     public ProxyData ProxyData { get; set; }
+    
+    public AvitoCookie Cookie { get; set; }
 }
 
 public class ProxyData
@@ -20,4 +22,11 @@ public class ProxyData
     public string Login { get; set; }
     
     public string Password { get; set; }
+}
+
+public class AvitoCookie
+{
+    public string U { get; set; }
+    
+    public string V { get; set; }
 }

@@ -61,6 +61,16 @@ public static class RegisterAvitoDependenciesExtension
             })
             .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
             {
+                var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
+                
+                var handler = new HttpClientHandler();
+                handler.CookieContainer = new CookieContainer();
+                handler.CookieContainer.Add(new Cookie("u", options.Cookie.U) { Domain = "avito.ru" });
+                handler.CookieContainer.Add(new Cookie("v", options.Cookie.V) { Domain = "avito.ru" });
+                return handler;
+            })
+            .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
+            {
                 var handler = new HttpClientHandler();
                 var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
                 if (options.ProxyData.Active)
