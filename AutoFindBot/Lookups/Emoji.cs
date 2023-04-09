@@ -5,5 +5,8 @@ namespace AutoFindBot.Lookups;
 public enum Emoji
 {
     [EnumMember(Value = "❌")]
-    Cross
+    Cross,
+    
+    [EnumMember(Value = "🚘")]
+    Car
 }

@@ -76,12 +76,14 @@ public class MessageService : IMessageService
         foreach (var newCar in newCarList)
         {
             var message =
-                      $"*{newCar.Title}*\n" +
+                      $"По вашему фильтру *«{userFilter.Title}»*" +
+                      $"Найдено новое объявление" +
+                      $"{Emoji.Car}*{newCar.Title}*\n" +
                       $"Год: {newCar.Year}\n" +
                       $"Цена: {newCar.Price} руб.\n" +
                       $"Город: {newCar.Сity}\n" +
                       $"Дата добавления: {newCar.PublishedAt}\n" +
-                      $"Ссылка: [Открыть]({GetUrlBySource(newCar)})";
+                      $"[Открыть объявление]({GetUrlBySource(newCar)})";
 
             await botClient.SendTextMessageAsync(
                 user.ChatId, 
