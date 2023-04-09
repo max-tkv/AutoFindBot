@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using AutoFindBot.Entities;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Models.TradeDealer;
@@ -56,7 +57,11 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Id, o => o.MapFrom(x => 0))
             .ForMember(x => x.Сity, o => o.MapFrom(x => x.Сity))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => x.PublishedAt))
-            .ForMember(x => x.Url, o => o.MapFrom(x => x.Url));
+            .ForMember(x => x.Url, o => o.MapFrom(x => x.Url))
+            .ForMember(x => x.ImageUrls, o => o.MapFrom(x => x.Images));
+        
+        CreateMap<AvitoImage, Image>()
+            .ForMember(x => x.Urls, o => o.MapFrom(x => x.Urls));
     }
 
     private string ConvertPrice(decimal price)

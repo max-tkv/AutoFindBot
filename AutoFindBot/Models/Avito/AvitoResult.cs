@@ -13,4 +13,5 @@ public class AvitoResult
     public string Url { get; set; }
     public int Year { get; set; }
     public string Vin { get; set; }
+    public List<AvitoImage> Images { get; set; }
 }

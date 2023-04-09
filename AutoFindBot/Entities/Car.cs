@@ -23,7 +23,14 @@ public class Car : BaseEntity
     public string? Url { get; set; }
     
     public DateTime PublishedAt { get; set; }
+
+    public List<Image> ImageUrls { get; set; } = new List<Image>();
     
     public virtual AppUser User { get; set; }
     public virtual UserFilter UserFilter { get; set; }
+}
+
+public class Image
+{
+    public Dictionary<string, string> Urls { get; set; }
 }

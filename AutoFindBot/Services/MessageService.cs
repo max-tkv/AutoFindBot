@@ -76,20 +76,63 @@ public class MessageService : IMessageService
         foreach (var newCar in newCarList)
         {
             var message =
-                      $"По вашему фильтру *«{userFilter.Title}»*" +
-                      $"Найдено новое объявление" +
-                      $"{Emoji.Car}*{newCar.Title}*\n" +
+                      $"По вашему фильтру *«{userFilter.Title}»*\n" +
+                      $"Найдено новое объявление\n\n" +
+                      $"{Emoji.Car.GetValue()}*{newCar.Title}*\n" +
                       $"Год: {newCar.Year}\n" +
                       $"Цена: {newCar.Price} руб.\n" +
                       $"Город: {newCar.Сity}\n" +
-                      $"Дата добавления: {newCar.PublishedAt}\n" +
+                      //$"Дата добавления: {newCar.PublishedAt}\n" +
                       $"[Открыть объявление]({GetUrlBySource(newCar)})";
 
-            await botClient.SendTextMessageAsync(
-                user.ChatId, 
-                message, 
-                ParseMode.Markdown, 
-                replyMarkup: new ReplyKeyboardRemove());
+            if (newCar.ImageUrls.Any())
+            {
+                var media = new List<IAlbumInputMedia>();
+                var messageFill = false;
+                if (newCar.ImageUrls.Count == 1)
+                {
+                    continue;
+                }
+                foreach (var imageUrl in newCar.ImageUrls)
+                {
+                    if (media.Count >= 10)
+                    {
+                        continue;    
+                    }
+                    
+                    var imagesOrderBy = imageUrl.Urls.OrderByDescending(x => long.Parse(x.Key.Replace("x", String.Empty)));
+                    var image = imagesOrderBy.FirstOrDefault()!.Value;
+                    if (image == null) continue;
+
+                    InputMediaPhoto mediaPhoto;
+                    if (messageFill == false)
+                    {
+                        messageFill = true;
+                        mediaPhoto = new InputMediaPhoto(image)
+                        {
+                            Caption = message,
+                            ParseMode = ParseMode.Markdown
+                        };
+                    }
+                    else
+                    {
+                        mediaPhoto = new InputMediaPhoto(image);   
+                    }
+                    media.Add(mediaPhoto);
+                }
+                
+                await botClient.SendMediaGroupAsync(
+                    user.ChatId, 
+                    media);
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(
+                    user.ChatId, 
+                    message, 
+                    ParseMode.Markdown, 
+                    replyMarkup: new ReplyKeyboardRemove());   
+            }
         }
     }
 

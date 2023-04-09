@@ -3,6 +3,7 @@ using AutoFindBot.Integration.Avito.Models;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Utils.Helpers;
 using AutoMapper;
+using Newtonsoft.Json;
 
 namespace AutoFindBot.Integration.Avito.Mappings;
 
@@ -21,6 +22,27 @@ public class AvitoHttpApiClientMappingProfile : Profile
             .ForMember(x => x.Source, o => o.MapFrom(x => Source.Avito))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => 
                 DateTimeHelper.UnixTimeStampToDateTime(x.Value.Time)))
-            .ForMember(x => x.Url, o => o.MapFrom(x => x.Value.UriMweb));
+            .ForMember(x => x.Url, o => o.MapFrom(x => x.Value.UriMweb))
+            .AfterMap((s, d) =>
+            {
+                var output = new List<AvitoImage>();
+                var images = s.Value.GalleryItem.Where(z => z.Type == "image");
+                foreach (var image in images)
+                {
+                    var urls = new Dictionary<string, string>();
+                    try
+                    {
+                        urls = JsonConvert.DeserializeObject<Dictionary<string, string>>(image.Value.ToString());
+                        output.Add(new AvitoImage() { Urls = urls } );
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error Deserialize Object to Dictionary<string, string>. " +
+                                          "Object: " + image.Value);
+                    }
+                }
+
+                d.Images = output;
+            });
     }
 }

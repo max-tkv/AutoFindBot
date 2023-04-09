@@ -50,11 +50,11 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
                 throw new Exception($"Произошла ошибка: {content}");
             }
             
-            var tradeDealerResponse = GetObjectFromResponse<AvitoRootResponse>(content);
+            var avitoResponse = GetObjectFromResponse<AvitoRootResponse>(content);
 
-            ArgumentNullException.ThrowIfNull(tradeDealerResponse.Result.Items);
+            ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
             
-            return _mapper.Map<List<AvitoResult>>(tradeDealerResponse.Result.Items);
+            return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
         }
         catch (Exception e)
         {

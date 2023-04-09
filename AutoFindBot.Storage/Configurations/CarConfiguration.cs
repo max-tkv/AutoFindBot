@@ -1,6 +1,9 @@
-﻿using AutoFindBot.Entities;
+﻿using System.Text.Json;
+using AutoFindBot.Entities;
+using AutoFindBot.Storage.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AutoFindBot.Storage.Configurations;
 
@@ -25,6 +28,10 @@ public class CarConfiguration : IEntityTypeConfiguration<Entities.Car>
             .IsRequired(false);
         
         builder.Property(x => x.Url)
+            .IsRequired(false);
+
+        builder.Property(x => x.ImageUrls)
+            .HasConversion(new ImageUrlsConverter(new JsonSerializerOptions()))
             .IsRequired(false);
         
         builder.HasOne(x => x.User)

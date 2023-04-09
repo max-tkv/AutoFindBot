@@ -27,4 +27,7 @@ public class AvitoResultResponseItemValue
     
     [JsonProperty("uri_mweb")]
     public string UriMweb { get; set; }
+    
+    [JsonProperty("galleryItems")]
+    public List<AvitoGalleryItem> GalleryItem { get; set; }
 }
