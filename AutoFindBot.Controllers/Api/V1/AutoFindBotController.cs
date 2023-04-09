@@ -7,14 +7,14 @@ namespace AutoFindBot.Controllers.Api.V1
 {
     /// <inheritdoc />
     [ApiVersion("1")]
-    [Route("api/v{version:apiVersion}/message/update")]
+    [Route("api/v{version:apiVersion}/[controller]/message/update")]
     [ApiController]
-    public class TelegramBotController : ControllerBase
+    public class AutoFindBotController : ControllerBase
     {
         private readonly ICommandExecutorService _commandExecutorService;
 
         /// <inheritdoc />
-        public TelegramBotController(ICommandExecutorService commandExecutorService)
+        public AutoFindBotController(ICommandExecutorService commandExecutorService)
         {
             _commandExecutorService = commandExecutorService;
         }

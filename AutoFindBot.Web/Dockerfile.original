@@ -11,9 +11,7 @@ COPY ["AutoFindBot.Web/AutoFindBot.Web.csproj", "AutoFindBot.Web/"]
 COPY ["AutoFindBot.Controllers/AutoFindBot.Controllers.csproj", "AutoFindBot.Controllers/"]
 COPY ["AutoFindBot/AutoFindBot.csproj", "AutoFindBot/"]
 COPY ["AutoFindBot.Utils/AutoFindBot.Utils.csproj", "AutoFindBot.Utils/"]
-COPY ["AutoFindBot.Integration.Avito/AutoFindBot.Integration.Avito.csproj", "AutoFindBot.Integration.Avito/"]
-COPY ["AutoFindBot.Integration.KeyAutoProbeg/AutoFindBot.Integration.KeyAutoProbeg.csproj", "AutoFindBot.Integration.KeyAutoProbeg/"]
-COPY ["AutoFindBot.Integration.TradeDealer/AutoFindBot.Integration.TradeDealer.csproj", "AutoFindBot.Integration.TradeDealer/"]
+COPY ["AutoFindBot.Integration/AutoFindBot.Integration.csproj", "AutoFindBot.Integration/"]
 COPY ["AutoFindBot.Storage/AutoFindBot.Storage.csproj", "AutoFindBot.Storage/"]
 RUN dotnet restore "AutoFindBot.Web/AutoFindBot.Web.csproj"
 COPY . .

@@ -52,7 +52,7 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
         catch (Exception e)
         {
             _logger.LogError(e, $"Ошибка: {e.Message}");
-            throw;
+            return new TradeDealerResult() { CarInfos = new List<CarInfo>() };
         }
     }
 }

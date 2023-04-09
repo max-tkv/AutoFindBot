@@ -103,7 +103,7 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
         catch (Exception e)
         {
             _logger.LogError(e, $"Ошибка: {e.Message}");
-            throw;
+            return new List<KeyAutoProbegResult>();
         }
     }
 }

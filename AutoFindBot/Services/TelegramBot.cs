@@ -22,7 +22,7 @@ namespace AutoFindBot.Services
             
             _botClient = new TelegramBotClient(_configuration["Token"]);
 
-            var hook = $"{_configuration["Url"]}api/v1/message/update";
+            var hook = $"{_configuration["Url"]}api/v1/AutoFindBot/message/update";
             await _botClient.SetWebhookAsync(hook);
 
             return _botClient;
