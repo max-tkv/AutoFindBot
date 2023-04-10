@@ -82,17 +82,12 @@ public class MessageService : IMessageService
                       $"Год: {newCar.Year}\n" +
                       $"Цена: {newCar.Price} руб.\n" +
                       $"Город: {newCar.Сity}\n" +
-                      //$"Дата добавления: {newCar.PublishedAt}\n" +
                       $"[Открыть объявление]({GetUrlBySource(newCar)})";
 
             if (newCar.ImageUrls.Any())
             {
                 var media = new List<IAlbumInputMedia>();
                 var messageFill = false;
-                if (newCar.ImageUrls.Count == 1)
-                {
-                    continue;
-                }
                 foreach (var imageUrl in newCar.ImageUrls)
                 {
                     if (media.Count >= 10)
