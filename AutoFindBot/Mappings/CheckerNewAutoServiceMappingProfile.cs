@@ -33,7 +33,17 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Id, o => o.MapFrom(x => 0))
             .ForMember(x => x.Сity, o => o.MapFrom(x => x.Company.Сity.Title))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => x.PublishedAt))
-            .ForMember(x => x.Url, o => o.MapFrom(x => $"{x.Brand.Alias}/{x.Generation!.Alias ?? x.Model!.Alias}/{x.Id}"));
+            .ForMember(x => x.Url, o => o.MapFrom(x => $"{x.Brand.Alias}/{x.Generation!.Alias ?? x.Model!.Alias}/{x.Id}"))
+            .ForMember(x => x.ImageUrls, o => o.MapFrom(x => 
+                x.OriginalPhotos
+                    .Select(z => new Image()
+                    {
+                        Urls = new Dictionary<string, string>()
+                        {
+                            { "1", z.Path }
+                        }
+                    })
+                    .ToList()));
         
         CreateMap<KeyAutoProbegResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))

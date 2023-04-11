@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutoFindBot.Models.TradeDealer;
+using Newtonsoft.Json;
 
 namespace AutoFindBot.Integration.Models;
 

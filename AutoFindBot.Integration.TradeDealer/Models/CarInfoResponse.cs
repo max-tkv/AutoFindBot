@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutoFindBot.Models.TradeDealer;
+using Newtonsoft.Json;
 
 namespace AutoFindBot.Integration.Models;
 
@@ -39,4 +40,7 @@ public class CarInfoResponse
         
         [JsonProperty("model")]
         public ModelResponse Model { get; set; }
+        
+        [JsonProperty("originalPhotos")]
+        public List<OriginalPhotoResponse> OriginalPhotos { get; set; }
 }

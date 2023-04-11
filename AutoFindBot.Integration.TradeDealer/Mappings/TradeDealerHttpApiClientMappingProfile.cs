@@ -23,5 +23,7 @@ public class TradeDealerHttpApiClientMappingProfile : Profile
          CreateMap<GenerationResponse, Generation>(MemberList.Destination);
          
          CreateMap<ModelResponse, Model>(MemberList.Destination);
+         
+         CreateMap<OriginalPhotoResponse, OriginalPhoto>(MemberList.Destination);
     }
 }

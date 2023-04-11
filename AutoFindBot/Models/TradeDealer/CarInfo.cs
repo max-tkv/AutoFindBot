@@ -25,4 +25,6 @@ public class CarInfo : BaseCarInfo
     public Generation? Generation { get; set; }
     
     public Model? Model { get; set; }
+    
+    public List<OriginalPhoto> OriginalPhotos { get; set; }
 }
