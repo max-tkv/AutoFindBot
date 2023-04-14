@@ -1,6 +1,7 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
+using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Models.TradeDealer;
@@ -20,11 +21,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IMapper _mapper;
     private readonly IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClient;
     private readonly IAvitoHttpApiClient _avitoHttpApiClient;
+    private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
         IKeyAutoProbegHttpApiClient keyAutoProbegHttpApiClient,
         ITradeDealerHttpApiClient tradeDealerHttpApiClient,
+        IAutoRuHttpApiClient autoRuHttpApiClient,
         IAvitoHttpApiClient avitoHttpApiClient,
         IUserFilterService userFilterService,
         IMessageService messageService,
@@ -34,6 +37,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         _logger = logger;
         _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
         _tradeDealerHttpApiClient = tradeDealerHttpApiClient;
+        _autoRuHttpApiClient = autoRuHttpApiClient;
         _avitoHttpApiClient = avitoHttpApiClient;
         _userFilterService = userFilterService;
         _messageService = messageService;
@@ -65,6 +69,10 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     {
         var cars = new List<Car>();
         
+        var autoRuFilter = _mapper.Map<AutoRuFilter>(userFilter);
+        var autoRuResult = await _autoRuHttpApiClient.GetAutoByFilterAsync(autoRuFilter);
+        cars.AddRange(_mapper.Map<List<Car>>(autoRuResult));
+        
         var tradeDealerFilter = _mapper.Map<TradeDealerFilter>(userFilter);
         var tradeDealerResult = await _tradeDealerHttpApiClient.GetAutoByFilterAsync(tradeDealerFilter);
         cars.AddRange(_mapper.Map<List<Car>>(tradeDealerResult.CarInfos));
@@ -76,7 +84,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         var avitoFilter = _mapper.Map<AvitoFilter>(userFilter);
         var avitoResult = await _avitoHttpApiClient.GetAutoByFilterAsync(avitoFilter);
         cars.AddRange(_mapper.Map<List<Car>>(avitoResult));
-        
+
         return cars;
     }
 }

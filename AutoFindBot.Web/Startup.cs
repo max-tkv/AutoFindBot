@@ -21,6 +21,7 @@ using AutoFindBot.Integration.Avito.Mappings;
 using AutoFindBot.Integration.Extensions;
 using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
+using AutoFindBot.Integration.RuCaptcha.Extensions;
 using AutoFindBot.Mappings;
 using AutoFindBot.Services;
 using AutoFindBot.Storage;
@@ -64,6 +65,7 @@ namespace AutoFindBot.Web
             services.AddKeyAutoProbegHttpApiClient(_configuration);
             services.AddAvitoHttpApiClient(_configuration);
             services.AddAutoRuHttpApiClient(_configuration);
+            services.AddRuCaptchaHttpApiClient(_configuration);
             
             services.AddMvc()
                 .AddApi()

@@ -46,6 +46,7 @@
       <ProjectReference Include="..\AutoFindBot.Integration.AutoRu\AutoFindBot.Integration.AutoRu.csproj" />
       <ProjectReference Include="..\AutoFindBot.Integration.Avito\AutoFindBot.Integration.Avito.csproj" />
       <ProjectReference Include="..\AutoFindBot.Integration.KeyAutoProbeg\AutoFindBot.Integration.KeyAutoProbeg.csproj" />
+      <ProjectReference Include="..\AutoFindBot.Integration.RuCaptcha\AutoFindBot.Integration.RuCaptcha.csproj" />
       <ProjectReference Include="..\AutoFindBot.Integration.TradeDealer\AutoFindBot.Integration.TradeDealer.csproj" />
       <ProjectReference Include="..\AutoFindBot.Storage\AutoFindBot.Storage.csproj" />
       <ProjectReference Include="..\AutoFindBot\AutoFindBot.csproj" />

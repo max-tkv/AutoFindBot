@@ -53,6 +53,16 @@ namespace AutoFindBot.Utils.Http;
 
             return await HttpClient.SendAsync(request);
         }
+        
+        protected virtual async Task<HttpResponseMessage> SendAsync(HttpRequestMessage? request)
+        {
+            return await HttpClient.SendAsync(request);
+        }
+        
+        protected virtual async Task<HttpResponseMessage> PostAsync(string path, HttpContent? content = null)
+        {
+            return await HttpClient.PostAsync(path, content);
+        }
 
         protected virtual async Task<ApiResponseResult<TResult>> Get<TResult>(string path)
             where TResult : class

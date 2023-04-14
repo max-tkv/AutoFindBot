@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFindBot.Integration.Avi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFindBot.Integration.AutoRu", "AutoFindBot.Integration.AutoRu\AutoFindBot.Integration.AutoRu.csproj", "{CC3E43DA-CFD6-48A7-93BD-7B6CEDBE564F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFindBot.Integration.RuCaptcha", "AutoFindBot.Integration.RuCaptcha\AutoFindBot.Integration.RuCaptcha.csproj", "{9542BC60-94C8-4AD3-B95D-344CD05AC6D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{CC3E43DA-CFD6-48A7-93BD-7B6CEDBE564F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC3E43DA-CFD6-48A7-93BD-7B6CEDBE564F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC3E43DA-CFD6-48A7-93BD-7B6CEDBE564F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9542BC60-94C8-4AD3-B95D-344CD05AC6D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9542BC60-94C8-4AD3-B95D-344CD05AC6D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9542BC60-94C8-4AD3-B95D-344CD05AC6D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9542BC60-94C8-4AD3-B95D-344CD05AC6D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

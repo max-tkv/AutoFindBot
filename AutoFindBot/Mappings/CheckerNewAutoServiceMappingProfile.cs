@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using AutoFindBot.Entities;
+using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Models.TradeDealer;
@@ -20,6 +21,10 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.PriceMax, o => o.MapFrom(x => ConvertPrice(x.PriceMax)));
         
         CreateMap<Entities.UserFilter, AvitoFilter>()
+            .ForMember(x => x.PriceMin, o => o.MapFrom(x => ConvertPrice(x.PriceMin)))
+            .ForMember(x => x.PriceMax, o => o.MapFrom(x => ConvertPrice(x.PriceMax)));
+        
+        CreateMap<Entities.UserFilter, AutoRuFilter>()
             .ForMember(x => x.PriceMin, o => o.MapFrom(x => ConvertPrice(x.PriceMin)))
             .ForMember(x => x.PriceMax, o => o.MapFrom(x => ConvertPrice(x.PriceMax)));
         

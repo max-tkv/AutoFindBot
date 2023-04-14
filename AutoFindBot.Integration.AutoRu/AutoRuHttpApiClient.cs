@@ -1,10 +1,13 @@
 ﻿using AutoFindBot.Abstractions.HttpClients;
+using AutoFindBot.Exceptions;
+using AutoFindBot.Integration.AutoRu.Exceptions;
 using AutoFindBot.Integration.AutoRu.Invariants;
 using AutoFindBot.Integration.AutoRu.Models;
 using AutoFindBot.Integration.AutoRu.Options;
 using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Integration.AutoRu;
@@ -37,16 +40,16 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
                 .Replace(AutoRuHttpApiClientInvariants.PriceMax, filter.PriceMax);
             var response = await SendAsync(path, HttpMethod.Get);
             var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode == false)
-            {
-                throw new Exception($"Произошла ошибка: {content}");
-            }
-            
+
             var avitoResponse = GetObjectFromResponse<AutoRuResponse>(content);
 
             ArgumentNullException.ThrowIfNull(avitoResponse);
 
             return default;
+        }
+        catch (AutoRuCaptchaException)
+        {
+            throw;
         }
         catch (Exception e)
         {
