@@ -1,13 +1,10 @@
 ﻿using AutoFindBot.Abstractions.HttpClients;
-using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.AutoRu.Exceptions;
-using AutoFindBot.Integration.AutoRu.Invariants;
 using AutoFindBot.Integration.AutoRu.Models;
 using AutoFindBot.Integration.AutoRu.Options;
 using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
-using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Integration.AutoRu;
@@ -19,7 +16,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
     private readonly AutoRuHttpApiClientOptions _options;
 
     public AutoRuHttpApiClient(
-        HttpClient httpClient, 
+        HttpClient httpClient,
         ILogger<AutoRuHttpApiClient> logger,
         IMapper mapper,
         AutoRuHttpApiClientOptions options) : base(httpClient)
@@ -28,24 +25,37 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         _mapper = mapper;
         _options = options;
     }
-    
-    public async Task<List<AutoRuResult>> GetAutoByFilterAsync(AutoRuFilter filter)
+
+    public async Task<AutoRuResult> GetAutoByFilterAsync(AutoRuFilter filter)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(filter);
 
-            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
-                .Replace(AutoRuHttpApiClientInvariants.PriceMin, filter.PriceMin)
-                .Replace(AutoRuHttpApiClientInvariants.PriceMax, filter.PriceMax);
-            var response = await SendAsync(path, HttpMethod.Get);
+            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
+            var request = new AutoRuRequest()
+            {
+                Category = "cars",
+                Section = "used",
+                PriceFrom = Int32.Parse(filter.PriceMin),
+                PriceTo = Int32.Parse(filter.PriceMax),
+                YearFrom = 2010,
+                Sort = "price-asc",
+                OutputType = "list",
+                GeoId = new List<int>()
+                {
+                    8
+                }
+            };
+
+            var response = await SendAsync(path, HttpMethod.Post, GetContent(request));
             var content = await response.Content.ReadAsStringAsync();
 
-            var avitoResponse = GetObjectFromResponse<AutoRuResponse>(content);
+            var autoRuResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<AutoRuResponse>(content);
 
-            ArgumentNullException.ThrowIfNull(avitoResponse);
+            ArgumentNullException.ThrowIfNull(autoRuResponse);
 
-            return default;
+            return _mapper.Map<AutoRuResult>(autoRuResponse);
         }
         catch (AutoRuCaptchaException)
         {
@@ -54,7 +64,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         catch (Exception e)
         {
             _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
-            return new List<AutoRuResult>();
+            return new AutoRuResult();
         }
     }
 }

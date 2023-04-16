@@ -1,4 +1,7 @@
-﻿using System.Net.Sockets;
+﻿using System.Net.Http.Json;
+using System.Net.Sockets;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Web;
 using AutoFindBot.Abstractions;
@@ -6,7 +9,11 @@ using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.AutoRu.Exceptions;
 using AutoFindBot.Integration.AutoRu.Invariants;
+using AutoFindBot.Integration.AutoRu.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace AutoFindBot.Integration.AutoRu.HttpMessageHandlers;
 
@@ -32,19 +39,19 @@ public class CheckCaptchaHandler : DelegatingHandler
         
         if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0)
         {
-            var requestMessage = await SolutionAsync(content);
+            var autoRuCaptchaResponse = JsonConvert.DeserializeObject<AutoRuCaptchaResponse>(content);
+            var requestMessage = await SolutionAsync(autoRuCaptchaResponse);
             return await base.SendAsync(requestMessage, cancellationToken);
         }
 
         return await base.SendAsync(request, cancellationToken);
     }
     
-    public async Task<HttpRequestMessage> SolutionAsync(string html)
+    public async Task<HttpRequestMessage> SolutionAsync(AutoRuCaptchaResponse autoRuCaptchaResponse)
     {
         try
         {
-            var pathCaptcha = GetCaptchaPath(html);
-            var actionPage = await GetCaptchaActionPageAsync(pathCaptcha);
+            var actionPage = autoRuCaptchaResponse.Captcha.CaptchaPage;
             var imageCaptchaUrl = GetCaptchaImageUrl(actionPage);
             var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl);
         

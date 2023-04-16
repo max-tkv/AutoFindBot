@@ -4,5 +4,6 @@ public enum Source
 {
     TradeDealer,
     KeyAutoProbeg,
-    Avito
+    Avito,
+    AutoRu
 }

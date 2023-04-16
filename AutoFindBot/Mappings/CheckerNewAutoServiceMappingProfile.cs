@@ -77,6 +77,25 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<AvitoImage, Image>()
             .ForMember(x => x.Urls, o => o.MapFrom(x => x.Urls));
+        
+        CreateMap<AutoRuResultOffer, Entities.Car>()
+            .ForMember(x => x.Price, o => o.MapFrom(x => x.PriceInfo.Price))
+            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.AutoRu))
+            .ForMember(x => x.Title, o => o.MapFrom(x => $"{x.VehicleInfo.MarkInfo.Name} " +
+                                                         $"{x.VehicleInfo.ModelInfo.Name} " +
+                                                         $"{x.VehicleInfo.TechParam.HumanName}, " +
+                                                         $"{x.Documents.Year}, " +
+                                                         $"{x.State.Mileage} км"))
+            .ForMember(x => x.Year, o => o.MapFrom(x => x.Documents.Year))
+            .ForMember(x => x.OriginId, o => o.MapFrom(x => x.Id))
+            .ForMember(x => x.Id, o => o.MapFrom(x => 0))
+            .ForMember(x => x.Сity, o => o.MapFrom(x => x.Seller.Location.RegionInfo.Name))
+            .ForMember(x => x.PublishedAt, o => o.MapFrom(x => DateTime.Now))
+            .ForMember(x => x.Url, o => o.MapFrom(x => $"/cars/used/sale/{x.VehicleInfo.MarkInfo.Name}/{x.VehicleInfo.ModelInfo.Name}/{x.SaleId}/"))
+            .ForMember(x => x.ImageUrls, o => o.MapFrom(x => x.State.ImageUrls));
+        
+        CreateMap<AutoRuResultOfferStateImageUrl, Image>()
+            .ForMember(x => x.Urls, o => o.MapFrom(x => x.Sizes));
     }
 
     private string ConvertPrice(decimal price)

@@ -6,5 +6,5 @@ public class AutoRuHttpApiClientInvariants
     
     public const string PriceMax = ":priceMax";
 
-    public const string CaptchaFlag = "Подтвердите, что запросы отправляли вы, а не робот";
+    public const string CaptchaFlag = "captcha";
 }

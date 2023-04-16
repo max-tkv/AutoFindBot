@@ -4,5 +4,5 @@ namespace AutoFindBot.Abstractions.HttpClients;
 
 public interface IAutoRuHttpApiClient
 {
-    Task<List<AutoRuResult>?> GetAutoByFilterAsync(AutoRuFilter filter);
+    Task<AutoRuResult> GetAutoByFilterAsync(AutoRuFilter filter);
 }

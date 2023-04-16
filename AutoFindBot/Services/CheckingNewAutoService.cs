@@ -71,7 +71,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         
         var autoRuFilter = _mapper.Map<AutoRuFilter>(userFilter);
         var autoRuResult = await _autoRuHttpApiClient.GetAutoByFilterAsync(autoRuFilter);
-        cars.AddRange(_mapper.Map<List<Car>>(autoRuResult));
+        cars.AddRange(_mapper.Map<List<Car>>(autoRuResult.Offers));
         
         var tradeDealerFilter = _mapper.Map<TradeDealerFilter>(userFilter);
         var tradeDealerResult = await _tradeDealerHttpApiClient.GetAutoByFilterAsync(tradeDealerFilter);

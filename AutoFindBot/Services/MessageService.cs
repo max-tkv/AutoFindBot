@@ -84,38 +84,10 @@ public class MessageService : IMessageService
                       $"Город: {newCar.Сity}\n" +
                       $"[Открыть объявление]({GetUrlBySource(newCar)})";
 
+            
             if (newCar.ImageUrls.Any())
             {
-                var media = new List<IAlbumInputMedia>();
-                var messageFill = false;
-                foreach (var imageUrl in newCar.ImageUrls)
-                {
-                    if (media.Count >= 10)
-                    {
-                        continue;    
-                    }
-                    
-                    var imagesOrderBy = imageUrl.Urls.OrderByDescending(x => long.Parse(x.Key.Replace("x", String.Empty)));
-                    var image = imagesOrderBy.FirstOrDefault()!.Value;
-                    if (image == null) continue;
-
-                    InputMediaPhoto mediaPhoto;
-                    if (messageFill == false)
-                    {
-                        messageFill = true;
-                        mediaPhoto = new InputMediaPhoto(image)
-                        {
-                            Caption = message,
-                            ParseMode = ParseMode.Markdown
-                        };
-                    }
-                    else
-                    {
-                        mediaPhoto = new InputMediaPhoto(image);   
-                    }
-                    media.Add(mediaPhoto);
-                }
-                
+                var media = GetMediaMessage(newCar.ImageUrls, message);
                 await botClient.SendMediaGroupAsync(
                     user.ChatId, 
                     media);
@@ -129,6 +101,51 @@ public class MessageService : IMessageService
                     replyMarkup: new ReplyKeyboardRemove());   
             }
         }
+    }
+
+    private IEnumerable<IAlbumInputMedia> GetMediaMessage(List<Image> newCarImageUrls, string message)
+    {
+        var media = new List<IAlbumInputMedia>();
+        var messageFill = false;
+        foreach (var imageUrl in newCarImageUrls)
+        {
+            if (media.Count >= 10)
+            {
+                continue;    
+            }
+                    
+            var imagesOrderBy = imageUrl.Urls.OrderByDescending(x => long.Parse(x.Key
+                .Replace("x", String.Empty)
+                .Replace("n", String.Empty)
+                .Replace("small", "0")
+                .Replace("thumb_m", "0")));
+            var imageBestUrl = imagesOrderBy.FirstOrDefault()!.Value;
+            
+            if (imageBestUrl == null) continue;
+
+            if (imageBestUrl.Substring(0, 2) == "//")
+            {
+                imageBestUrl = imageBestUrl.Replace("//", "https://");   
+            }
+
+            InputMediaPhoto mediaPhoto;
+            if (messageFill == false)
+            {
+                messageFill = true;
+                mediaPhoto = new InputMediaPhoto(imageBestUrl)
+                {
+                    Caption = message,
+                    ParseMode = ParseMode.Markdown
+                };
+            }
+            else
+            {
+                mediaPhoto = new InputMediaPhoto(imageBestUrl);   
+            }
+            media.Add(mediaPhoto);
+        }
+
+        return media;
     }
 
     public async Task SendSettingsCommands(TelegramBotClient botClient, Update update, AppUser user)
@@ -146,6 +163,7 @@ public class MessageService : IMessageService
         {
             Source.Avito => $"{_configuration["Integration:Avito:BaseUrl"]}{car.Url}",
             Source.TradeDealer => $"{_configuration["Integration:TradeDealer:SiteUrl"]}/{car.Url}",
+            Source.AutoRu => $"{_configuration["Integration:AutoRu:BaseUrl"]}{car.Url}",
             Source.KeyAutoProbeg => $"{car.Url}"
         };
     }
