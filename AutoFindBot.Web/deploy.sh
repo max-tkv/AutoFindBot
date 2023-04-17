@@ -24,8 +24,14 @@ fi
 echo "Удаление существующего образа..."
 docker rmi -f autofindbot >/dev/null 2>&1 || true # игнорирование ошибки, если образ уже удален
 
-echo "Клонирование репозитория из GitHub..."
-git clone https://${TOKEN}@github.com/max-tkv/AutoFindBot.git /home/dev/AutoFindBot
+if [ ! -d "/home/dev/AutoFindBot" ]; then
+  echo "Клонирование репозитория..."
+  git clone https://github.com/max-tkv/AutoFindBot.git /home/dev/AutoFindBot
+else
+  echo "Получение последних изменений из репозитория..."
+  cd /home/dev/AutoFindBot
+  git pull
+fi
 
 echo "Создание нового образа..."
 docker build -f "/home/dev/AutoFindBot/AutoFindBot.Web/Dockerfile" --force-rm -t autofindbot "/home/dev/AutoFindBot" || { echo "Ошибка: не удалось создать образ" >&2; exit 1; }
