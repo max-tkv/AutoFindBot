@@ -67,7 +67,7 @@ public class MessageService : IMessageService
         {
             await botClient.SendTextMessageAsync(
                 user.ChatId, 
-                "Новых объявлений не найдено!", 
+                "Новых объявлений не найдено (", 
                 ParseMode.Markdown, 
                 replyMarkup: new ReplyKeyboardRemove());
             return;
