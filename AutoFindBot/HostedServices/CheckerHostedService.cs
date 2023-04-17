@@ -1,5 +1,6 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -13,10 +14,12 @@ public class CheckerHostedService : IHostedService, IDisposable
     private readonly IAppUserService _appUserService;
     private readonly ICheckingNewAutoService _checkingNewAutoService;
     private readonly TelegramBotClient _botClient;
+    private readonly IConfiguration _configuration;
 
-    public CheckerHostedService(ILogger<CheckerHostedService> logger)
+    public CheckerHostedService(ILogger<CheckerHostedService> logger, IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration;
         _appUserService = ServiceLocator.GetService<IAppUserService>();
         _checkingNewAutoService = ServiceLocator.GetService<ICheckingNewAutoService>();
         
@@ -28,8 +31,9 @@ public class CheckerHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation($"{nameof(CheckerHostedService)} running.");
 
+        var checkTimer = _configuration.GetValue<int>("CheckTimer");
         _timer = new Timer(DoWork, null, TimeSpan.Zero,
-            TimeSpan.FromSeconds(60)); //900 - 15min
+            TimeSpan.FromSeconds(checkTimer));
 
         return Task.CompletedTask;
     }
