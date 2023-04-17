@@ -30,7 +30,7 @@ if [ ! -d "/home/dev/AutoFindBot" ]; then
 else
   echo "Получение последних изменений из репозитория..."
   cd /home/dev/AutoFindBot
-  git pull
+  git pull --force
 fi
 
 echo "Создание нового образа..."
