@@ -60,7 +60,17 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Id, o => o.MapFrom(x => 0))
             .ForMember(x => x.Сity, o => o.MapFrom(x => x.Сity))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => x.PublishedAt))
-            .ForMember(x => x.Url, o => o.MapFrom(x => x.Url));
+            .ForMember(x => x.Url, o => o.MapFrom(x => x.Url))
+            .ForMember(x => x.ImageUrls, o => o.MapFrom(x => 
+                x.ImageUrls
+                    .Select(z => new Image()
+                    {
+                        Urls = new Dictionary<string, string>()
+                        {
+                            { "1", z }
+                        }
+                    })
+                    .ToList()));
         
         CreateMap<AvitoResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))

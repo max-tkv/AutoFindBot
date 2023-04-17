@@ -84,6 +84,15 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
                     .First()
                     .SelectSingleNode("span[contains(@class, 'text-base font-normal')]")
                     .InnerText.Trim();
+
+                var images = new List<string>();
+                var imagesNodes = carNode.SelectNodes(".//div[contains(@class, 'swiper-slide h-full')]");
+                foreach (var imagesNode in imagesNodes)
+                {
+                    var url = imagesNode.SelectSingleNode("img").Attributes["src"].Value
+                        .Replace("medium", "large");
+                    images.Add(url);
+                }
                 
                 result.Add(new KeyAutoProbegResult()
                 {
@@ -94,7 +103,8 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
                     Price = Int32.Parse(price),
                     PublishedAt = DateTime.Now,
                     Url = href,
-                    Year = Int32.Parse(year)
+                    Year = Int32.Parse(year),
+                    ImageUrls = images
                 });
             }
 

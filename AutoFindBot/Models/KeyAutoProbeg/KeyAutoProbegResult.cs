@@ -17,4 +17,6 @@ public class KeyAutoProbegResult : BaseCarInfo
     public string Url { get; set; }
     
     public DateTime PublishedAt { get; set; }
+    
+    public List<string> ImageUrls { get; set; }
 }
