@@ -39,6 +39,9 @@ public class CheckCaptchaHandler : DelegatingHandler
         
         if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0)
         {
+            _logger.LogWarning($"Зпрос заблокирован. Требуется решить каптчу. " +
+                               $"Получен ответ: {content}");
+            
             var autoRuCaptchaResponse = JsonConvert.DeserializeObject<AutoRuCaptchaResponse>(content);
             var requestMessage = await SolutionAsync(autoRuCaptchaResponse);
             return await base.SendAsync(requestMessage, cancellationToken);
