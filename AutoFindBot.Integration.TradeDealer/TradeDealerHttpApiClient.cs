@@ -33,6 +33,12 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
     {
         try
         {
+            if (!IsActive())
+            {
+                _logger.LogInformation($"{nameof(TradeDealerHttpApiClient)} отключен.");
+                return new TradeDealerResult();
+            }
+            
             var path = _options.BaseUrl + _options.GetAutoByFilterQuery
                 .Replace(TradeDealerHttpApiClientInvariants.PriceMin, filter.PriceMin)
                 .Replace(TradeDealerHttpApiClientInvariants.PriceMax, filter.PriceMax);
@@ -54,5 +60,10 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
             _logger.LogError(e, $"Ошибка: {e.Message}");
             return new TradeDealerResult() { CarInfos = new List<CarInfo>() };
         }
+    }
+
+    public bool IsActive()
+    {
+        return _options.Active;
     }
 }

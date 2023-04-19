@@ -30,6 +30,12 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
     {
         try
         {
+            if (!IsActive())
+            {
+                _logger.LogInformation($"{nameof(AutoRuHttpApiClient)} отключен.");
+                return new AutoRuResult();
+            }
+            
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
@@ -66,5 +72,10 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
             _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             return new AutoRuResult();
         }
+    }
+
+    public bool IsActive()
+    {
+        return _options.Active;
     }
 }

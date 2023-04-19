@@ -4,6 +4,8 @@ namespace AutoFindBot.Integration.Options;
 
 public class TradeDealerHttpApiClientOptions : HttpApiClientOptions
 {
+    public bool Active { get; set; }
+    
     public string Host { get; set; }
     
     public string SiteUrl { get; set; }

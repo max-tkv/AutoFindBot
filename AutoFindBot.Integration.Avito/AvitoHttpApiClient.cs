@@ -20,12 +20,9 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
     private readonly AvitoHttpApiClientOptions? _options;
     private readonly IMapper _mapper;
 
-    //private const string CarNodePath = "//div[contains(@class, 'iva-item-content-rejJg')]";
-
     public AvitoHttpApiClient(
         IMapper mapper,
-        HttpClient httpClient, 
-        IConfiguration configuration, 
+        HttpClient httpClient,
         ILogger<AvitoHttpApiClient> logger,
         AvitoHttpApiClientOptions options) : base(httpClient)
     {
@@ -38,6 +35,12 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
     {
         try
         {
+            if (!IsActive())
+            {
+                _logger.LogInformation($"{nameof(AvitoHttpApiClient)} отключен.");
+                return new List<AvitoResult>();
+            }
+            
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
@@ -61,5 +64,10 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
             _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
             return new List<AvitoResult>();
         }
+    }
+
+    public bool IsActive()
+    {
+        return _options.Active;
     }
 }

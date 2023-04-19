@@ -15,7 +15,7 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
     private readonly ILogger<KeyAutoProbegHttpApiClient> _logger;
     private readonly KeyAutoProbegHttpApiClientOptions? _options;
 
-    private const string CarNodePath = "//a[contains(@class, 'w-full py-8 flex flex-col sm:flex-row justify-between blank car-hor')]";
+    private const string CarNodePath = "";
 
     public KeyAutoProbegHttpApiClient(
         HttpClient httpClient,
@@ -30,6 +30,12 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
     {
         try
         {
+            if (!IsActive())
+            {
+                _logger.LogInformation($"{nameof(KeyAutoProbegHttpApiClient)} отключен.");
+                return new List<KeyAutoProbegResult>();
+            }
+            
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
@@ -115,5 +121,10 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
             _logger.LogError(e, $"Ошибка: {e.Message}");
             return new List<KeyAutoProbegResult>();
         }
+    }
+
+    public bool IsActive()
+    {
+        return _options.Active;
     }
 }
