@@ -42,19 +42,19 @@ public class CheckCaptchaHandler : DelegatingHandler
             _logger.LogWarning($"Зпрос заблокирован. Требуется решить каптчу. " +
                                $"Получен ответ: {content}");
             
-            var autoRuCaptchaResponse = JsonConvert.DeserializeObject<AutoRuCaptchaResponse>(content);
-            var requestMessage = await SolutionAsync(autoRuCaptchaResponse);
+            var requestMessage = await SolutionAsync(content);
             return await base.SendAsync(requestMessage, cancellationToken);
         }
 
         return await base.SendAsync(request, cancellationToken);
     }
     
-    public async Task<HttpRequestMessage> SolutionAsync(AutoRuCaptchaResponse autoRuCaptchaResponse)
+    public async Task<HttpRequestMessage> SolutionAsync(string html)
     {
         try
         {
-            var actionPage = autoRuCaptchaResponse.Captcha.CaptchaPage;
+            var pathCaptcha = GetCaptchaPath(html);
+            var actionPage = await GetCaptchaActionPageAsync(pathCaptcha);
             var imageCaptchaUrl = GetCaptchaImageUrl(actionPage);
             var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl);
         
