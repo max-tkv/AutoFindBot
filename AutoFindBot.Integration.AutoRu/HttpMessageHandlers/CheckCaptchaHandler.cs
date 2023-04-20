@@ -34,19 +34,19 @@ public class CheckCaptchaHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var response = await base.SendAsync(request, cancellationToken);
-        var content = await response.Content.ReadAsStringAsync();
-        
-        if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0)
-        {
-            _logger.LogWarning($"Зпрос заблокирован. Требуется решить каптчу. " +
-                               $"Получен ответ: {content}");
-            
-            var requestMessage = await SolutionAsync(content);
-            return await base.SendAsync(requestMessage, cancellationToken);
-        }
-
         return await base.SendAsync(request, cancellationToken);
+        // var content = await response.Content.ReadAsStringAsync();
+        
+        // if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0)
+        // {
+        //     _logger.LogWarning($"Зпрос заблокирован. Требуется решить каптчу. " +
+        //                        $"Получен ответ: {content}");
+        //     
+        //     var requestMessage = await SolutionAsync(content);
+        //     return await base.SendAsync(requestMessage, cancellationToken);
+        // }
+
+        // return await base.SendAsync(request, cancellationToken);
     }
     
     public async Task<HttpRequestMessage> SolutionAsync(string html)

@@ -79,8 +79,8 @@ public static class AutoRuHttpApiClientOptionsExtensions
             {
                 container => container.GetRequiredService<CheckSuccessfulStatusCodeMessageHandler>(),
                 container => container.GetRequiredService<CheckCaptchaHandler>()
-            })
-            .AddPolicyHandler(retryPolicy);
+            });
+            //.AddPolicyHandler(retryPolicy);
 
         return services;
     }
