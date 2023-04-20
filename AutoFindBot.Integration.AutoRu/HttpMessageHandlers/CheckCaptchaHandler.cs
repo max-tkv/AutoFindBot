@@ -39,10 +39,10 @@ public class CheckCaptchaHandler : DelegatingHandler
         
         if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0)
         {
-            _logger.LogWarning($"Запрос заблокирован. Требуется решить каптчу.");
+            throw new Exception("Запрос заблокирован. Требуется решить каптчу.");
         }
 
-        return await base.SendAsync(request, cancellationToken);
+        return response;
     }
     
     public async Task<HttpRequestMessage> SolutionAsync(string html)

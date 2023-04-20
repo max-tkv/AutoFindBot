@@ -69,7 +69,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogWarning(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             return new AutoRuResult();
         }
     }
