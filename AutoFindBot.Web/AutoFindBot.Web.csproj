@@ -20,7 +20,7 @@
       <PackageReference Include="IdentityModel" Version="6.0.0" />
       <PackageReference Include="IdentityModel.AspNetCore" Version="4.3.0" />
       <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.16" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
@@ -33,10 +33,10 @@
       <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
       <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-      <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.2.2" />
-      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.2" />
-      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.2" />
-      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.2.2" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
       <PackageReference Include="Telegram.Bot" Version="16.0.2" />
       <PackageReference Include="TMDbLib" Version="1.9.2" />
     </ItemGroup>

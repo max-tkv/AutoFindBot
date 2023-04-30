@@ -9,11 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using AutoFindBot.Controllers;
-using AutoFindBot.HostedServices;
+using AutoFindBot.Controllers.Configuration.Swagger;
+using AutoFindBot.Controllers.Extensions;
 using AutoFindBot.Integration.AutoRu.Extensions;
 using AutoFindBot.Integration.AutoRu.Mappings;
 using AutoFindBot.Integration.Avito.Extensions;
@@ -25,8 +22,6 @@ using AutoFindBot.Integration.RuCaptcha.Extensions;
 using AutoFindBot.Mappings;
 using AutoFindBot.Services;
 using AutoFindBot.Storage;
-using AutoFindBot.Web.Configuration;
-using AutoFindBot.Web.Configuration.Swagger;
 
 namespace AutoFindBot.Web
 {
@@ -66,20 +61,8 @@ namespace AutoFindBot.Web
             services.AddAvitoHttpApiClient(_configuration);
             services.AddAutoRuHttpApiClient(_configuration);
             services.AddRuCaptchaHttpApiClient(_configuration);
-            
-            services.AddMvc()
-                .AddApi()
-                .AddValidators()
-                .AddControllersAsServices()
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(),
-                        false));
-                });
-            
-            services.AddSwagger(_configuration);
-            services.Configure<AppSwaggerOptions>(_configuration);
+
+            services.RegisterApiWithSwagger(_configuration);
             
             var serviceProvider = services.BuildServiceProvider();
             ServiceLocator.SetProvider(serviceProvider);
@@ -88,8 +71,7 @@ namespace AutoFindBot.Web
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, 
-            ILogger<Startup> logger, IHostApplicationLifetime lifetime, IOptions<AppSwaggerOptions> swaggerOptions,
-            IApiVersionDescriptionProvider apiVersionDescriptionProvider)
+            ILogger<Startup> logger, IHostApplicationLifetime lifetime)
         {
             MigrationsRunner.ApplyMigrations(logger, serviceProvider, "AutoFindBot.Web").Wait();
             RegisterLifetimeLogging(lifetime, logger);
@@ -99,8 +81,10 @@ namespace AutoFindBot.Web
                 app.UseDeveloperExceptionPage();
             }
 
+            var swaggerOptions = serviceProvider.GetRequiredService<IOptions<AppSwaggerOptions>>();
             if (swaggerOptions.Value.UseSwagger)
             {
+                var apiVersionDescriptionProvider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
                 app.UseSwaggerWithVersion(apiVersionDescriptionProvider);
             }
 

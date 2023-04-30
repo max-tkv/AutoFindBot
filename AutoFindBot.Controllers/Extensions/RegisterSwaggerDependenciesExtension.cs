@@ -1,18 +1,19 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
+using AutoFindBot.Controllers.Api.V1;
+using AutoFindBot.Controllers.Configuration.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using AutoFindBot.Controllers.Api.V1;
-using AutoFindBot.Web.Configuration.Swagger;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace AutoFindBot.Web.Configuration;
+namespace AutoFindBot.Controllers.Extensions;
 
-public static class Entry
+public static class RegisterSwaggerDependenciesExtension
 {
     public static void AddSwagger(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
@@ -24,14 +25,16 @@ public static class Entry
                 options.SubstituteApiVersionInUrl = true;
             });
         serviceCollection.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-        serviceCollection.AddSwaggerGen(c =>
+        serviceCollection.Replace(ServiceDescriptor.Transient<ISwaggerProvider, SwaggerProviderCachingDecorator>());
+        serviceCollection.Replace(ServiceDescriptor.Transient<IAsyncSwaggerProvider, SwaggerProviderCachingDecorator>());
+        serviceCollection.AddSwaggerGen(options =>
         {
-            {   //Добавляем документации для контроллеров
-                var xmlFile = $"{Assembly.GetAssembly(typeof(AdminController))?.GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
-            }
+            //Добавляем документации для контроллеров
+            var xmlFile = $"{Assembly.GetAssembly(typeof(AutoFindBotController))?.GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
         });
+        
         serviceCollection.AddSwaggerGenNewtonsoftSupport();
         serviceCollection.Configure<AppSwaggerOptions>(configuration);
     }
@@ -45,9 +48,9 @@ public static class Entry
             {
                 c.SwaggerEndpoint(
                     $"/swagger/{description.GroupName}/swagger.json",
-                    $"Auto Find Bot API {description.GroupName}");
+                    $"{nameof(AutoFindBot)} API {description.GroupName}");
             }
-                    
+            
             c.RoutePrefix = "swagger";
         });
     }

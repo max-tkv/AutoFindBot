@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace AutoFindBot.Web.Configuration.Swagger
+namespace AutoFindBot.Controllers.Configuration.Swagger
 {
     [PublicAPI]
     public class AppSwaggerOptions
