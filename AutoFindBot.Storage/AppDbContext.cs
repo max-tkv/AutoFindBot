@@ -22,7 +22,7 @@ namespace AutoFindBot.Storage
                 .ApplyConfiguration(new PaymentConfiguration())
                 .ApplyConfiguration(new CarConfiguration())
                 .ApplyConfiguration(new UserFilterConfiguration())
-                .ApplyConfiguration(new HistorySourceCheckConfiguration());
+                .ApplyConfiguration(new SourceCheckConfiguration());
         }
     }
 }

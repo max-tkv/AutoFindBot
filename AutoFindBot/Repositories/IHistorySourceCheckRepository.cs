@@ -2,9 +2,9 @@
 
 namespace AutoFindBot.Repositories;
 
-public interface IHistorySourceCheckRepository : IRepository<Entities.HistorySourceCheck>
+public interface ISourceCheckRepository : IRepository<Entities.SourceCheck>
 {
-    Task<Entities.HistorySourceCheck> AddAsync(Entities.HistorySourceCheck newHistorySourceCheck);
+    Task<Entities.SourceCheck> AddAsync(Entities.SourceCheck newSourceCheck);
 
-    Task<Entities.HistorySourceCheck?> GetLastByFilterAsync(Expression<Func<Entities.HistorySourceCheck, bool>> predicate);
+    Task<Entities.SourceCheck?> GetLastByFilterAsync(Expression<Func<Entities.SourceCheck, bool>> predicate);
 }

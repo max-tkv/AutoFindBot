@@ -14,7 +14,7 @@ public interface IUnitOfWork : IDisposable
     
     IUserFilterRepository UserFilters { get; }
     
-    public IHistorySourceCheckRepository HistorySourceChecks { get; }
+    public ISourceCheckRepository SourceChecks { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     

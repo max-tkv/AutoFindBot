@@ -31,7 +31,7 @@ public static class RegisterDomainDependenciesExtension
         services.AddTransient<IUserFilterService, UserFilterService>();
         services.AddTransient<ICarService, CarService>();
         services.AddTransient<ICaptchaSolutionsService, CaptchaSolutionsService>();
-        services.AddTransient<IHistorySourceCheckService, HistorySourceCheckService>();
+        services.AddTransient<ISourceCheckService, SourceCheckService>();
 
         // commands
         services.AddTransient<BaseCommand, StartCommand>();

@@ -23,11 +23,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClient;
     private readonly IAvitoHttpApiClient _avitoHttpApiClient;
     private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
-    private readonly IHistorySourceCheckService _historySourceCheckService;
+    private readonly ISourceCheckService _historySourceCheckService;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
-        IHistorySourceCheckService historySourceCheckService,
+        ISourceCheckService historySourceCheckService,
         IKeyAutoProbegHttpApiClient keyAutoProbegHttpApiClient,
         ITradeDealerHttpApiClient tradeDealerHttpApiClient,
         IAutoRuHttpApiClient autoRuHttpApiClient,
@@ -78,7 +78,10 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             await _messageService.SendNewAutoMessageAsync(botClient, user, filter, newAutoList);   
         }
         
-        _logger.LogInformation($"User ID: {user.Id}. Filter ID: {filter.Id}. New cars found: {newAutoList.Count}");
+        _logger.LogInformation(
+            $"User ID: {user.Id}. " +
+            $"Filter ID: {filter.Id}. " +
+            $"New cars found: {newAutoList.Count}");
     }
 
     private async Task<List<Car>> GetAutoByFilterAsync(UserFilter userFilter)
@@ -101,21 +104,23 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var avitoResult = await _avitoHttpApiClient.GetAutoByFilterAsync(avitoFilter);
             var carList = _mapper.Map<List<Car>>(avitoResult);
 
-            var existsSuccess = await _historySourceCheckService.ExistsSuccessBySourceAsync(filter, Source.Avito);
-            var historySourceCheckId = await _historySourceCheckService.AddSuccessAsync(filter, Source.Avito);
+            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.Avito);
             if (existsSuccess)
             {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 cars.AddRange(newCars);
             }
             else
             {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                await _carService.GetNewCarsAndSaveAsync(carList, filter);
+                await _historySourceCheckService.AddSourceAsync(filter, Source.Avito);
             }
         }
         catch (Exception e)
         {
-            await _historySourceCheckService.AddErrorAsync(filter, Source.Avito, e.Message);
+            _logger.LogWarning(
+                $"User Filter ID: {filter.Id}. " +
+                $"Error GetCarsFromAvitoAsync: {e.Message}");
         }
     }
     
@@ -127,21 +132,23 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAutoByFilterAsync(keyAutoProbeg);
             var carList = _mapper.Map<List<Car>>(keyAutoProbegResult);
 
-            var existsSuccess = await _historySourceCheckService.ExistsSuccessBySourceAsync(filter, Source.KeyAutoProbeg);
-            var historySourceCheckId = await _historySourceCheckService.AddSuccessAsync(filter, Source.KeyAutoProbeg);
+            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.KeyAutoProbeg);
             if (existsSuccess)
             {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 cars.AddRange(newCars);
             }
             else
             {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                await _carService.GetNewCarsAndSaveAsync(carList, filter);
+                await _historySourceCheckService.AddSourceAsync(filter, Source.KeyAutoProbeg);
             }
         }
         catch (Exception e)
         {
-            await _historySourceCheckService.AddErrorAsync(filter, Source.KeyAutoProbeg, e.Message);
+            _logger.LogWarning(
+                $"User Filter ID: {filter.Id}. " +
+                $"Error GetCarsFromKeyAutoProbegAsync: {e.Message}");
         }
     }
     
@@ -153,21 +160,23 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var tradeDealerResult = await _tradeDealerHttpApiClient.GetAutoByFilterAsync(tradeDealerFilter);
             var carList = _mapper.Map<List<Car>>(tradeDealerResult.CarInfos);
             
-            var existsSuccess = await _historySourceCheckService.ExistsSuccessBySourceAsync(filter, Source.TradeDealer);
-            var historySourceCheckId = await _historySourceCheckService.AddSuccessAsync(filter, Source.TradeDealer);
+            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.TradeDealer);
             if (existsSuccess)
             {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 cars.AddRange(newCars);
             }
             else
             {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                await _carService.GetNewCarsAndSaveAsync(carList, filter);
+                await _historySourceCheckService.AddSourceAsync(filter, Source.TradeDealer);
             }
         }
         catch (Exception e)
         {
-            await _historySourceCheckService.AddErrorAsync(filter, Source.TradeDealer, e.Message);
+            _logger.LogWarning(
+                $"User Filter ID: {filter.Id}. " +
+                $"Error GetCarsFromTradeDealerAsync: {e.Message}");
         }
     }
     
@@ -179,21 +188,23 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var autoRuResult = await _autoRuHttpApiClient.GetAutoByFilterAsync(autoRuFilter);
             var carList = _mapper.Map<List<Car>>(autoRuResult.Offers);
 
-            var existsSuccess = await _historySourceCheckService.ExistsSuccessBySourceAsync(filter, Source.AutoRu);
-            var historySourceCheckId = await _historySourceCheckService.AddSuccessAsync(filter, Source.AutoRu);
+            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.AutoRu);
             if (existsSuccess)
             {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 cars.AddRange(newCars);
             }
             else
             {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter, historySourceCheckId);
+                await _carService.GetNewCarsAndSaveAsync(carList, filter);
+                await _historySourceCheckService.AddSourceAsync(filter, Source.AutoRu);
             }
         }
         catch (Exception e)
         {
-            await _historySourceCheckService.AddErrorAsync(filter, Source.AutoRu, e.Message);
+            _logger.LogWarning(
+                $"User Filter ID: {filter.Id}. " +
+                $"Error GetCarsFromAutoRuAsync: {e.Message}");
         }
     }
 }

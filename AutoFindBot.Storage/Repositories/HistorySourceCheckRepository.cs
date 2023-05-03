@@ -5,19 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AutoFindBot.Storage.Repositories;
 
-public class HistorySourceCheckRepository : Repository<Entities.HistorySourceCheck>, IHistorySourceCheckRepository
+public class SourceCheckRepository : Repository<Entities.SourceCheck>, ISourceCheckRepository
 {
-    public HistorySourceCheckRepository(AppDbContext context) : base(context)
+    public SourceCheckRepository(AppDbContext context) : base(context)
     {
     }
 
-    public async Task<HistorySourceCheck> AddAsync(HistorySourceCheck newHistorySourceCheck)
+    public async Task<SourceCheck> AddAsync(SourceCheck newSourceCheck)
     {
-        var result = await DbSet.AddAsync(newHistorySourceCheck);
+        var result = await DbSet.AddAsync(newSourceCheck);
         return result.Entity;
     }
 
-    public async Task<HistorySourceCheck?> GetLastByFilterAsync(Expression<Func<HistorySourceCheck, bool>> predicate) =>
+    public async Task<SourceCheck?> GetLastByFilterAsync(Expression<Func<SourceCheck, bool>> predicate) =>
         await DbSet.AsNoTracking()
             .Where(predicate)
             .OrderByDescending(x => x.CreatedAt)

@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AutoFindBot.Storage.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230502205844_Initial")]
+    [Migration("20230503105925_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,6 +229,36 @@ namespace AutoFindBot.Storage.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("AutoFindBot.Entities.SourceCheck", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("current_timestamp");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("current_timestamp");
+
+                    b.Property<long>("UserFilterId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserFilterId");
+
+                    b.ToTable("SourceChecks");
+                });
+
             modelBuilder.Entity("AutoFindBot.Entities.UserFilter", b =>
                 {
                     b.Property<long>("Id")
@@ -309,6 +339,17 @@ namespace AutoFindBot.Storage.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AutoFindBot.Entities.SourceCheck", b =>
+                {
+                    b.HasOne("AutoFindBot.Entities.UserFilter", "UserFilter")
+                        .WithMany("SourceChecks")
+                        .HasForeignKey("UserFilterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UserFilter");
+                });
+
             modelBuilder.Entity("AutoFindBot.Entities.UserFilter", b =>
                 {
                     b.HasOne("AutoFindBot.Entities.AppUser", "User")
@@ -334,6 +375,8 @@ namespace AutoFindBot.Storage.Migrations
             modelBuilder.Entity("AutoFindBot.Entities.UserFilter", b =>
                 {
                     b.Navigation("Cars");
+
+                    b.Navigation("SourceChecks");
                 });
 #pragma warning restore 612, 618
         }

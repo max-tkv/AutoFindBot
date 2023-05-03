@@ -2,11 +2,9 @@
 
 namespace AutoFindBot.Abstractions;
 
-public interface IHistorySourceCheckService
+public interface ISourceCheckService
 {
-    Task<long> AddErrorAsync(UserFilter filter, Source source, string error);
+    Task<long> AddSourceAsync(UserFilter filter, Source source);
 
-    Task<long> AddSuccessAsync(UserFilter filter, Source source);
-
-    Task<bool> ExistsSuccessBySourceAsync(UserFilter filter, Source source);
+    Task<bool> ExistsAsync(UserFilter filter, Source source);
 }

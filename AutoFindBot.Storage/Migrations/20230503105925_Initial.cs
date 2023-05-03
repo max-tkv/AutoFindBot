@@ -144,6 +144,28 @@ namespace AutoFindBot.Storage.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SourceChecks",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserFilterId = table.Column<long>(type: "bigint", nullable: false),
+                    Source = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "current_timestamp"),
+                    UpdatedDateTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "current_timestamp")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SourceChecks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SourceChecks_UserFilters_UserFilterId",
+                        column: x => x.UserFilterId,
+                        principalTable: "UserFilters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Actions_CommandName",
                 table: "Actions",
@@ -180,6 +202,11 @@ namespace AutoFindBot.Storage.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SourceChecks_UserFilterId",
+                table: "SourceChecks",
+                column: "UserFilterId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserFilters_Title",
                 table: "UserFilters",
                 column: "Title");
@@ -200,6 +227,9 @@ namespace AutoFindBot.Storage.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "SourceChecks");
 
             migrationBuilder.DropTable(
                 name: "UserFilters");

@@ -116,9 +116,6 @@ namespace AutoFindBot.Storage.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("current_timestamp");
 
-                    b.Property<long>("HistorySourceCheckId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("ImageUrls")
                         .HasColumnType("text");
 
@@ -165,8 +162,6 @@ namespace AutoFindBot.Storage.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HistorySourceCheckId");
-
                     b.HasIndex("UserFilterId");
 
                     b.HasIndex("UserId");
@@ -174,42 +169,6 @@ namespace AutoFindBot.Storage.Migrations
                     b.HasIndex("Title", "Price", "Year", "Source");
 
                     b.ToTable("Cars");
-                });
-
-            modelBuilder.Entity("AutoFindBot.Entities.HistorySourceCheck", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("current_timestamp");
-
-                    b.Property<string>("Data")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Source")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("Success")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("current_timestamp");
-
-                    b.Property<long>("UserFilterId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserFilterId");
-
-                    b.ToTable("HistorySourceChecks");
                 });
 
             modelBuilder.Entity("AutoFindBot.Entities.Payment", b =>
@@ -268,6 +227,36 @@ namespace AutoFindBot.Storage.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("AutoFindBot.Entities.SourceCheck", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("current_timestamp");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("current_timestamp");
+
+                    b.Property<long>("UserFilterId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserFilterId");
+
+                    b.ToTable("SourceChecks");
+                });
+
             modelBuilder.Entity("AutoFindBot.Entities.UserFilter", b =>
                 {
                     b.Property<long>("Id")
@@ -320,12 +309,6 @@ namespace AutoFindBot.Storage.Migrations
 
             modelBuilder.Entity("AutoFindBot.Entities.Car", b =>
                 {
-                    b.HasOne("AutoFindBot.Entities.HistorySourceCheck", "HistorySourceCheck")
-                        .WithMany("Cars")
-                        .HasForeignKey("HistorySourceCheckId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("AutoFindBot.Entities.UserFilter", "UserFilter")
                         .WithMany("Cars")
                         .HasForeignKey("UserFilterId")
@@ -338,20 +321,7 @@ namespace AutoFindBot.Storage.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("HistorySourceCheck");
-
                     b.Navigation("User");
-
-                    b.Navigation("UserFilter");
-                });
-
-            modelBuilder.Entity("AutoFindBot.Entities.HistorySourceCheck", b =>
-                {
-                    b.HasOne("AutoFindBot.Entities.UserFilter", "UserFilter")
-                        .WithMany("HistorySourceChecks")
-                        .HasForeignKey("UserFilterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
 
                     b.Navigation("UserFilter");
                 });
@@ -365,6 +335,17 @@ namespace AutoFindBot.Storage.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AutoFindBot.Entities.SourceCheck", b =>
+                {
+                    b.HasOne("AutoFindBot.Entities.UserFilter", "UserFilter")
+                        .WithMany("SourceChecks")
+                        .HasForeignKey("UserFilterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UserFilter");
                 });
 
             modelBuilder.Entity("AutoFindBot.Entities.UserFilter", b =>
@@ -389,16 +370,11 @@ namespace AutoFindBot.Storage.Migrations
                     b.Navigation("UserFilters");
                 });
 
-            modelBuilder.Entity("AutoFindBot.Entities.HistorySourceCheck", b =>
-                {
-                    b.Navigation("Cars");
-                });
-
             modelBuilder.Entity("AutoFindBot.Entities.UserFilter", b =>
                 {
                     b.Navigation("Cars");
 
-                    b.Navigation("HistorySourceChecks");
+                    b.Navigation("SourceChecks");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AutoFindBot.Storage.Configurations;
 
-public class HistorySourceCheckConfiguration : IEntityTypeConfiguration<Entities.HistorySourceCheck>
+public class SourceCheckConfiguration : IEntityTypeConfiguration<Entities.SourceCheck>
 {
-    public void Configure(EntityTypeBuilder<HistorySourceCheck> builder)
+    public void Configure(EntityTypeBuilder<SourceCheck> builder)
     {
-        builder.ToTable("HistorySourceChecks")
+        builder.ToTable("SourceChecks")
             .HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.CreatedAt)
@@ -21,13 +21,8 @@ public class HistorySourceCheckConfiguration : IEntityTypeConfiguration<Entities
             .IsRequired();
 
         builder.HasOne(x => x.UserFilter)
-            .WithMany(x => x.HistorySourceChecks)
+            .WithMany(x => x.SourceChecks)
             .HasForeignKey(x => x.UserFilterId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        builder.HasMany(x => x.Cars)
-            .WithOne(x => x.HistorySourceCheck)
-            .HasForeignKey(x => x.HistorySourceCheckId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

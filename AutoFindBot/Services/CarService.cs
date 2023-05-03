@@ -1,7 +1,5 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
-using AutoFindBot.Models.TradeDealer;
-using AutoMapper;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Services;
@@ -21,8 +19,7 @@ public class CarService : ICarService
     
     public async Task<List<Car>> GetNewCarsAndSaveAsync(
         List<Car> carsInput, 
-        UserFilter userFilter, 
-        long historySourceCheckId)
+        UserFilter userFilter)
     {
         var newCars = new List<Car>();
         foreach (var carData in carsInput)
@@ -37,7 +34,6 @@ public class CarService : ICarService
                 
                 carData.UserId = userFilter.UserId;
                 carData.UserFilterId = userFilter.Id;
-                carData.HistorySourceCheckId = historySourceCheckId;
                 await _unitOfWork.Cars.AddAsync(carData);
             }
         }
