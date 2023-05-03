@@ -1,4 +1,5 @@
 ﻿using AutoFindBot.Abstractions.HttpClients;
+using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.Avito.Invariants;
 using AutoFindBot.Integration.Avito.Models;
 using AutoFindBot.Integration.Avito.Options;
@@ -12,7 +13,7 @@ namespace AutoFindBot.Integration.Avito;
 public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
 {
     private readonly ILogger<AvitoHttpApiClient> _logger;
-    private readonly AvitoHttpApiClientOptions? _options;
+    private readonly AvitoHttpApiClientOptions _options;
     private readonly IMapper _mapper;
 
     public AvitoHttpApiClient(
@@ -30,11 +31,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
     {
         try
         {
-            if (!IsActive())
-            {
-                throw new Exception($"{nameof(AvitoHttpApiClient)} отключен.");
-            }
-            
+            NotActiveSourceException.ThrowIfNotActive(nameof(AvitoHttpApiClient), _options.Active);
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
@@ -53,15 +50,15 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
             
             return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
         }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            throw;
+        }
         catch (Exception e)
         {
             _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
             throw;
         }
-    }
-
-    public bool IsActive()
-    {
-        return _options.Active;
     }
 }

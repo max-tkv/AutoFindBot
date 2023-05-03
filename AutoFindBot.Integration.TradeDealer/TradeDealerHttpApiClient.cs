@@ -16,7 +16,7 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
 {
     private readonly IMapper _mapper;
     private readonly ILogger<TradeDealerHttpApiClient> _logger;
-    private readonly TradeDealerHttpApiClientOptions? _options;
+    private readonly TradeDealerHttpApiClientOptions _options;
 
     public TradeDealerHttpApiClient(
         HttpClient httpClient,
@@ -33,10 +33,8 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
     {
         try
         {
-            if (!IsActive())
-            {
-                throw new TradeDealerClientException($"{nameof(TradeDealerHttpApiClient)} отключен.");
-            }
+            NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
+            ArgumentNullException.ThrowIfNull(filter);
             
             var path = _options.BaseUrl + _options.GetAutoByFilterQuery
                 .Replace(TradeDealerHttpApiClientInvariants.PriceMin, filter.PriceMin)
@@ -54,15 +52,15 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
     
             return _mapper.Map<TradeDealerResult>(tradeDealerResponse);
         }
-        catch (Exception e)
+        catch (NotActiveSourceException e)
         {
-            _logger.LogError(e, $"Ошибка: {e.Message}");
+            _logger.LogWarning(e, $"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
             throw;
         }
-    }
-
-    public bool IsActive()
-    {
-        return _options.Active;
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
+            throw;
+        }
     }
 }

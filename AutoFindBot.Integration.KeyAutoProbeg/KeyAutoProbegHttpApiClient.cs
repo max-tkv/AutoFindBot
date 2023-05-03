@@ -1,11 +1,11 @@
 ﻿using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
+using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.KeyAutoProbeg.Invariants;
 using AutoFindBot.Integration.KeyAutoProbeg.Options;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Utils.Http;
 using HtmlAgilityPack;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Integration.KeyAutoProbeg;
@@ -13,7 +13,8 @@ namespace AutoFindBot.Integration.KeyAutoProbeg;
 public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpApiClient
 {
     private readonly ILogger<KeyAutoProbegHttpApiClient> _logger;
-    private readonly KeyAutoProbegHttpApiClientOptions? _options;
+    private readonly KeyAutoProbegHttpApiClientOptions _options;
+    private IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClientImplementation;
 
     private const string CarNodePath = "";
 
@@ -30,12 +31,7 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
     {
         try
         {
-            if (!IsActive())
-            {
-                throw new Exception(
-                    $"{nameof(KeyAutoProbegHttpApiClient)} отключен.");
-            }
-            
+            NotActiveSourceException.ThrowIfNotActive(nameof(KeyAutoProbegHttpApiClient), _options.Active);
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
@@ -117,15 +113,15 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
 
             return result;
         }
-        catch (Exception e)
+        catch (NotActiveSourceException e)
         {
-            _logger.LogError(e, $"Ошибка: {e.Message}");
+            _logger.LogWarning(e, $"{nameof(KeyAutoProbegHttpApiClient)}: {e.Message}");
             throw;
         }
-    }
-
-    public bool IsActive()
-    {
-        return _options.Active;
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"{nameof(KeyAutoProbegHttpApiClient)}: {e.Message}");
+            throw;
+        }
     }
 }

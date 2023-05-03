@@ -1,4 +1,5 @@
 ﻿using AutoFindBot.Abstractions.HttpClients;
+using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.AutoRu.Exceptions;
 using AutoFindBot.Integration.AutoRu.Models;
 using AutoFindBot.Integration.AutoRu.Options;
@@ -30,11 +31,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
     {
         try
         {
-            if (!IsActive())
-            {
-                throw new Exception($"{nameof(AutoRuHttpApiClient)} отключен.");
-            }
-            
+            NotActiveSourceException.ThrowIfNotActive(nameof(AutoRuHttpApiClient), _options.Active);
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
@@ -66,15 +63,15 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         {
             throw;
         }
-        catch (Exception e)
+        catch (NotActiveSourceException e)
         {
             _logger.LogWarning(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             throw;
         }
-    }
-
-    public bool IsActive()
-    {
-        return _options.Active;
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            throw;
+        }
     }
 }

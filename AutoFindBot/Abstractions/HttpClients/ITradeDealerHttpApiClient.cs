@@ -3,7 +3,7 @@ using AutoFindBot.Utils.Http;
 
 namespace AutoFindBot.Abstractions.HttpClients;
 
-public interface ITradeDealerHttpApiClient : IBaseIntegrationHttpApiClient
+public interface ITradeDealerHttpApiClient
 {
     Task<TradeDealerResult> GetAutoByFilterAsync(TradeDealerFilter filter);
 }

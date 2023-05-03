@@ -3,7 +3,7 @@ using AutoFindBot.Utils.Http;
 
 namespace AutoFindBot.Abstractions.HttpClients;
 
-public interface IAvitoHttpApiClient : IBaseIntegrationHttpApiClient
+public interface IAvitoHttpApiClient
 {
     Task<List<AvitoResult>> GetAutoByFilterAsync(AvitoFilter filter);
 }
