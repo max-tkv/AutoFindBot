@@ -33,7 +33,7 @@ public class ActionRepository : Repository<Entities.Action>, IActionRepository
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync();
 
-    public async Task<Entities.Action> GetLastByFilterAsync(Expression<Func<Action,bool>> predicate) =>
+    public async Task<Entities.Action> GetLastByFilterAsync(Expression<Func<Action, bool>> predicate) =>
         await DbSet.AsNoTracking()
             .Where(predicate)
             .OrderByDescending(x => x.CreatedAt)

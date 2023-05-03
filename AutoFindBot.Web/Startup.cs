@@ -3,7 +3,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AutoFindBot.Controllers.Configuration.Swagger;
 using AutoFindBot.Controllers.Extensions;
+using AutoFindBot.Extensions;
 using AutoFindBot.Integration.AutoRu.Extensions;
 using AutoFindBot.Integration.AutoRu.Mappings;
 using AutoFindBot.Integration.Avito.Extensions;
@@ -22,6 +22,7 @@ using AutoFindBot.Integration.RuCaptcha.Extensions;
 using AutoFindBot.Mappings;
 using AutoFindBot.Services;
 using AutoFindBot.Storage;
+using AutoFindBot.Storage.PostgreSql.Extensions;
 
 namespace AutoFindBot.Web
 {
@@ -36,12 +37,7 @@ namespace AutoFindBot.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
-            services.AddSqlStorage(options =>
-            {
-                options.UseSqlServer(_configuration.GetConnectionString("Db") ?? "");
-                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            });
+            services.RegisterPostgreSqlStorage(_configuration);
             
             services.AddSingleton(new MapperConfiguration(mc =>
             {
@@ -52,10 +48,9 @@ namespace AutoFindBot.Web
                 mc.AddProfile(new AutoRuHttpApiClientMappingProfile());
             }).CreateMapper());
 
-            services.AddDomain();
-            services.AddHostedServices();
-            services.AddConfig(_configuration);
-            
+            services.RegisterDomain(_configuration);
+            services.RegisterHostedServices();
+
             services.AddTradeDealerHttpApiClient(_configuration);
             services.AddKeyAutoProbegHttpApiClient(_configuration);
             services.AddAvitoHttpApiClient(_configuration);

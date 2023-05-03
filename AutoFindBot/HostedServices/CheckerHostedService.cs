@@ -45,14 +45,12 @@ public class CheckerHostedService : IHostedService, IDisposable
             _logger.LogInformation($"{nameof(CheckerHostedService)}: Start CheckerHostedService.DoWork method.");
             
             var users = await _appUserService.GetAllAsync();
-            
-            _logger.LogInformation($"{nameof(CheckerHostedService)}: Find {users.Count} users.");
-            
+            var tasks = new List<Task>();
             foreach (var user in users)
             {
-                _logger.LogInformation($"Select User ID: {user.Id}");
-                await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user);
+                tasks.Add(Task.Run(() => _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user)));
             }
+            await Task.WhenAll(tasks);
             
             _logger.LogInformation($"{nameof(CheckerHostedService)}: End CheckerHostedService.DoWork method.");
         }

@@ -2,9 +2,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
-using AutoFindBot.Lookups;
+using AutoFindBot.Invariants;
 using AutoFindBot.Models.ConfigurationOptions;
-using AutoFindBot.Utils.Helpers;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Payments;
@@ -70,7 +69,7 @@ public class PaymentService : IPaymentService
         }
         catch (Exception e)
         {
-            await _botClient.AnswerPreCheckoutQueryAsync(update.PreCheckoutQuery.Id, Messages.ErrorPayed.GetDescription());
+            await _botClient.AnswerPreCheckoutQueryAsync(update.PreCheckoutQuery.Id, Messages.ErrorPayed);
             throw;
         }
         

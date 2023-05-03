@@ -1,21 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using AutoFindBot.Abstractions;
+﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Commands;
 using AutoFindBot.HostedServices;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace AutoFindBot;
+namespace AutoFindBot.Extensions;
 
-public static class Entry
+public static class RegisterDomainDependenciesExtension
 {
     /// <summary>
     /// Регистрация зависимостей уровня бизнес-логики
     /// </summary>
     /// <param name="serviceCollection">serviceCollection</param>
     /// <returns>IServiceCollection</returns>
-    public static IServiceCollection AddDomain(this IServiceCollection services)
+    public static IServiceCollection RegisterDomain(this IServiceCollection services, IConfiguration configuration)
     {
         // services
         services.AddSingleton<TelegramBot>();
@@ -31,11 +31,18 @@ public static class Entry
         services.AddTransient<IUserFilterService, UserFilterService>();
         services.AddTransient<ICarService, CarService>();
         services.AddTransient<ICaptchaSolutionsService, CaptchaSolutionsService>();
+        services.AddTransient<IHistorySourceCheckService, HistorySourceCheckService>();
 
         // commands
         services.AddTransient<BaseCommand, StartCommand>();
         services.AddTransient<BaseCommand, CheckNewAutoCommand>();
         services.AddTransient<BaseCommand, SettingsCommand>();
+        services.AddTransient<BaseCommand, SourcesCommand>();
+        services.AddTransient<BaseCommand, FiltersCommand>();
+        
+        // options
+        services.Configure<PaymentsOptions>(configuration.GetSection(new PaymentsOptions().Name));
+        services.Configure<RequiredSubscriptionsOptions>(configuration.GetSection(new RequiredSubscriptionsOptions().Name));
 
         return services;
     }
@@ -45,17 +52,9 @@ public static class Entry
     /// </summary>
     /// <param name="serviceCollection">serviceCollection</param>
     /// <returns>IServiceCollection</returns>
-    public static IServiceCollection AddHostedServices(this IServiceCollection services)
+    public static IServiceCollection RegisterHostedServices(this IServiceCollection services)
     {
         services.AddHostedService<CheckerHostedService>();
-        return services;
-    }
-    
-    public static IServiceCollection AddConfig(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<PaymentsOptions>(configuration.GetSection(new PaymentsOptions().Name));
-        services.Configure<RequiredSubscriptionsOptions>(configuration.GetSection(new RequiredSubscriptionsOptions().Name));
-        
         return services;
     }
 }

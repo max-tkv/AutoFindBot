@@ -3,9 +3,8 @@ using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Helpers;
-using AutoFindBot.Lookups;
+using AutoFindBot.Invariants;
 using AutoFindBot.Services;
-using AutoFindBot.Utils.Helpers;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -44,7 +43,7 @@ public class CheckRequiredSubscriptionsCommand : BaseCommand
             try
             {
                 await _messageService.SendPopupMessageAsync(_botClient, user, update, 
-                    Messages.RequiredSubscriptionsPopupError.GetDescription());
+                    Messages.RequiredSubscriptionsPopupError);
             }
             catch (Exception e)
             {

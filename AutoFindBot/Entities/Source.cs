@@ -2,8 +2,8 @@
 
 public enum Source
 {
-    TradeDealer,
-    KeyAutoProbeg,
-    Avito,
-    AutoRu
+    TradeDealer = 1,
+    KeyAutoProbeg = 2,
+    Avito = 3,
+    AutoRu = 4
 }

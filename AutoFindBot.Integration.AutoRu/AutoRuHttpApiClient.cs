@@ -32,8 +32,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         {
             if (!IsActive())
             {
-                _logger.LogInformation($"{nameof(AutoRuHttpApiClient)} отключен.");
-                return new AutoRuResult();
+                throw new Exception($"{nameof(AutoRuHttpApiClient)} отключен.");
             }
             
             ArgumentNullException.ThrowIfNull(filter);
@@ -70,7 +69,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         catch (Exception e)
         {
             _logger.LogWarning(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
-            return new AutoRuResult();
+            throw;
         }
     }
 

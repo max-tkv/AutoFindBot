@@ -1,8 +1,4 @@
-﻿using AutoFindBot.Extensions;
-using AutoFindBot.Lookups;
-using AutoFindBot.Utils.Helpers;
-
-namespace AutoFindBot.Helpers;
+﻿namespace AutoFindBot.Helpers;
 
 public static class CommandHelpers
 {

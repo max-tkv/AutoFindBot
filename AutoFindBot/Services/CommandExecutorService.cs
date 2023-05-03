@@ -3,9 +3,6 @@ using AutoFindBot.Abstractions;
 using Telegram.Bot.Types;
 using AutoFindBot.Commands;
 using AutoFindBot.Entities;
-using AutoFindBot.Extensions;
-using Telegram.Bot;
-using Emoji = AutoFindBot.Lookups.Emoji;
 
 namespace AutoFindBot.Services
 {
@@ -48,12 +45,6 @@ namespace AutoFindBot.Services
             
             if(update.Message?.Chat == null && update?.CallbackQuery == null)
                 return;
-            
-            // if (update.CallbackQuery?.Data is CommandNames.DownloadTrackCommand)
-            // {
-            //     await ExecuteCommand(update.CallbackQuery?.Data, update, user);
-            //     return;
-            // }
 
             if (update.Message != null)
             {
@@ -74,6 +65,18 @@ namespace AutoFindBot.Services
                     await ExecuteCommand(CommandNames.SettingsCommand, update, user);
                     return;
                 }
+            }
+            
+            if (update.CallbackQuery?.Data is CommandNames.FiltersCommand)
+            {
+                await ExecuteCommand(CommandNames.FiltersCommand, update, user);
+                return;
+            }
+            
+            if (update.CallbackQuery?.Data is CommandNames.SourcesCommand)
+            {
+                await ExecuteCommand(CommandNames.SourcesCommand, update, user);
+                return;
             }
             
             var lastAction = await _actionService.GetLastByUserAsync(user);

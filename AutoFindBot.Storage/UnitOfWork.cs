@@ -13,6 +13,7 @@ public class UnitOfWork : IUnitOfWork
     public IPaymentRepository Payments { get; }
     public ICarRepository Cars { get; }
     public IUserFilterRepository UserFilters { get; }
+    public IHistorySourceCheckRepository HistorySourceChecks { get; }
     
     private readonly AppDbContext _appDbContext;
     private bool _isDisposed;
@@ -26,6 +27,7 @@ public class UnitOfWork : IUnitOfWork
         Payments = new PaymentRepository(appDbContext);
         Cars = new CarRepository(appDbContext);
         UserFilters = new UserFilterRepository(appDbContext);
+        HistorySourceChecks = new HistorySourceCheckRepository(appDbContext);
     }
 
     public void Dispose()

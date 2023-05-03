@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using AutoFindBot.Abstractions;
+using AutoFindBot.Entities;
 using AutoFindBot.Models.ConfigurationOptions;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -79,20 +80,30 @@ public class KeyboardService : IKeyboardService
             {
                 InlineKeyboardButton.WithCallbackData(
                     text: "Фильтры",
-                    callbackData: CommandNames.ChangeFiltersCommand
+                    callbackData: CommandNames.FiltersCommand
                 ),
                 InlineKeyboardButton.WithCallbackData(
                     text: "Источники",
-                    callbackData: CommandNames.ChangeSourcesCommand
+                    callbackData: CommandNames.SourcesCommand
                 )
             }
         });
     }
 
-
-    #region Приватные методы
-    
-    //todo
-    
-    #endregion
+    public IReplyMarkup GetUserFiltersKeyboard(List<UserFilter> userFilters)
+    {
+        var filterButtons = new List<InlineKeyboardButton>();
+        foreach (var userFilter in userFilters)
+        {
+            filterButtons.Add(InlineKeyboardButton.WithCallbackData(
+                text: userFilter.Title,
+                callbackData: CommandNames.SelectedFilterCommand + ":" + userFilter.Id
+            ));
+        }
+        
+        return new InlineKeyboardMarkup(new List<IEnumerable<InlineKeyboardButton>>()
+        {
+            filterButtons
+        });
+    }
 }

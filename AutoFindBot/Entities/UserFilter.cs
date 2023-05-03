@@ -7,6 +7,7 @@ public class UserFilter : BaseEntity
     public decimal PriceMin { get; set; }
     public decimal PriceMax { get; set; }
     
+    public virtual List<HistorySourceCheck> HistorySourceChecks { get; set; }
     public virtual AppUser User { get; set; }
     public virtual List<Car> Cars { get; set; }
 }

@@ -6,6 +6,8 @@ public class Car : BaseEntity
     
     public virtual long UserFilterId { get; set; }
     
+    public virtual long HistorySourceCheckId { get; set; }
+    
     public string OriginId { get; set; }
     
     public string Title { get; set; }
@@ -27,7 +29,10 @@ public class Car : BaseEntity
     public List<Image> ImageUrls { get; set; } = new List<Image>();
     
     public virtual AppUser User { get; set; }
+    
     public virtual UserFilter UserFilter { get; set; }
+    
+    public virtual HistorySourceCheck HistorySourceCheck { get; set; }
 }
 
 public class Image

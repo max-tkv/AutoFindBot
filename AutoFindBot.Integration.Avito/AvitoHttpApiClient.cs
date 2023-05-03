@@ -1,15 +1,10 @@
-﻿using System.Text.RegularExpressions;
-using AutoFindBot.Abstractions.HttpClients;
-using AutoFindBot.Entities;
+﻿using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Integration.Avito.Invariants;
 using AutoFindBot.Integration.Avito.Models;
 using AutoFindBot.Integration.Avito.Options;
 using AutoFindBot.Models.Avito;
-using AutoFindBot.Models.TradeDealer;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
-using HtmlAgilityPack;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Integration.Avito;
@@ -37,8 +32,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         {
             if (!IsActive())
             {
-                _logger.LogInformation($"{nameof(AvitoHttpApiClient)} отключен.");
-                return new List<AvitoResult>();
+                throw new Exception($"{nameof(AvitoHttpApiClient)} отключен.");
             }
             
             ArgumentNullException.ThrowIfNull(filter);
@@ -62,7 +56,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         catch (Exception e)
         {
             _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
-            return new List<AvitoResult>();
+            throw;
         }
     }
 

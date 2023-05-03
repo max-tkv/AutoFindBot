@@ -19,7 +19,10 @@ public class CarService : ICarService
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<List<Car>> GetNewCarsAndSaveAsync(List<Car> carsInput, AppUser user, UserFilter userFilter)
+    public async Task<List<Car>> GetNewCarsAndSaveAsync(
+        List<Car> carsInput, 
+        UserFilter userFilter, 
+        long historySourceCheckId)
     {
         var newCars = new List<Car>();
         foreach (var carData in carsInput)
@@ -27,13 +30,14 @@ public class CarService : ICarService
             var car = await _unitOfWork.Cars
                 .GetByFilterAsync(x => x.OriginId == carData.OriginId 
                                        && x.UserFilterId == userFilter.Id 
-                                       && x.UserId == user.Id);
+                                       && x.UserId == userFilter.UserId);
             if (car == null)
             {
                 newCars.Add(carData);
                 
-                carData.UserId = user.Id;
+                carData.UserId = userFilter.UserId;
                 carData.UserFilterId = userFilter.Id;
+                carData.HistorySourceCheckId = historySourceCheckId;
                 await _unitOfWork.Cars.AddAsync(carData);
             }
         }

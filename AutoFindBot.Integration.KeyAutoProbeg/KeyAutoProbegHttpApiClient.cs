@@ -32,8 +32,8 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
         {
             if (!IsActive())
             {
-                _logger.LogInformation($"{nameof(KeyAutoProbegHttpApiClient)} отключен.");
-                return new List<KeyAutoProbegResult>();
+                throw new Exception(
+                    $"{nameof(KeyAutoProbegHttpApiClient)} отключен.");
             }
             
             ArgumentNullException.ThrowIfNull(filter);
@@ -45,7 +45,8 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
             var content = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode == false)
             {
-                throw new Exception($"Произошла ошибка: {content}");
+                throw new Exception(
+                    $"Произошла ошибка: {content}");
             }
             
             var doc = new HtmlDocument();
@@ -119,7 +120,7 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
         catch (Exception e)
         {
             _logger.LogError(e, $"Ошибка: {e.Message}");
-            return new List<KeyAutoProbegResult>();
+            throw;
         }
     }
 

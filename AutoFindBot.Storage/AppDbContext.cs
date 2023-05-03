@@ -21,13 +21,8 @@ namespace AutoFindBot.Storage
                 .ApplyConfiguration(new AppUserConfiguration())
                 .ApplyConfiguration(new PaymentConfiguration())
                 .ApplyConfiguration(new CarConfiguration())
-                .ApplyConfiguration(new UserFilterConfiguration());
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                .ApplyConfiguration(new UserFilterConfiguration())
+                .ApplyConfiguration(new HistorySourceCheckConfiguration());
         }
     }
 }

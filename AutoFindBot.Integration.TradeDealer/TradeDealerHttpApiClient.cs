@@ -35,8 +35,7 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
         {
             if (!IsActive())
             {
-                _logger.LogInformation($"{nameof(TradeDealerHttpApiClient)} отключен.");
-                return new TradeDealerResult();
+                throw new TradeDealerClientException($"{nameof(TradeDealerHttpApiClient)} отключен.");
             }
             
             var path = _options.BaseUrl + _options.GetAutoByFilterQuery
@@ -58,7 +57,7 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
         catch (Exception e)
         {
             _logger.LogError(e, $"Ошибка: {e.Message}");
-            return new TradeDealerResult() { CarInfos = new List<CarInfo>() };
+            throw;
         }
     }
 

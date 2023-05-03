@@ -14,4 +14,5 @@ public interface IMessageService
     Task SendPopupMessageAsync(TelegramBotClient botClient, AppUser user, Update update, string getDescription);
     Task SendNewAutoMessageAsync(TelegramBotClient botClient, AppUser user, UserFilter userFilter, List<Car> newCarList);
     Task SendSettingsCommands(TelegramBotClient botClient, Update update, AppUser user);
+    Task SendUserFiltersMessageAsync(TelegramBotClient botClient, Update update, AppUser user);
 }

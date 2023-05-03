@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using AutoFindBot.Entities;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AutoFindBot.Abstractions;
 
@@ -9,4 +10,5 @@ public interface IKeyboardService
     IReplyMarkup GetRemovedKeyboard();
     IReplyMarkup GetRequiredSubscriptionsKeyboard();
     IReplyMarkup GetUserSettingsKeyboard();
+    IReplyMarkup GetUserFiltersKeyboard(List<UserFilter> userFilters);
 }
