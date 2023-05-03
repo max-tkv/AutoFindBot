@@ -120,7 +120,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         {
             _logger.LogWarning(
                 $"User Filter ID: {filter.Id}. " +
-                $"Error GetCarsFromAvitoAsync: {e.Message}");
+                $"Method GetCarsFromAvitoAsync: {e.Message}");
         }
     }
     
@@ -148,7 +148,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         {
             _logger.LogWarning(
                 $"User Filter ID: {filter.Id}. " +
-                $"Error GetCarsFromKeyAutoProbegAsync: {e.Message}");
+                $"Method GetCarsFromKeyAutoProbegAsync: {e.Message}");
         }
     }
     
@@ -176,7 +176,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         {
             _logger.LogWarning(
                 $"User Filter ID: {filter.Id}. " +
-                $"Error GetCarsFromTradeDealerAsync: {e.Message}");
+                $"Method GetCarsFromTradeDealerAsync: {e.Message}");
         }
     }
     
@@ -204,7 +204,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         {
             _logger.LogWarning(
                 $"User Filter ID: {filter.Id}. " +
-                $"Error GetCarsFromAutoRuAsync: {e.Message}");
+                $"Method GetCarsFromAutoRuAsync: {e.Message}");
         }
     }
 }
