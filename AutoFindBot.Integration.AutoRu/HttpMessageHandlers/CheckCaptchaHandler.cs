@@ -39,7 +39,7 @@ public class CheckCaptchaHandler : DelegatingHandler
         
         if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0)
         {
-            throw new Exception("Запрос заблокирован. Требуется решить каптчу.");
+            throw new AutoRuCaptchaException("Запрос заблокирован. Требуется решить каптчу.");
         }
 
         return response;

@@ -1,4 +1,4 @@
-﻿namespace AutoFindBot.Integration.AutoRu.Exceptions;
+﻿namespace AutoFindBot.Exceptions;
 
 public class AutoRuCaptchaException : Exception
 {
