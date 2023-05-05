@@ -20,6 +20,7 @@ public class AppUserRepository : Repository<Entities.AppUser>, IAppUserRepositor
     {
         var user = await DbSet.SingleAsync(x => x.Id == userId);
         user.Confirm = true;
+        user.UpdatedDateTime = DateTime.Now;
     }
     
     public async Task<Entities.AppUser?> GetByChatIdAsync(long chatId)
