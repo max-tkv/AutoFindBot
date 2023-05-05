@@ -59,12 +59,18 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     {
         var filters = await _userFilterService.GetByUserAsync(user);
         _logger.LogInformation($"User ID: {user.Id}. Find {filters.Count} filters.");
-        
+
+        var i = 0;
         var tasks = new List<Task>();
         foreach (var filter in filters)
         {
             _logger.LogInformation($"User ID: {user.Id}. Select Filter ID: {filter.Id}");
-            tasks.Add(Task.Run(() => GetAutoAndSendMessageByFilterAsync(botClient, user, filter, sendEmptyResultMessage)));
+            
+            // Задержка между запуском задач
+            var delayBetweenTasks = TimeSpan.FromSeconds(30);
+            
+            tasks.Add(Task.Run(() => GetAutoAndSendMessageByFilterAsync(botClient, user, filter, sendEmptyResultMessage, delayBetweenTasks * i)));
+            i++;
         }
         await Task.WhenAll(tasks);
     }
@@ -73,8 +79,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         TelegramBotClient botClient, 
         AppUser user, 
         UserFilter filter, 
-        bool sendEmptyResultMessage)
+        bool sendEmptyResultMessage,
+        TimeSpan delay)
     {
+        await Task.Delay(delay);
+        
         var newAutoList = await GetAutoByFilterAsync(filter, botClient, user);
         if (newAutoList.Any() || sendEmptyResultMessage)
         {

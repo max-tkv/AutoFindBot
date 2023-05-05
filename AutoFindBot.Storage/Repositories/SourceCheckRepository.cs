@@ -22,4 +22,16 @@ public class SourceCheckRepository : Repository<Entities.SourceCheck>, ISourceCh
             .Where(predicate)
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync();
+
+    public async Task<bool> UpdateDateTimeAsync(UserFilter filter, Source source)
+    {
+        var sourceCheck = await DbSet.SingleOrDefaultAsync(x => x.Source == source && x.UserFilterId == filter.Id);
+        if (sourceCheck != null)
+        {
+            sourceCheck.UpdatedDateTime = DateTime.Now;
+            return true;
+        }
+
+        return false;
+    }
 }
