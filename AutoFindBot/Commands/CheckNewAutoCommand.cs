@@ -30,7 +30,7 @@ public class CheckNewAutoCommand : BaseCommand
         try
         {
             _logger.LogInformation($"Current User ID: {user.Id}");
-            await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user, true);
+            await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user, TimeSpan.Zero, true);
         }
         catch (Exception e)
         {
