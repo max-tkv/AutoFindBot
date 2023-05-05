@@ -167,6 +167,13 @@ public class MessageService : IMessageService
             replyMarkup: keyboard);
     }
 
+    public async Task SendUserConfirmationMessageAsync(TelegramBotClient botClient, AppUser user)
+    {
+        var keyboard = _keyboardService.GetStartMenuKeyboard();
+        await botClient.SendTextMessageAsync(user.ChatId, Messages.UserConfirmation, 
+            ParseMode.Markdown, replyMarkup: keyboard);
+    }
+
     #region Приватные методы
 
     private string GetUrlBySource(Car car)

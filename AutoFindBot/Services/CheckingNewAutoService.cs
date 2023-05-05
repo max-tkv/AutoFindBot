@@ -72,7 +72,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         UserFilter filter, 
         bool sendEmptyResultMessage)
     {
-        var newAutoList = await GetAutoByFilterAsync(filter);
+        var newAutoList = await GetAutoByFilterAsync(filter, botClient, user);
         if (newAutoList.Any() || sendEmptyResultMessage)
         {
             await _messageService.SendNewAutoMessageAsync(botClient, user, filter, newAutoList);   
@@ -84,19 +84,26 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             $"New cars found: {newAutoList.Count}");
     }
 
-    private async Task<List<Car>> GetAutoByFilterAsync(UserFilter userFilter)
+    private async Task<List<Car>> GetAutoByFilterAsync(
+        UserFilter userFilter, 
+        TelegramBotClient botClient, 
+        AppUser user)
     {
         var cars = new List<Car>();
 
-        await GetCarsFromAutoRuAsync(userFilter, cars);
-        await GetCarsFromTradeDealerAsync(userFilter, cars);
-        await GetCarsFromKeyAutoProbegAsync(userFilter, cars);
-        await GetCarsFromAvitoAsync(userFilter, cars);
+        await GetCarsFromAutoRuAsync(userFilter, cars, botClient, user);
+        await GetCarsFromTradeDealerAsync(userFilter, cars, botClient, user);
+        await GetCarsFromKeyAutoProbegAsync(userFilter, cars, botClient, user);
+        await GetCarsFromAvitoAsync(userFilter, cars, botClient, user);
 
         return cars;
     }
 
-    private async Task GetCarsFromAvitoAsync(UserFilter filter, List<Car> cars)
+    private async Task GetCarsFromAvitoAsync(
+        UserFilter filter, 
+        List<Car> cars, 
+        TelegramBotClient botClient, 
+        AppUser user)
     {
         try
         {
@@ -114,6 +121,12 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             {
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.Avito);
+                
+                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
+                if (!existsAny)
+                {
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                }
             }
         }
         catch (Exception e)
@@ -124,7 +137,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
     
-    private async Task GetCarsFromKeyAutoProbegAsync(UserFilter filter, List<Car> cars)
+    private async Task GetCarsFromKeyAutoProbegAsync(
+        UserFilter filter, 
+        List<Car> cars, 
+        TelegramBotClient botClient, 
+        AppUser user)
     {
         try
         {
@@ -142,6 +159,12 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             {
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.KeyAutoProbeg);
+                
+                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
+                if (!existsAny)
+                {
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                }
             }
         }
         catch (Exception e)
@@ -152,7 +175,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
     
-    private async Task GetCarsFromTradeDealerAsync(UserFilter filter, List<Car> cars)
+    private async Task GetCarsFromTradeDealerAsync(
+        UserFilter filter, 
+        List<Car> cars, 
+        TelegramBotClient botClient, 
+        AppUser user)
     {
         try
         {
@@ -170,6 +197,12 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             {
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.TradeDealer);
+                
+                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
+                if (!existsAny)
+                {
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                }
             }
         }
         catch (Exception e)
@@ -180,7 +213,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
     
-    private async Task GetCarsFromAutoRuAsync(UserFilter filter, List<Car> cars)
+    private async Task GetCarsFromAutoRuAsync(
+        UserFilter filter, 
+        List<Car> cars, 
+        TelegramBotClient botClient, 
+        AppUser user)
     {
         try
         {
@@ -198,6 +235,12 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             {
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.AutoRu);
+                
+                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
+                if (!existsAny)
+                {
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                }
             }
         }
         catch (Exception e)

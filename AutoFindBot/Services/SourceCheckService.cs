@@ -34,4 +34,14 @@ public class SourceCheckService : ISourceCheckService
                 _ => true
             };
     }
+    
+    public async Task<bool> ExistsAsync(UserFilter filter)
+    {
+        return await _unitOfWork.SourceChecks.GetLastByFilterAsync(x => 
+                x.UserFilterId == filter.Id) switch
+            {
+                null => false,
+                _ => true
+            };
+    }
 }
