@@ -24,6 +24,10 @@ public class UserFilterConfiguration : IEntityTypeConfiguration<Entities.UserFil
             .HasDefaultValueSql("current_timestamp")
             .ValueGeneratedOnAdd()
             .IsRequired();
+        builder.Property(x => x.YearMax)
+            .HasDefaultValue(-1);
+        builder.Property(x => x.YearMin)
+            .HasDefaultValue(-1);
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.UserFilters)
