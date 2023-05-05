@@ -4,7 +4,9 @@ namespace AutoFindBot.Invariants;
 
 public class Messages
 {
-    public const string Start = "Добро пожаловать!";
+    public const string Start = "Добро пожаловать!\n" +
+                                "Бот заработает только после личного подтверждения администратором.\n" +
+                                "Ожидайте подтверждения";
     
     public const string ErrorPayed = "При обработке платежа произошла ошибка, пожалуйста повторите попытку позже.";
     
