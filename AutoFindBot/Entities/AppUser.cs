@@ -7,6 +7,7 @@
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public Tarif Tarif { get; set; }
+        public bool Confirm { get; set; }
         
         public virtual List<Action> Actions { get; set; } = new List<Action>();
         public virtual List<Payment> Payments { get; set; } = new List<Payment>();

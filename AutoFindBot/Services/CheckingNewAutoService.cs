@@ -24,6 +24,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IAvitoHttpApiClient _avitoHttpApiClient;
     private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
     private readonly ISourceCheckService _historySourceCheckService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
@@ -35,7 +36,8 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         IUserFilterService userFilterService,
         IMessageService messageService,
         ICarService carService,
-        IMapper mapper)
+        IMapper mapper,
+        IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _historySourceCheckService = historySourceCheckService;
@@ -47,6 +49,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         _messageService = messageService;
         _carService = carService;
         _mapper = mapper;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task CheckAndSendMessageAsync(
@@ -122,10 +125,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.Avito);
                 
-                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
-                if (!existsAny)
+                if (!user.Confirm)
                 {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
+                    await _unitOfWork.Users.ConfirmAsync(user.Id);
+                    user.Confirm = true;
                 }
             }
         }
@@ -160,10 +164,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.KeyAutoProbeg);
                 
-                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
-                if (!existsAny)
+                if (!user.Confirm)
                 {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
+                    await _unitOfWork.Users.ConfirmAsync(user.Id);
+                    user.Confirm = true;
                 }
             }
         }
@@ -198,10 +203,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.TradeDealer);
                 
-                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
-                if (!existsAny)
+                if (!user.Confirm)
                 {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
+                    await _unitOfWork.Users.ConfirmAsync(user.Id);
+                    user.Confirm = true;
                 }
             }
         }
@@ -236,10 +242,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                 await _carService.GetNewCarsAndSaveAsync(carList, filter);
                 await _historySourceCheckService.AddSourceAsync(filter, Source.AutoRu);
                 
-                var existsAny = await _historySourceCheckService.ExistsAsync(filter);
-                if (!existsAny)
+                if (!user.Confirm)
                 {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);   
+                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
+                    await _unitOfWork.Users.ConfirmAsync(user.Id);
+                    user.Confirm = true;
                 }
             }
         }

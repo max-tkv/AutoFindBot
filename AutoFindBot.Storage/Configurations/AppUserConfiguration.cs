@@ -22,6 +22,8 @@ public class AppUserConfiguration : IEntityTypeConfiguration<Entities.AppUser>
         
         builder.Property(x => x.Tarif)
             .HasDefaultValue(Tarif.Free);
+        builder.Property(x => x.Confirm)
+            .HasDefaultValue(false);
 
         builder.HasMany(x => x.Actions)
             .WithOne(x => x.User)

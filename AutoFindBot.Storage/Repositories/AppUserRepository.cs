@@ -16,6 +16,12 @@ public class AppUserRepository : Repository<Entities.AppUser>, IAppUserRepositor
         return userEntity.Entity;
     }
     
+    public async Task ConfirmAsync(long userId)
+    {
+        var user = await DbSet.SingleAsync(x => x.Id == userId);
+        user.Confirm = true;
+    }
+    
     public async Task<Entities.AppUser?> GetByChatIdAsync(long chatId)
     {
         return await DbSet.AsNoTracking().Where(x => x.ChatId == chatId)
