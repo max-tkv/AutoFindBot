@@ -33,14 +33,15 @@ namespace AutoFindBot.Commands
         {
             try
             {
-                if (user.ChatId != 983077680)
-                {
-                    await _messageService.SendErrorMessageAsync(_botClient, user, "Sorry. Bot is in development.");
-                }
-                else
-                {
-                    await _messageService.SendStartMessage(_botClient, user);   
-                }
+                // if (user.ChatId != 983077680)
+                // {
+                //     await _messageService.SendErrorMessageAsync(_botClient, user, "Sorry. Bot is in development.");
+                // }
+                // else
+                // {
+                //     await _messageService.SendStartMessage(_botClient, user);   
+                // }
+                await _messageService.SendStartMessage(_botClient, user);
                 await _actionService.AddAsync(new Entities.Action()
                 {
                     UserId = user.Id,
