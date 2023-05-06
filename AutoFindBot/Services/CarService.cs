@@ -35,12 +35,8 @@ public class CarService : ICarService
                 
                 carData.UserFilterId = userFilter.Id;
                 await _unitOfWork.Cars.AddAsync(carData);
+                await _unitOfWork.SaveChangesAsync();
             }
-        }
-
-        if (newCars.Any())
-        {
-            await _unitOfWork.SaveChangesAsync();
         }
 
         return newCars;

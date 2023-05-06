@@ -13,7 +13,9 @@ public class CarConfiguration : IEntityTypeConfiguration<Entities.Car>
     {
         builder.ToTable("Cars").HasKey(x => x.Id);
         builder.HasIndex(x => new { x.Title, x.Price, x.Year, x.Source });
-        builder.Property(x => x.Id).ValueGeneratedOnAdd();
+        builder.Property(x => x.Id)
+            .ValueGeneratedOnAdd()
+            .IsRequired();
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("current_timestamp")
             .ValueGeneratedOnAdd()
