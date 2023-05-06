@@ -7,7 +7,6 @@ public interface ICheckingNewAutoService
 {
     Task CheckAndSendMessageAsync(
         TelegramBotClient botClient, 
-        AppUser user, 
-        TimeSpan delay,  
+        AppUser user,
         bool sendEmptyResultMessage = false);
 }

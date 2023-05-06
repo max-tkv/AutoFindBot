@@ -25,6 +25,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
     private readonly ISourceCheckService _historySourceCheckService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
@@ -55,21 +56,26 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     public async Task CheckAndSendMessageAsync(
         TelegramBotClient botClient, 
         AppUser user,
-        TimeSpan delay,  
         bool sendEmptyResultMessage = false)
     {
-        await Task.Delay(delay);
-        
-        var filters = await _userFilterService.GetByUserAsync(user);
-        _logger.LogInformation($"User ID: {user.Id}. Find {filters.Count} filters.");
-        
-        var tasks = new List<Task>();
-        foreach (var filter in filters)
+        await _semaphore.WaitAsync();
+        await Task.Delay(TimeSpan.FromSeconds(15));
+
+        try
         {
-            _logger.LogInformation($"User ID: {user.Id}. Select Filter ID: {filter.Id}");
-            tasks.Add(Task.Run(() => GetAutoAndSendMessageByFilterAsync(botClient, user, filter, sendEmptyResultMessage)));
+            var filters = await _userFilterService.GetByUserAsync(user);
+            _logger.LogInformation($"User ID: {user.Id}. Find {filters.Count} filters.");
+            
+            foreach (var filter in filters)
+            {
+                _logger.LogInformation($"User ID: {user.Id}. Select Filter ID: {filter.Id}");
+                await GetAutoAndSendMessageByFilterAsync(botClient, user, filter, sendEmptyResultMessage);
+            }
         }
-        await Task.WhenAll(tasks);
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     private async Task GetAutoAndSendMessageByFilterAsync(

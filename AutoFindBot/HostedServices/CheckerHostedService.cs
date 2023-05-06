@@ -46,13 +46,9 @@ public class CheckerHostedService : IHostedService, IDisposable
             
             var users = await _appUserService.GetAllAsync();
             var tasks = new List<Task>();
-            var i = 0;
             foreach (var user in users)
             {
-                // Задержка между запуском задач
-                var delayBetweenTasks = TimeSpan.FromSeconds(30);
-                tasks.Add(Task.Run(() => _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user, delayBetweenTasks * i)));
-                i++;
+                tasks.Add(Task.Run(() => _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user)));
             }
             await Task.WhenAll(tasks);
             
