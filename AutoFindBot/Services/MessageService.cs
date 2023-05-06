@@ -70,7 +70,8 @@ public class MessageService : IMessageService
         {
             await botClient.SendTextMessageAsync(
                 user.ChatId, 
-                Messages.NewCarNotFound, 
+                Messages.NewCarNotFound
+                    .Replace(":filterTitle", userFilter.Title), 
                 ParseMode.Markdown, 
                 replyMarkup: new ReplyKeyboardRemove());
             return;

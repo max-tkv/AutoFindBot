@@ -30,5 +30,6 @@ public class Messages
                                         $"Город: :newCarСity\n" +
                                         $"[Открыть объявление](:newCarUrl)";
     
-    public const string NewCarNotFound = "Новых объявлений не найдено!";
+    public const string NewCarNotFound = $"По вашему фильтру *«:filterTitle»*\n" +
+                                         $"Новых объявлений не найдено!";
 }
