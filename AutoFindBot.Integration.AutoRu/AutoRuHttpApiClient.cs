@@ -74,4 +74,51 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
             throw;
         }
     }
+
+    public async Task<AutoRuResult> GetAllNewAutoAsync()
+    {
+        try
+        {
+            NotActiveSourceException.ThrowIfNotActive(nameof(AutoRuHttpApiClient), _options.Active);
+
+            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
+            var request = new AutoRuRequest()
+            {
+                Category = "cars",
+                Section = "used",
+                PriceFrom = 1,
+                PriceTo = 100000000,
+                YearFrom = 2010,
+                Sort = "price-asc",
+                OutputType = "list",
+                GeoId = new List<int>()
+                {
+                    8
+                }
+            };
+
+            var response = await SendAsync(path, HttpMethod.Post, GetContent(request));
+            var content = await response.Content.ReadAsStringAsync();
+
+            var autoRuResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<AutoRuResponse>(content);
+
+            ArgumentNullException.ThrowIfNull(autoRuResponse);
+
+            return _mapper.Map<AutoRuResult>(autoRuResponse);
+        }
+        catch (AutoRuCaptchaException)
+        {
+            throw;
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            throw;
+        }
+    }
 }

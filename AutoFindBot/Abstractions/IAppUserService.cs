@@ -12,4 +12,5 @@ public interface IAppUserService
     Task CheckFreeRequestAsync(AppUser user);
     Task CheckRequiredSubscriptionsAsync(TelegramBotClient botClient, AppUser user);
     Task<List<Entities.AppUser>> GetAllAsync();
+    Task SetConfirmAsync(long currentFilterUserId);
 }

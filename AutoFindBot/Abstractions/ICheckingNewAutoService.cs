@@ -5,8 +5,5 @@ namespace AutoFindBot.Abstractions;
 
 public interface ICheckingNewAutoService
 {
-    Task CheckAndSendMessageAsync(
-        TelegramBotClient botClient, 
-        AppUser user,
-        bool sendEmptyResultMessage = false);
+    Task CheckAndSendMessageAsync(TelegramBotClient botClient, AppUser? user = null);
 }

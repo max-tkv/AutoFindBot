@@ -1,11 +1,6 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
-using AutoFindBot.Models.AutoRu;
-using AutoFindBot.Models.Avito;
-using AutoFindBot.Models.KeyAutoProbeg;
-using AutoFindBot.Models.TradeDealer;
-using AutoFindBot.Repositories;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -23,13 +18,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClient;
     private readonly IAvitoHttpApiClient _avitoHttpApiClient;
     private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
-    private readonly ISourceCheckService _historySourceCheckService;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+    private readonly IAppUserService _appUserService;
+    private readonly ISourceCheckService _sourceCheckService;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
-        ISourceCheckService historySourceCheckService,
         IKeyAutoProbegHttpApiClient keyAutoProbegHttpApiClient,
         ITradeDealerHttpApiClient tradeDealerHttpApiClient,
         IAutoRuHttpApiClient autoRuHttpApiClient,
@@ -38,10 +31,10 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         IMessageService messageService,
         ICarService carService,
         IMapper mapper,
-        IUnitOfWork unitOfWork)
+        IAppUserService appUserService,
+        ISourceCheckService sourceCheckService)
     {
         _logger = logger;
-        _historySourceCheckService = historySourceCheckService;
         _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
         _tradeDealerHttpApiClient = tradeDealerHttpApiClient;
         _autoRuHttpApiClient = autoRuHttpApiClient;
@@ -50,219 +43,185 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         _messageService = messageService;
         _carService = carService;
         _mapper = mapper;
-        _unitOfWork = unitOfWork;
+        _appUserService = appUserService;
+        _sourceCheckService = sourceCheckService;
     }
 
-    public async Task CheckAndSendMessageAsync(
-        TelegramBotClient botClient, 
-        AppUser user,
-        bool sendEmptyResultMessage = false)
+    public async Task CheckAndSendMessageAsync(TelegramBotClient botClient, AppUser? user = null)
     {
-        await _semaphore.WaitAsync();
-        await Task.Delay(TimeSpan.FromSeconds(15));
-
-        try
+        var newCars = await GetNewAutoAsync();
+        if (!newCars.Any())
         {
-            var filters = await _userFilterService.GetByUserAsync(user);
-            _logger.LogInformation($"User ID: {user.Id}. Find {filters.Count} filters.");
-            
-            foreach (var filter in filters)
-            {
-                _logger.LogInformation($"User ID: {user.Id}. Select Filter ID: {filter.Id}");
-                await GetAutoAndSendMessageByFilterAsync(botClient, user, filter, sendEmptyResultMessage);
-            }
+            _logger.LogInformation("New auto not found");
+            return;
         }
-        finally
-        {
-            _semaphore.Release();
-        }
-    }
 
-    private async Task GetAutoAndSendMessageByFilterAsync(
-        TelegramBotClient botClient, 
-        AppUser user, 
-        UserFilter filter, 
-        bool sendEmptyResultMessage)
-    {
-        var newAutoList = await GetAutoByFilterAsync(filter, botClient, user);
-        if (newAutoList.Any() || sendEmptyResultMessage)
+        if (user != null)
         {
-            await _messageService.SendNewAutoMessageAsync(botClient, user, filter, newAutoList);   
+            await CheckAutoAndSendMessageByUserAsync(botClient, user, newCars, true);
+            return;
         }
         
-        _logger.LogInformation(
-            $"User ID: {user.Id}. " +
-            $"Filter ID: {filter.Id}. " +
-            $"New cars found: {newAutoList.Count}");
+        var users = await _appUserService.GetAllAsync();
+        foreach (var currentUser in users)
+        {
+            await CheckAutoAndSendMessageByUserAsync(botClient, currentUser, newCars);
+        }
     }
 
-    private async Task<List<Car>> GetAutoByFilterAsync(
-        UserFilter userFilter, 
-        TelegramBotClient botClient, 
-        AppUser user)
+    private async Task CheckAutoAndSendMessageByUserAsync(
+        TelegramBotClient botClient, AppUser currentUser, List<Car> newCars, bool sendEmptyResultMessage = false)
+    {
+        var filters = await _userFilterService.GetByUserAsync(currentUser);
+        _logger.LogInformation($"User ID: {currentUser.Id}. Find {filters.Count} filters.");
+        foreach (var currentFilter in filters)
+        {
+            _logger.LogInformation($"User ID: {currentUser.Id}. Select Filter ID: {currentFilter.Id}");
+            var newCarsGroupsBySource = newCars.GroupBy(x => x.Source);
+            foreach (var newCarsGroupBySource in newCarsGroupsBySource)
+            {
+                var currentSource = newCarsGroupBySource.Key;
+                var newCarsSource = newCarsGroupBySource.ToList();
+                var checkedNewCars = await CheckAutoAsync(newCarsSource, currentFilter);
+                if (checkedNewCars.Any() || sendEmptyResultMessage)
+                {
+                    var existsSuccess = await _sourceCheckService.ExistsAsync(currentFilter, currentSource);
+                    if (existsSuccess)
+                    {
+                        await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, checkedNewCars);    
+                    }
+                    else
+                    {
+                        await _sourceCheckService.AddSourceAsync(currentFilter, currentSource);
+                        if (!currentUser.Confirm)
+                        {
+                            await _messageService.SendUserConfirmationMessageAsync(botClient, currentUser);
+                            await _appUserService.SetConfirmAsync(currentUser.Id);
+                            currentUser.Confirm = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter)
+    {
+        var result = new List<Car>();
+        var checkedNewCars = await _carService.CheckExistNewCarsAndSaveAsync(newCars, currentFilter);
+        foreach (var currentCheckedNewCar in checkedNewCars)
+        {
+            var filterSuccess = CheckAutoByUserFilter(currentFilter, currentCheckedNewCar);
+            if (filterSuccess)
+            {
+                result.Add(currentCheckedNewCar);
+            }
+        }
+
+        return result;
+    }
+
+    private bool CheckAutoByUserFilter(UserFilter currentFilter, Car newCar)
+    {
+        if (newCar.Price < currentFilter.PriceMin || newCar.Price > currentFilter.PriceMax)
+        {
+            return false;
+        }
+        
+        if (newCar.Year < currentFilter.YearMin || newCar.Year > currentFilter.YearMax)
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    // private async Task GetAutoAndSendMessageByFilterAsync(
+    //     TelegramBotClient botClient, 
+    //     AppUser user, 
+    //     UserFilter filter, 
+    //     bool sendEmptyResultMessage)
+    // {
+    //     var newAutoList = await GetAutoByFilterAsync(filter, botClient, user);
+    //     if (newAutoList.Any() || sendEmptyResultMessage)
+    //     {
+    //         await _messageService.SendNewAutoMessageAsync(botClient, user, filter, newAutoList);   
+    //     }
+    //     
+    //     _logger.LogInformation(
+    //         $"User ID: {user.Id}. " +
+    //         $"Filter ID: {filter.Id}. " +
+    //         $"New cars found: {newAutoList.Count}");
+    // }
+
+    private async Task<List<Car>> GetNewAutoAsync()
     {
         var cars = new List<Car>();
 
-        await GetCarsFromAutoRuAsync(userFilter, cars, botClient, user);
-        await GetCarsFromTradeDealerAsync(userFilter, cars, botClient, user);
-        await GetCarsFromKeyAutoProbegAsync(userFilter, cars, botClient, user);
-        await GetCarsFromAvitoAsync(userFilter, cars, botClient, user);
+        await GetCarsFromAutoRuAsync(cars);
+        await GetCarsFromTradeDealerAsync(cars);
+        await GetCarsFromKeyAutoProbegAsync(cars);
+        await GetCarsFromAvitoAsync(cars);
 
         return cars;
     }
 
-    private async Task GetCarsFromAvitoAsync(
-        UserFilter filter, 
-        List<Car> cars, 
-        TelegramBotClient botClient, 
-        AppUser user)
+    private async Task GetCarsFromAvitoAsync(List<Car> cars)
     {
         try
         {
-            var avitoFilter = _mapper.Map<AvitoFilter>(filter);
-            var avitoResult = await _avitoHttpApiClient.GetAutoByFilterAsync(avitoFilter);
-            var carList = _mapper.Map<List<Car>>(avitoResult);
-
-            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.Avito);
-            if (existsSuccess)
-            {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                cars.AddRange(newCars);
-            }
-            else
-            {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                await _historySourceCheckService.AddSourceAsync(filter, Source.Avito);
-                
-                if (!user.Confirm)
-                {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
-                    await _unitOfWork.Users.ConfirmAsync(user.Id);
-                    user.Confirm = true;
-                }
-            }
+            var avitoResult = await _avitoHttpApiClient.GetAllNewAutoAsync();
+            var newCars = _mapper.Map<List<Car>>(avitoResult);
+            cars.AddRange(newCars);
         }
         catch (Exception e)
         {
             _logger.LogWarning(
-                $"User Filter ID: {filter.Id}. " +
                 $"Method GetCarsFromAvitoAsync: {e.Message}");
         }
     }
     
-    private async Task GetCarsFromKeyAutoProbegAsync(
-        UserFilter filter, 
-        List<Car> cars, 
-        TelegramBotClient botClient, 
-        AppUser user)
+    private async Task GetCarsFromKeyAutoProbegAsync(List<Car> cars)
     {
         try
         {
-            var keyAutoProbeg = _mapper.Map<KeyAutoProbegFilter>(filter);
-            var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAutoByFilterAsync(keyAutoProbeg);
-            var carList = _mapper.Map<List<Car>>(keyAutoProbegResult);
-
-            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.KeyAutoProbeg);
-            if (existsSuccess)
-            {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                cars.AddRange(newCars);
-            }
-            else
-            {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                await _historySourceCheckService.AddSourceAsync(filter, Source.KeyAutoProbeg);
-                
-                if (!user.Confirm)
-                {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
-                    await _unitOfWork.Users.ConfirmAsync(user.Id);
-                    user.Confirm = true;
-                }
-            }
+            var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAllNewAutoAsync();
+            var newCars = _mapper.Map<List<Car>>(keyAutoProbegResult);
+            cars.AddRange(newCars);
         }
         catch (Exception e)
         {
             _logger.LogWarning(
-                $"User Filter ID: {filter.Id}. " +
                 $"Method GetCarsFromKeyAutoProbegAsync: {e.Message}");
         }
     }
     
-    private async Task GetCarsFromTradeDealerAsync(
-        UserFilter filter, 
-        List<Car> cars, 
-        TelegramBotClient botClient, 
-        AppUser user)
+    private async Task GetCarsFromTradeDealerAsync(List<Car> cars)
     {
         try
         {
-            var tradeDealerFilter = _mapper.Map<TradeDealerFilter>(filter);
-            var tradeDealerResult = await _tradeDealerHttpApiClient.GetAutoByFilterAsync(tradeDealerFilter);
-            var carList = _mapper.Map<List<Car>>(tradeDealerResult.CarInfos);
-            
-            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.TradeDealer);
-            if (existsSuccess)
-            {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                cars.AddRange(newCars);
-            }
-            else
-            {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                await _historySourceCheckService.AddSourceAsync(filter, Source.TradeDealer);
-                
-                if (!user.Confirm)
-                {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
-                    await _unitOfWork.Users.ConfirmAsync(user.Id);
-                    user.Confirm = true;
-                }
-            }
+            var tradeDealerResult = await _tradeDealerHttpApiClient.GetAllNewAutoAsync();
+            var newCars = _mapper.Map<List<Car>>(tradeDealerResult.CarInfos);
+            cars.AddRange(newCars);
         }
         catch (Exception e)
         {
             _logger.LogWarning(
-                $"User Filter ID: {filter.Id}. " +
                 $"Method GetCarsFromTradeDealerAsync: {e.Message}");
         }
     }
     
-    private async Task GetCarsFromAutoRuAsync(
-        UserFilter filter, 
-        List<Car> cars, 
-        TelegramBotClient botClient, 
-        AppUser user)
+    private async Task GetCarsFromAutoRuAsync(List<Car> cars)
     {
         try
         {
-            var autoRuFilter = _mapper.Map<AutoRuFilter>(filter);
-            var autoRuResult = await _autoRuHttpApiClient.GetAutoByFilterAsync(autoRuFilter);
-            var carList = _mapper.Map<List<Car>>(autoRuResult.Offers);
-
-            var existsSuccess = await _historySourceCheckService.ExistsAsync(filter, Source.AutoRu);
-            if (existsSuccess)
-            {
-                var newCars = await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                cars.AddRange(newCars);
-            }
-            else
-            {
-                await _carService.GetNewCarsAndSaveAsync(carList, filter);
-                await _historySourceCheckService.AddSourceAsync(filter, Source.AutoRu);
-                
-                if (!user.Confirm)
-                {
-                    await _messageService.SendUserConfirmationMessageAsync(botClient, user);
-                    await _unitOfWork.Users.ConfirmAsync(user.Id);
-                    user.Confirm = true;
-                }
-            }
+            var autoRuResult = await _autoRuHttpApiClient.GetAllNewAutoAsync();
+            var newCars = _mapper.Map<List<Car>>(autoRuResult.Offers);
+            cars.AddRange(newCars);
         }
         catch (Exception e)
         {
             _logger.LogWarning(
-                $"User Filter ID: {filter.Id}. " +
                 $"Method GetCarsFromAutoRuAsync: {e.Message}");
         }
     }

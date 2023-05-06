@@ -138,4 +138,10 @@ public class AppUserService : IAppUserService
     {
         return await _unitOfWork.Users.GetAllAsync();
     }
+
+    public async Task SetConfirmAsync(long currentFilterUserId)
+    {
+        await _unitOfWork.Users.ConfirmAsync(currentFilterUserId);
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

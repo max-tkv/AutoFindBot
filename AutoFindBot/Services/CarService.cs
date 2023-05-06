@@ -17,7 +17,7 @@ public class CarService : ICarService
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<List<Car>> GetNewCarsAndSaveAsync(
+    public async Task<List<Car>> CheckExistNewCarsAndSaveAsync(
         List<Car> carsInput, 
         UserFilter userFilter)
     {
@@ -28,7 +28,7 @@ public class CarService : ICarService
                 .GetByFilterAsync(x => x.OriginId == carData.OriginId 
                                        && x.UserFilterId == userFilter.Id 
                                        && x.UserId == userFilter.UserId);
-            if (car == null && CheckFilterYear(userFilter, carData))
+            if (car == null)
             {
                 newCars.Add(carData);
                 
@@ -53,29 +53,5 @@ public class CarService : ICarService
             await _unitOfWork.Cars.AddAsync(car);
         }
         await _unitOfWork.SaveChangesAsync();
-    }
-    
-    private bool CheckFilterYear(UserFilter userFilter, Car? newCar)
-    {
-        if (newCar == null)
-        {
-            _logger.LogInformation($"FilterID: {userFilter.Id}. False");
-            return false;
-        }
-        
-        if (userFilter.YearMax == -1 && userFilter.YearMin == -1)
-        {
-            _logger.LogInformation($"FilterID: {userFilter.Id}. Car Year={newCar.Year}. True");
-            return true;
-        }
-
-        if (userFilter.YearMax >= newCar.Year && userFilter.YearMin <= newCar.Year)
-        {
-            _logger.LogInformation($"FilterID: {userFilter.Id}. Car Year={newCar.Year}. True");
-            return true;
-        }
-
-        _logger.LogInformation($"FilterID: {userFilter.Id}. Car Year={newCar.Year}. False");
-        return false;
     }
 }

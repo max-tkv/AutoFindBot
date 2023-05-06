@@ -27,6 +27,40 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         _mapper = mapper;
     }
 
+    public async Task<List<AvitoResult>> GetAllNewAutoAsync()
+    {
+        try
+        {
+            NotActiveSourceException.ThrowIfNotActive(nameof(AvitoHttpApiClient), _options.Active);
+
+            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
+                .Replace(AvitoHttpApiClientInvariants.PriceMin, "1")
+                .Replace(AvitoHttpApiClientInvariants.PriceMax, "100000000");
+            var response = await SendAsync(path, HttpMethod.Get);
+            var content = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode == false)
+            {
+                throw new Exception($"Произошла ошибка: {content}");
+            }
+            
+            var avitoResponse = GetObjectFromResponse<AvitoRootResponse>(content);
+
+            ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
+            
+            return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            throw;
+        }
+    }
+
     public async Task<List<AvitoResult>> GetAutoByFilterAsync(AvitoFilter filter)
     {
         try

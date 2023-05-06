@@ -63,4 +63,38 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
             throw;
         }
     }
+
+    public async Task<TradeDealerResult> GetAllNewAutoAsync()
+    {
+        try
+        {
+            NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
+
+            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
+                .Replace(TradeDealerHttpApiClientInvariants.PriceMin, "1")
+                .Replace(TradeDealerHttpApiClientInvariants.PriceMax, "100000000");
+            var response = await SendAsync(path, HttpMethod.Get);
+            var content = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode == false)
+            {
+                throw new TradeDealerClientException($"Произошла ошибка: {content}");
+            }
+            
+            var tradeDealerResponse = GetObjectFromResponse<TradeDealerResponse>(content);
+
+            ArgumentNullException.ThrowIfNull(tradeDealerResponse.CarInfoResponses);
+    
+            return _mapper.Map<TradeDealerResult>(tradeDealerResponse);
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e, $"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
+            throw;
+        }
+    }
 }
