@@ -4,33 +4,47 @@ using AutoFindBot.Repositories;
 
 namespace AutoFindBot.Storage.Repositories;
 
-public class AppUserRepository : Repository<Entities.AppUser>, IAppUserRepository
+public class AppUserRepository : IAppUserRepository
 {
-    public AppUserRepository(AppDbContext context) : base(context)
+    private readonly AppDbContext _context;
+
+    public AppUserRepository(AppDbContext context)
     {
+        _context = context;
     }
 
     public async Task<Entities.AppUser> AddAsync(Entities.AppUser newUser)
     {
-        var userEntity = await DbSet.AddAsync(newUser);
+        var userEntity = await _context.Users.AddAsync(newUser);
         return userEntity.Entity;
     }
     
     public async Task ConfirmAsync(long userId)
     {
-        var user = await DbSet.SingleAsync(x => x.Id == userId);
+        var user = await _context.Users.SingleAsync(x => x.Id == userId);
         user.Confirm = true;
         user.UpdatedDateTime = DateTime.Now;
+
+        await CommitAsync();
     }
     
     public async Task<Entities.AppUser?> GetByChatIdAsync(long chatId)
     {
-        return await DbSet.AsNoTracking().Where(x => x.ChatId == chatId)
+        return await _context.Users.AsNoTracking().Where(x => x.ChatId == chatId)
             .SingleOrDefaultAsync();
     }
 
     public async Task<List<AppUser>> GetAllAsync()
     {
-        return await DbSet.AsNoTracking().ToListAsync();
+        return await _context.Users.AsNoTracking().ToListAsync();
     }
+
+    public async Task UpdateAsync(AppUser user)
+    {
+        _context.Users.Update(user);
+        await CommitAsync();
+    }
+
+    private async Task CommitAsync(CancellationToken cancellationToken = default) =>
+        await _context.SaveChangesAsync(cancellationToken);
 }

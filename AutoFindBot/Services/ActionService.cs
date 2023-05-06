@@ -1,23 +1,24 @@
 ﻿using System.Linq.Expressions;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
+using AutoFindBot.Repositories;
 
 namespace AutoFindBot.Services;
 
 public class ActionService : IActionService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IActionRepository _actionRepository;
 
-    public ActionService(IUnitOfWork unitOfWork)
+    public ActionService(IActionRepository actionRepository)
     {
-        _unitOfWork = unitOfWork;
+        _actionRepository = actionRepository;
     }
 
     public async Task<Entities.Action> GetLastByUserAsync(AppUser appUser) =>
-        await _unitOfWork.Actions.GetLastByUserAsync(appUser);
+        await _actionRepository.GetLastByUserAsync(appUser);
     
     public async Task<Entities.Action> GetLastByFilter(Expression<Func<Entities.Action, bool>> predicate) =>
-        await _unitOfWork.Actions.GetLastByFilterAsync(predicate);
+        await _actionRepository.GetLastByFilterAsync(predicate);
 
     public async Task<Entities.Action> GetLastActionByCommandNameAsync(AppUser appUser, string commandName)
     {
@@ -30,7 +31,6 @@ public class ActionService : IActionService
 
     public async Task AddAsync(Entities.Action newAction)
     {
-        await _unitOfWork.Actions.AddAsync(newAction);
-        await _unitOfWork.SaveChangesAsync();
+        await _actionRepository.AddAsync(newAction);
     }
 }

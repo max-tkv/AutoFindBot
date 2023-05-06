@@ -15,18 +15,18 @@ public class MessageService : IMessageService
     private readonly IKeyboardService _keyboardService;
     private readonly ILogger<MessageService> _logger;
     private readonly IConfiguration _configuration;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserFilterService _userFilterService;
 
     public MessageService(
         IKeyboardService keyboardService, 
         ILogger<MessageService> logger,
         IConfiguration configuration,
-        IUnitOfWork unitOfWork)
+        IUserFilterService userFilterService)
     {
         _logger = logger;
         _keyboardService = keyboardService;
         _configuration = configuration;
-        _unitOfWork = unitOfWork;
+        _userFilterService = userFilterService;
     }
     
     public async Task SendStartMessage(TelegramBotClient botClient, AppUser user)
@@ -159,7 +159,7 @@ public class MessageService : IMessageService
 
     public async Task SendUserFiltersMessageAsync(TelegramBotClient botClient, Update update, AppUser user)
     {
-        var userFilters = await _unitOfWork.UserFilters.GetByUserAsync(user);
+        var userFilters = await _userFilterService.GetByUserAsync(user);
         var keyboard = _keyboardService.GetUserFiltersKeyboard(userFilters);
         await botClient.SendTextMessageAsync(
             user.ChatId, 

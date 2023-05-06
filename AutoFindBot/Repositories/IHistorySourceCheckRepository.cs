@@ -3,7 +3,7 @@ using AutoFindBot.Entities;
 
 namespace AutoFindBot.Repositories;
 
-public interface ISourceCheckRepository : IRepository<Entities.SourceCheck>
+public interface ISourceCheckRepository
 {
     Task<Entities.SourceCheck> AddAsync(Entities.SourceCheck newSourceCheck);
 

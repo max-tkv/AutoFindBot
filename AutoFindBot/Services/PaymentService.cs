@@ -4,6 +4,7 @@ using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Invariants;
 using AutoFindBot.Models.ConfigurationOptions;
+using AutoFindBot.Repositories;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Payments;
@@ -15,15 +16,17 @@ public class PaymentService : IPaymentService
     private readonly TelegramBotClient _botClient;
     private readonly IOptions<PaymentsOptions> _paymentsOptions;
     private readonly ILogger<PaymentService> _logger;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IPaymentRepository _paymentRepository;
+    private readonly IAppUserRepository _appUserRepository;
 
     public PaymentService(IOptions<PaymentsOptions> paymentsOptions, TelegramBot telegramBot, 
-        ILogger<PaymentService> logger, IUnitOfWork unitOfWork)
+        ILogger<PaymentService> logger, IPaymentRepository paymentRepository, IAppUserRepository appUserRepository)
     {
         _logger = logger;
-        _unitOfWork = unitOfWork;
         _botClient = telegramBot.GetBot().Result;
         _paymentsOptions = paymentsOptions;
+        _paymentRepository = paymentRepository;
+        _appUserRepository = appUserRepository;
     }
 
     public async Task SendInvoiceAsync(AppUser user)
@@ -49,7 +52,7 @@ public class PaymentService : IPaymentService
     {
         try
         {
-            await _unitOfWork.Payments.AddAsync(new Payment()
+            await _paymentRepository.AddAsync(new Payment()
             {
                 UserId = user.Id,
                 PayId = update.PreCheckoutQuery.Id,
@@ -63,9 +66,7 @@ public class PaymentService : IPaymentService
             });
 
             user.Tarif = Tarif.Premium;
-            _unitOfWork.Users.Update(user);
-            
-            await _unitOfWork.SaveChangesAsync();
+            await _appUserRepository.UpdateAsync(user);
         }
         catch (Exception e)
         {

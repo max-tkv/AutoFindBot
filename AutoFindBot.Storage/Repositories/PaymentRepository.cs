@@ -3,15 +3,22 @@ using AutoFindBot.Repositories;
 
 namespace AutoFindBot.Storage.Repositories;
 
-public class PaymentRepository : Repository<Entities.Payment>, IPaymentRepository
+public class PaymentRepository : IPaymentRepository
 {
-    public PaymentRepository(AppDbContext context) : base(context)
+    private readonly AppDbContext _context;
+
+    public PaymentRepository(AppDbContext context)
     {
+        _context = context;
     }
 
     public async Task<Payment> AddAsync(Payment newPayment)
     {
-        var result = await DbSet.AddAsync(newPayment);
+        var result = await _context.Payments.AddAsync(newPayment);
+        await CommitAsync();
         return result.Entity;
     }
+    
+    private async Task CommitAsync(CancellationToken cancellationToken = default) =>
+        await _context.SaveChangesAsync(cancellationToken);
 }

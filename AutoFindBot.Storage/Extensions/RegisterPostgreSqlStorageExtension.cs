@@ -35,11 +35,11 @@ public static class RegisterPostgreSqlStorageExtension
             });
 
         return serviceCollection
-            .AddTransient<IUnitOfWork, UnitOfWork>()
             .AddTransient<IAppUserRepository, AppUserRepository>()
             .AddTransient<IActionRepository, ActionRepository>()
             .AddTransient<IPaymentRepository, PaymentRepository>()
             .AddTransient<ICarRepository, CarRepository>()
-            .AddTransient<IUserFilterRepository, UserFilterRepository>();
+            .AddTransient<IUserFilterRepository, UserFilterRepository>()
+            .AddTransient<ISourceCheckRepository, SourceCheckRepository>();
     }
 }

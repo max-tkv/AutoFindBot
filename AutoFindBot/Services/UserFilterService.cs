@@ -1,24 +1,25 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
+using AutoFindBot.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Services;
 
 public class UserFilterService : IUserFilterService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserFilterRepository _userFilterRepository;
     private readonly ILogger<UserFilterService> _logger;
 
     public UserFilterService(
-        IUnitOfWork unitOfWork,
+        IUserFilterRepository userFilterRepository,
         ILogger<UserFilterService> logger)
     {
         _logger = logger;
-        _unitOfWork = unitOfWork;
+        _userFilterRepository = userFilterRepository;
     }
     
     public async Task<List<UserFilter>> GetByUserAsync(AppUser appUser)
     {
-        return await _unitOfWork.UserFilters.GetByUserAsync(appUser);
+        return await _userFilterRepository.GetByUserAsync(appUser);
     }
 }

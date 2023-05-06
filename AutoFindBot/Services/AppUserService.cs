@@ -4,6 +4,7 @@ using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Models.ConfigurationOptions;
+using AutoFindBot.Repositories;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -12,19 +13,22 @@ namespace AutoFindBot.Services;
 
 public class AppUserService : IAppUserService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IAppUserRepository _appUserRepository;
     private readonly IOptions<PaymentsOptions> _paymentsOptions;
     private readonly IOptions<RequiredSubscriptionsOptions> _requiredSubscriptionsOptions;
     private readonly ILogger<AppUserService> _logger;
+    private readonly IActionRepository _actionRepository;
 
     public AppUserService(
-        IUnitOfWork unitOfWork, 
+        IAppUserRepository appUserRepository, 
+        IActionRepository actionRepository,
         IOptions<PaymentsOptions> paymentsOptions,
         IOptions<RequiredSubscriptionsOptions> requiredSubscriptionsOptions,
         ILogger<AppUserService> logger)
     {
         _logger = logger;
-        _unitOfWork = unitOfWork;
+        _appUserRepository = appUserRepository;
+        _actionRepository = actionRepository;
         _paymentsOptions = paymentsOptions;
         _requiredSubscriptionsOptions = requiredSubscriptionsOptions;
     }
@@ -32,27 +36,25 @@ public class AppUserService : IAppUserService
     public async Task<AppUser> GetOrCreateAsync(Update update)
     {
         var newUser = GetByUpdate(update);
-        var user = await _unitOfWork.Users.GetByChatIdAsync(newUser.ChatId);
+        var user = await _appUserRepository.GetByChatIdAsync(newUser.ChatId);
         if (user != null)
         {
             return user;
         }
 
-        await _unitOfWork.Users.AddAsync(newUser);
-        await _unitOfWork.SaveChangesAsync();
+        await _appUserRepository.AddAsync(newUser);
         return newUser;
     }
     
     public async Task<AppUser> GetOrCreateAsync(AppUser newUser)
     {
-        var user = await _unitOfWork.Users.GetByChatIdAsync(newUser.ChatId);
+        var user = await _appUserRepository.GetByChatIdAsync(newUser.ChatId);
         if (user != null)
         {
             return user;
         }
 
-        await _unitOfWork.Users.AddAsync(newUser);
-        await _unitOfWork.SaveChangesAsync();
+        await _appUserRepository.AddAsync(newUser);
         return newUser;
     }
     
@@ -95,7 +97,7 @@ public class AppUserService : IAppUserService
         
         if (_paymentsOptions.Value.Active)
         {
-            var numberOfRequests = await _unitOfWork.Actions.GetNumberOfRequestsByUserAsync(user);
+            var numberOfRequests = await _actionRepository.GetNumberOfRequestsByUserAsync(user);
             if (numberOfRequests >= _paymentsOptions.Value.MaxFreeNumberRequests)
             {
                 throw new FreeRequestsDidNotException();
@@ -136,12 +138,11 @@ public class AppUserService : IAppUserService
 
     public async Task<List<AppUser>> GetAllAsync()
     {
-        return await _unitOfWork.Users.GetAllAsync();
+        return await _appUserRepository.GetAllAsync();
     }
 
     public async Task SetConfirmAsync(long currentFilterUserId)
     {
-        await _unitOfWork.Users.ConfirmAsync(currentFilterUserId);
-        await _unitOfWork.SaveChangesAsync();
+        await _appUserRepository.ConfirmAsync(currentFilterUserId);
     }
 }

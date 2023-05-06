@@ -1,32 +1,32 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
+using AutoFindBot.Repositories;
 
 namespace AutoFindBot.Services;
 
 public class SourceCheckService : ISourceCheckService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ISourceCheckRepository _sourceCheckRepository;
 
-    public SourceCheckService(IUnitOfWork unitOfWork)
+    public SourceCheckService(ISourceCheckRepository sourceCheckRepository)
     {
-        _unitOfWork = unitOfWork;
+        _sourceCheckRepository = sourceCheckRepository;
     }
 
     public async Task<long> AddSourceAsync(UserFilter filter, Source source)
     {
-        var entity = await _unitOfWork.SourceChecks.AddAsync(new SourceCheck()
+        var entity = await _sourceCheckRepository.AddAsync(new SourceCheck()
         {
             Source = source,
             UserFilterId = filter.Id
         });
-        await _unitOfWork.SaveChangesAsync();
 
         return entity.Id;
     }
 
     public async Task<bool> ExistsAsync(UserFilter filter, Source source)
     {
-        return await _unitOfWork.SourceChecks.GetLastByFilterAsync(x => 
+        return await _sourceCheckRepository.GetLastByFilterAsync(x => 
                     x.UserFilterId == filter.Id &&
                     x.Source == source) switch
             {
@@ -37,7 +37,7 @@ public class SourceCheckService : ISourceCheckService
     
     public async Task<bool> ExistsAsync(UserFilter filter)
     {
-        return await _unitOfWork.SourceChecks.GetLastByFilterAsync(x => 
+        return await _sourceCheckRepository.GetLastByFilterAsync(x => 
                 x.UserFilterId == filter.Id) switch
             {
                 null => false,

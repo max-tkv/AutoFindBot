@@ -4,7 +4,7 @@ using Action = AutoFindBot.Entities.Action;
 
 namespace AutoFindBot.Repositories;
 
-public interface IActionRepository : IRepository<Entities.Action>
+public interface IActionRepository
 {
     Task<Entities.Action> AddAsync(Entities.Action action);
     Task<Entities.Action> GetLastAsync(long id);

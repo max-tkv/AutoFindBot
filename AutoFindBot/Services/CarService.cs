@@ -1,5 +1,6 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
+using AutoFindBot.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Services;
@@ -7,47 +8,33 @@ namespace AutoFindBot.Services;
 public class CarService : ICarService
 {
     private readonly ILogger<CarService> _logger;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICarRepository _carRepository;
 
     public CarService(
         ILogger<CarService> logger, 
-        IUnitOfWork unitOfWork)
+        ICarRepository carRepository)
     {
         _logger = logger;
-        _unitOfWork = unitOfWork;
+        _carRepository = carRepository;
     }
     
-    public async Task<List<Car>> CheckExistNewCarsAndSaveAsync(
-        List<Car> carsInput, 
+    public async Task<bool> CheckExistNewCarAndSaveAsync(
+        Car newCar, 
         UserFilter userFilter,
         Source source)
     {
-        var newCars = new List<Car>();
-        foreach (var carData in carsInput)
+        var car = await _carRepository
+            .GetByFilterAsync(x => x.OriginId == newCar.OriginId
+                                   && x.UserFilterId == userFilter.Id
+                                   && x.Source == source);
+        if (car == null)
         {
-            var car = await _unitOfWork.Cars
-                .GetByFilterAsync(x => x.OriginId == carData.OriginId 
-                                       && x.UserFilterId == userFilter.Id
-                                       && x.Source == source);
-            if (car == null)
-            {
-                newCars.Add(carData);
-                
-                carData.UserFilterId = userFilter.Id;
-                await _unitOfWork.Cars.AddAsync(carData);
-                await _unitOfWork.SaveChangesAsync();
-            }
+            newCar.UserFilterId = userFilter.Id;
+            await _carRepository.AddAsync(newCar);
+
+            return true;
         }
 
-        return newCars;
-    }
-
-    public async Task AddCarRangeAsync(List<Car> cars)
-    {
-        foreach (var car in cars)
-        {
-            await _unitOfWork.Cars.AddAsync(car);
-        }
-        await _unitOfWork.SaveChangesAsync();
+        return false;
     }
 }

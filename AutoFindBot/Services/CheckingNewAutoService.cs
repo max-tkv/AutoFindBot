@@ -115,13 +115,16 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter, Source source)
     {
         var result = new List<Car>();
-        var checkedNewCars = await _carService.CheckExistNewCarsAndSaveAsync(newCars, currentFilter, source);
-        foreach (var currentCheckedNewCar in checkedNewCars)
+        foreach (var newCar in newCars)
         {
-            var filterSuccess = CheckAutoByUserFilter(currentFilter, currentCheckedNewCar);
+            var filterSuccess = CheckAutoByUserFilter(currentFilter, newCar);
             if (filterSuccess)
             {
-                result.Add(currentCheckedNewCar);
+                var checkedNewCar = await _carService.CheckExistNewCarAndSaveAsync(newCar, currentFilter, source);
+                if (checkedNewCar)
+                {
+                    result.Add(newCar);
+                }
             }
         }
 
