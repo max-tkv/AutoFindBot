@@ -2,8 +2,7 @@
 
 public class Car : BaseEntity
 {
-    public virtual long UserId { get; set; }
-    
+
     public virtual long UserFilterId { get; set; }
 
     public string OriginId { get; set; }
@@ -25,9 +24,7 @@ public class Car : BaseEntity
     public DateTime PublishedAt { get; set; }
 
     public List<Image> ImageUrls { get; set; } = new List<Image>();
-    
-    public virtual AppUser User { get; set; }
-    
+
     public virtual UserFilter UserFilter { get; set; }
 }
 

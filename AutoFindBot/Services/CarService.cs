@@ -19,20 +19,20 @@ public class CarService : ICarService
     
     public async Task<List<Car>> CheckExistNewCarsAndSaveAsync(
         List<Car> carsInput, 
-        UserFilter userFilter)
+        UserFilter userFilter,
+        Source source)
     {
         var newCars = new List<Car>();
         foreach (var carData in carsInput)
         {
             var car = await _unitOfWork.Cars
                 .GetByFilterAsync(x => x.OriginId == carData.OriginId 
-                                       && x.UserFilterId == userFilter.Id 
-                                       && x.UserId == userFilter.UserId);
+                                       && x.UserFilterId == userFilter.Id
+                                       && x.Source == source);
             if (car == null)
             {
                 newCars.Add(carData);
                 
-                carData.UserId = userFilter.UserId;
                 carData.UserFilterId = userFilter.Id;
                 await _unitOfWork.Cars.AddAsync(carData);
             }

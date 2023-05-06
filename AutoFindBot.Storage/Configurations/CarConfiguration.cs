@@ -11,8 +11,7 @@ public class CarConfiguration : IEntityTypeConfiguration<Entities.Car>
 {
     public void Configure(EntityTypeBuilder<Car> builder)
     {
-        builder.ToTable("Cars")
-            .HasKey(x => x.Id);
+        builder.ToTable("Cars").HasKey(x => x.Id);
         builder.HasIndex(x => new { x.Title, x.Price, x.Year, x.Source });
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.CreatedAt)
@@ -33,15 +32,10 @@ public class CarConfiguration : IEntityTypeConfiguration<Entities.Car>
         builder.Property(x => x.ImageUrls)
             .HasConversion(new ImageUrlsConverter(new JsonSerializerOptions()))
             .IsRequired(false);
-        
-        builder.HasOne(x => x.User)
-            .WithMany(x => x.Cars)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasOne(x => x.UserFilter)
             .WithMany(x => x.Cars)
-            .HasForeignKey(x => x.UserId)
+            .HasForeignKey(x => x.UserFilterId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

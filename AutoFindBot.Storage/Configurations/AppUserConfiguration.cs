@@ -31,8 +31,5 @@ public class AppUserConfiguration : IEntityTypeConfiguration<Entities.AppUser>
         builder.HasMany(x => x.Payments)
             .WithOne(x => x.User)
             .OnDelete(DeleteBehavior.Restrict);
-        builder.HasMany(x => x.Cars)
-            .WithOne(x => x.User)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

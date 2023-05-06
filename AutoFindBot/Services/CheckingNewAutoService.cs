@@ -83,7 +83,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             {
                 var currentSource = newCarsGroupBySource.Key;
                 var newCarsSource = newCarsGroupBySource.ToList();
-                var checkedNewCars = await CheckAutoAsync(newCarsSource, currentFilter);
+                var checkedNewCars = await CheckAutoAsync(newCarsSource, currentFilter, currentSource);
                 if (checkedNewCars.Any())
                 {
                     var existsSuccess = await _sourceCheckService.ExistsAsync(currentFilter, currentSource);
@@ -112,10 +112,10 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
 
-    private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter)
+    private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter, Source source)
     {
         var result = new List<Car>();
-        var checkedNewCars = await _carService.CheckExistNewCarsAndSaveAsync(newCars, currentFilter);
+        var checkedNewCars = await _carService.CheckExistNewCarsAndSaveAsync(newCars, currentFilter, source);
         foreach (var currentCheckedNewCar in checkedNewCars)
         {
             var filterSuccess = CheckAutoByUserFilter(currentFilter, currentCheckedNewCar);
@@ -142,24 +142,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         
         return true;
     }
-
-    // private async Task GetAutoAndSendMessageByFilterAsync(
-    //     TelegramBotClient botClient, 
-    //     AppUser user, 
-    //     UserFilter filter, 
-    //     bool sendEmptyResultMessage)
-    // {
-    //     var newAutoList = await GetAutoByFilterAsync(filter, botClient, user);
-    //     if (newAutoList.Any() || sendEmptyResultMessage)
-    //     {
-    //         await _messageService.SendNewAutoMessageAsync(botClient, user, filter, newAutoList);   
-    //     }
-    //     
-    //     _logger.LogInformation(
-    //         $"User ID: {user.Id}. " +
-    //         $"Filter ID: {filter.Id}. " +
-    //         $"New cars found: {newAutoList.Count}");
-    // }
+   
 
     private async Task<List<Car>> GetNewAutoAsync()
     {

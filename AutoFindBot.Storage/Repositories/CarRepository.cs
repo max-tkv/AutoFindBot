@@ -16,16 +16,6 @@ public class CarRepository : Repository<Entities.Car>, ICarRepository
         var result = await DbSet.AddAsync(newCar);
         return result.Entity;
     }
-    
-    public async Task<Entities.Car> GetByUserAsync(AppUser user) =>
-        await DbSet.AsNoTracking().Where(x => x.User == user)
-            .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync();
-    
-    public async Task<Entities.Car> GetByUserAndSourceAsync(AppUser user, Source source) =>
-        await DbSet.AsNoTracking().Where(x => x.User == user && x.Source == source)
-            .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync();
 
     public async Task<Entities.Car?> GetByFilterAsync(Expression<Func<Car, bool>> predicate) =>
         await DbSet.AsNoTracking()
