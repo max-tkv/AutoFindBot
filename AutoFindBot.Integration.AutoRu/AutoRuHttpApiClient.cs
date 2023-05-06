@@ -4,9 +4,11 @@ using AutoFindBot.Integration.AutoRu.Exceptions;
 using AutoFindBot.Integration.AutoRu.Models;
 using AutoFindBot.Integration.AutoRu.Options;
 using AutoFindBot.Models.AutoRu;
+using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AutoFindBot.Integration.AutoRu;
 
@@ -15,16 +17,19 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
     private readonly ILogger<AutoRuHttpApiClient> _logger;
     private readonly IMapper _mapper;
     private readonly AutoRuHttpApiClientOptions _options;
+    private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
 
     public AutoRuHttpApiClient(
         HttpClient httpClient,
         ILogger<AutoRuHttpApiClient> logger,
         IMapper mapper,
-        AutoRuHttpApiClientOptions options) : base(httpClient)
+        AutoRuHttpApiClientOptions options,
+        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
     {
         _logger = logger;
         _mapper = mapper;
         _options = options;
+        _defaultFilterOptions = defaultFilterOptions;
     }
 
     public async Task<AutoRuResult> GetAutoByFilterAsync(AutoRuFilter filter)
@@ -39,8 +44,8 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
             {
                 Category = "cars",
                 Section = "used",
-                PriceFrom = Int32.Parse(filter.PriceMin),
-                PriceTo = Int32.Parse(filter.PriceMax),
+                PriceFrom = _defaultFilterOptions.Value.PriceMin,
+                PriceTo = _defaultFilterOptions.Value.PriceMax,
                 YearFrom = 2010,
                 Sort = "price-asc",
                 OutputType = "list",

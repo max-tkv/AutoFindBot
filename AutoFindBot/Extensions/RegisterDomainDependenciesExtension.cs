@@ -40,6 +40,7 @@ public static class RegisterDomainDependenciesExtension
         // options
         services.Configure<PaymentsOptions>(configuration.GetSection(new PaymentsOptions().Name));
         services.Configure<RequiredSubscriptionsOptions>(configuration.GetSection(new RequiredSubscriptionsOptions().Name));
+        services.Configure<DefaultFilterOptions>(configuration.GetSection(new DefaultFilterOptions().Name));
 
         return services;
     }

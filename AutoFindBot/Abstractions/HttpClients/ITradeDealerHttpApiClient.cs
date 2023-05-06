@@ -4,6 +4,5 @@ namespace AutoFindBot.Abstractions.HttpClients;
 
 public interface ITradeDealerHttpApiClient
 {
-    Task<TradeDealerResult> GetAutoByFilterAsync(TradeDealerFilter filter);
     Task<TradeDealerResult> GetAllNewAutoAsync();
 }

@@ -3,10 +3,10 @@ using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.Invariants;
 using AutoFindBot.Integration.Models;
 using AutoFindBot.Integration.Options;
+using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Models.TradeDealer;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -17,51 +17,19 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
     private readonly IMapper _mapper;
     private readonly ILogger<TradeDealerHttpApiClient> _logger;
     private readonly TradeDealerHttpApiClientOptions _options;
+    private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
 
     public TradeDealerHttpApiClient(
         HttpClient httpClient,
         IMapper mapper,
         TradeDealerHttpApiClientOptions options,
-        ILogger<TradeDealerHttpApiClient> logger) : base(httpClient)
+        ILogger<TradeDealerHttpApiClient> logger,
+        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
     {
         _options = options;
         _mapper = mapper;
         _logger = logger;
-    }
-
-    public async Task<TradeDealerResult> GetAutoByFilterAsync(TradeDealerFilter filter)
-    {
-        try
-        {
-            NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
-            ArgumentNullException.ThrowIfNull(filter);
-            
-            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
-                .Replace(TradeDealerHttpApiClientInvariants.PriceMin, filter.PriceMin)
-                .Replace(TradeDealerHttpApiClientInvariants.PriceMax, filter.PriceMax);
-            var response = await SendAsync(path, HttpMethod.Get);
-            var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode == false)
-            {
-                throw new TradeDealerClientException($"Произошла ошибка: {content}");
-            }
-            
-            var tradeDealerResponse = GetObjectFromResponse<TradeDealerResponse>(content);
-
-            ArgumentNullException.ThrowIfNull(tradeDealerResponse.CarInfoResponses);
-    
-            return _mapper.Map<TradeDealerResult>(tradeDealerResponse);
-        }
-        catch (NotActiveSourceException e)
-        {
-            _logger.LogWarning(e, $"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, $"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
-            throw;
-        }
+        _defaultFilterOptions = defaultFilterOptions;
     }
 
     public async Task<TradeDealerResult> GetAllNewAutoAsync()
@@ -71,8 +39,8 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
             NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
 
             var path = _options.BaseUrl + _options.GetAutoByFilterQuery
-                .Replace(TradeDealerHttpApiClientInvariants.PriceMin, "1")
-                .Replace(TradeDealerHttpApiClientInvariants.PriceMax, "100000000");
+                .Replace(TradeDealerHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
+                .Replace(TradeDealerHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
             var response = await SendAsync(path, HttpMethod.Get);
             var content = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode == false)

@@ -13,6 +13,10 @@ public class AvitoHttpApiClientOptions : HttpApiClientOptions
     public ProxyData ProxyData { get; set; }
     
     public AvitoCookie Cookie { get; set; }
+    
+    public int DefaultPriceMin { get; set; }
+    
+    public int DefaultPriceMax { get; set; }
 }
 
 public class ProxyData
