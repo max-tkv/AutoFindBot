@@ -77,18 +77,20 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         foreach (var currentFilter in filters)
         {
             _logger.LogInformation($"User ID: {currentUser.Id}. Select Filter ID: {currentFilter.Id}");
+            var isFoundNewAutoByFilter = false;
             var newCarsGroupsBySource = newCars.GroupBy(x => x.Source);
             foreach (var newCarsGroupBySource in newCarsGroupsBySource)
             {
                 var currentSource = newCarsGroupBySource.Key;
                 var newCarsSource = newCarsGroupBySource.ToList();
                 var checkedNewCars = await CheckAutoAsync(newCarsSource, currentFilter);
-                if (checkedNewCars.Any() || sendEmptyResultMessage)
+                if (checkedNewCars.Any())
                 {
                     var existsSuccess = await _sourceCheckService.ExistsAsync(currentFilter, currentSource);
                     if (existsSuccess)
                     {
-                        await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, checkedNewCars);    
+                        await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, checkedNewCars);
+                        isFoundNewAutoByFilter = true;
                     }
                     else
                     {
@@ -102,6 +104,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                     }
                 }
             }
+            
+            if (!isFoundNewAutoByFilter && sendEmptyResultMessage)                                                           
+            {                                                                                                        
+                await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, new List<Car>());
+            }                                                                                                           
         }
     }
 
