@@ -17,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
     
     private readonly AppDbContext _appDbContext;
     private bool _isDisposed;
+    private readonly SemaphoreSlim _semaphore = new(1);
     
     public UnitOfWork([NotNull] AppDbContext appDbContext)
     {
@@ -43,8 +44,17 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        _appDbContext.ChangeTracker.DetectChanges();
-        return await _appDbContext.SaveChangesAsync(cancellationToken);
+        await _semaphore.WaitAsync(cancellationToken);
+
+        try
+        {
+            _appDbContext.ChangeTracker.DetectChanges();
+            return await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public Task DetachAllTrackingEntitiesAsync()
