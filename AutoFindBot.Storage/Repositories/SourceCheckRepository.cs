@@ -27,6 +27,17 @@ public class SourceCheckRepository : ISourceCheckRepository
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync();
 
+    public async Task<bool> ExistsAsync(UserFilter filter, Source source)
+    {
+        return await GetLastByFilterAsync(x => 
+                x.UserFilterId == filter.Id &&
+                x.Source == source) switch
+            {
+                null => false,
+                _ => true
+            };
+    }
+
     public async Task<bool> UpdateDateTimeAsync(UserFilter filter, Source source)
     {
         var sourceCheck = await _context.SourceChecks.SingleOrDefaultAsync(x => x.Source == source && x.UserFilterId == filter.Id);

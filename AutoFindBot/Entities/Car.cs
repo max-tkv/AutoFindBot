@@ -2,7 +2,6 @@
 
 public class Car : BaseEntity
 {
-
     public virtual long UserFilterId { get; set; }
 
     public string OriginId { get; set; }

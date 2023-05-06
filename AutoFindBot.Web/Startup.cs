@@ -62,7 +62,7 @@ namespace AutoFindBot.Web
             var serviceProvider = services.BuildServiceProvider();
             ServiceLocator.SetProvider(serviceProvider);
 
-            serviceProvider.GetRequiredService<TelegramBot>().GetBot().Wait();
+            serviceProvider.GetRequiredService<TelegramBotService>().GetBotAsync().Wait();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, 

@@ -23,12 +23,12 @@ public class CheckRequiredSubscriptionsCommand : BaseCommand
         IAppUserService appUserService, 
         IMessageService messageService,
         ILogger<CheckRequiredSubscriptionsCommand> logger,
-        TelegramBot telegramBot)
+        TelegramBotService telegramBotService)
     {
         _logger = logger;
         _appUserService = appUserService;
         _messageService = messageService;
-        _botClient = telegramBot.GetBot().Result;
+        _botClient = telegramBotService.GetBotAsync().Result;
     }
     
     public override async Task ExecuteAsync(Update update, AppUser user)

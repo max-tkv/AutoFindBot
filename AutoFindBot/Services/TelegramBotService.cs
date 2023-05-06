@@ -3,17 +3,17 @@ using Telegram.Bot;
 
 namespace AutoFindBot.Services
 {
-    public class TelegramBot
+    public class TelegramBotService
     {
         private readonly IConfiguration _configuration;
         private TelegramBotClient? _botClient;
 
-        public TelegramBot(IConfiguration configuration)
+        public TelegramBotService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        public async Task<TelegramBotClient> GetBot()
+        public async Task<TelegramBotClient> GetBotAsync()
         {
             if (_botClient != null)
             {

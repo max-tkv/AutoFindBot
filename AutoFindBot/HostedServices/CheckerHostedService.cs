@@ -23,8 +23,8 @@ public class CheckerHostedService : IHostedService, IDisposable
         _appUserService = ServiceLocator.GetService<IAppUserService>();
         _checkingNewAutoService = ServiceLocator.GetService<ICheckingNewAutoService>();
         
-        var telegramBot = ServiceLocator.GetService<TelegramBot>();
-        _botClient = telegramBot.GetBot().Result;
+        var telegramBot = ServiceLocator.GetService<TelegramBotService>();
+        _botClient = telegramBot.GetBotAsync().Result;
     }
 
     public Task StartAsync(CancellationToken stoppingToken)

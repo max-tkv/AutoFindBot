@@ -18,20 +18,17 @@ public static class RegisterDomainDependenciesExtension
     public static IServiceCollection RegisterDomain(this IServiceCollection services, IConfiguration configuration)
     {
         // services
-        services.AddSingleton<TelegramBot>();
+        services.AddSingleton<TelegramBotService>();
         
         services.AddTransient<ICommandExecutorService, CommandExecutorService>();
         services.AddTransient<IKeyboardService, KeyboardService>();
         services.AddTransient<IMessageService, MessageService>();
         services.AddTransient<IAppUserService, AppUserService>();
         services.AddTransient<IActionService, ActionService>();
-        services.AddTransient<IPaginationService, PaginationService>();
         services.AddTransient<IPaymentService, PaymentService>();
         services.AddTransient<ICheckingNewAutoService, CheckingNewAutoService>();
-        services.AddTransient<IUserFilterService, UserFilterService>();
         services.AddTransient<ICarService, CarService>();
         services.AddTransient<ICaptchaSolutionsService, CaptchaSolutionsService>();
-        services.AddTransient<ISourceCheckService, SourceCheckService>();
 
         // commands
         services.AddTransient<BaseCommand, StartCommand>();

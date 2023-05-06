@@ -18,10 +18,10 @@ public class CheckNewAutoCommand : BaseCommand
     public CheckNewAutoCommand(
         ICheckingNewAutoService checkingNewAutoService,
         ILogger<StartCommand> logger,
-        TelegramBot telegramBot)
+        TelegramBotService telegramBotService)
     {
         _checkingNewAutoService = checkingNewAutoService;
-        _botClient = telegramBot.GetBot().Result;
+        _botClient = telegramBotService.GetBotAsync().Result;
         _logger = logger;
     }
     

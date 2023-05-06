@@ -18,9 +18,9 @@ public class SettingsCommand : BaseCommand
     public SettingsCommand(
         IMessageService messageService,
         ILogger<StartCommand> logger,
-        TelegramBot telegramBot)
+        TelegramBotService telegramBotService)
     {
-        _botClient = telegramBot.GetBot().Result;
+        _botClient = telegramBotService.GetBotAsync().Result;
         _messageService = messageService;
         _logger = logger;
     }

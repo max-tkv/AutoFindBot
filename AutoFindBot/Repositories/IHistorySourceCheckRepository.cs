@@ -9,5 +9,7 @@ public interface ISourceCheckRepository
 
     Task<Entities.SourceCheck?> GetLastByFilterAsync(Expression<Func<Entities.SourceCheck, bool>> predicate);
 
+    Task<bool> ExistsAsync(UserFilter filter, Source source);
+
     Task<bool> UpdateDateTimeAsync(UserFilter filter, Source source);
 }

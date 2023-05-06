@@ -18,9 +18,9 @@ public class FiltersCommand : BaseCommand
     public FiltersCommand(
         IMessageService messageService,
         ILogger<FiltersCommand> logger,
-        TelegramBot telegramBot)
+        TelegramBotService telegramBotService)
     {
-        _botClient = telegramBot.GetBot().Result;
+        _botClient = telegramBotService.GetBotAsync().Result;
         _messageService = messageService;
         _logger = logger;
     }

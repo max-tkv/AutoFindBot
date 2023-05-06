@@ -18,9 +18,9 @@ public class SourcesCommand : BaseCommand
     public SourcesCommand(
         IMessageService messageService,
         ILogger<SourcesCommand> logger,
-        TelegramBot telegramBot)
+        TelegramBotService telegramBotService)
     {
-        _botClient = telegramBot.GetBot().Result;
+        _botClient = telegramBotService.GetBotAsync().Result;
         _messageService = messageService;
         _logger = logger;
     }

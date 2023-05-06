@@ -2,6 +2,7 @@
 using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Invariants;
+using AutoFindBot.Repositories;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -15,18 +16,18 @@ public class MessageService : IMessageService
     private readonly IKeyboardService _keyboardService;
     private readonly ILogger<MessageService> _logger;
     private readonly IConfiguration _configuration;
-    private readonly IUserFilterService _userFilterService;
+    private readonly IUserFilterRepository _userFilterRepository;
 
     public MessageService(
         IKeyboardService keyboardService, 
         ILogger<MessageService> logger,
         IConfiguration configuration,
-        IUserFilterService userFilterService)
+        IUserFilterRepository userFilterRepository)
     {
         _logger = logger;
         _keyboardService = keyboardService;
         _configuration = configuration;
-        _userFilterService = userFilterService;
+        _userFilterRepository = userFilterRepository;
     }
     
     public async Task SendStartMessage(TelegramBotClient botClient, AppUser user)
@@ -159,7 +160,7 @@ public class MessageService : IMessageService
 
     public async Task SendUserFiltersMessageAsync(TelegramBotClient botClient, Update update, AppUser user)
     {
-        var userFilters = await _userFilterService.GetByUserAsync(user);
+        var userFilters = await _userFilterRepository.GetByUserAsync(user);
         var keyboard = _keyboardService.GetUserFiltersKeyboard(userFilters);
         await botClient.SendTextMessageAsync(
             user.ChatId, 

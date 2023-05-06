@@ -1,6 +1,7 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
+using AutoFindBot.Repositories;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -11,7 +12,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
 {
     private readonly ILogger<CheckingNewAutoService> _logger;
     private readonly ITradeDealerHttpApiClient _tradeDealerHttpApiClient;
-    private readonly IUserFilterService _userFilterService;
+    private readonly IUserFilterRepository _userFilterRepository;
     private readonly IMessageService _messageService;
     private readonly ICarService _carService;
     private readonly IMapper _mapper;
@@ -19,7 +20,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IAvitoHttpApiClient _avitoHttpApiClient;
     private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
     private readonly IAppUserService _appUserService;
-    private readonly ISourceCheckService _sourceCheckService;
+    private readonly ISourceCheckRepository _sourceCheckRepository;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
@@ -27,24 +28,24 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         ITradeDealerHttpApiClient tradeDealerHttpApiClient,
         IAutoRuHttpApiClient autoRuHttpApiClient,
         IAvitoHttpApiClient avitoHttpApiClient,
-        IUserFilterService userFilterService,
+        IUserFilterRepository userFilterRepository,
         IMessageService messageService,
         ICarService carService,
         IMapper mapper,
         IAppUserService appUserService,
-        ISourceCheckService sourceCheckService)
+        ISourceCheckRepository sourceCheckRepository)
     {
         _logger = logger;
         _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
         _tradeDealerHttpApiClient = tradeDealerHttpApiClient;
         _autoRuHttpApiClient = autoRuHttpApiClient;
         _avitoHttpApiClient = avitoHttpApiClient;
-        _userFilterService = userFilterService;
+        _userFilterRepository = userFilterRepository;
         _messageService = messageService;
         _carService = carService;
         _mapper = mapper;
         _appUserService = appUserService;
-        _sourceCheckService = sourceCheckService;
+        _sourceCheckRepository = sourceCheckRepository;
     }
 
     public async Task CheckAndSendMessageAsync(TelegramBotClient botClient, AppUser? user = null)
@@ -72,7 +73,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private async Task CheckAutoAndSendMessageByUserAsync(
         TelegramBotClient botClient, AppUser currentUser, List<Car> newCars, bool sendEmptyResultMessage = false)
     {
-        var filters = await _userFilterService.GetByUserAsync(currentUser);
+        var filters = await _userFilterRepository.GetByUserAsync(currentUser);
         _logger.LogInformation($"User ID: {currentUser.Id}. Find {filters.Count} filters.");
         foreach (var currentFilter in filters)
         {
@@ -86,7 +87,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                 var checkedNewCars = await CheckAutoAsync(newCarsSource, currentFilter, currentSource);
                 if (checkedNewCars.Any())
                 {
-                    var existsSuccess = await _sourceCheckService.ExistsAsync(currentFilter, currentSource);
+                    var existsSuccess = await _sourceCheckRepository.ExistsAsync(currentFilter, currentSource);
                     if (existsSuccess)
                     {
                         await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, checkedNewCars);
@@ -94,7 +95,11 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                     }
                     else
                     {
-                        await _sourceCheckService.AddSourceAsync(currentFilter, currentSource);
+                        await _sourceCheckRepository.AddAsync(new SourceCheck()
+                        {
+                            Source = currentSource,
+                            UserFilterId = currentFilter.Id
+                        });
                         if (!currentUser.Confirm)
                         {
                             await _messageService.SendUserConfirmationMessageAsync(botClient, currentUser);

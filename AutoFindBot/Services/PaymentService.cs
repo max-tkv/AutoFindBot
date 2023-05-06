@@ -19,11 +19,11 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _paymentRepository;
     private readonly IAppUserRepository _appUserRepository;
 
-    public PaymentService(IOptions<PaymentsOptions> paymentsOptions, TelegramBot telegramBot, 
+    public PaymentService(IOptions<PaymentsOptions> paymentsOptions, TelegramBotService telegramBotService, 
         ILogger<PaymentService> logger, IPaymentRepository paymentRepository, IAppUserRepository appUserRepository)
     {
         _logger = logger;
-        _botClient = telegramBot.GetBot().Result;
+        _botClient = telegramBotService.GetBotAsync().Result;
         _paymentsOptions = paymentsOptions;
         _paymentRepository = paymentRepository;
         _appUserRepository = appUserRepository;

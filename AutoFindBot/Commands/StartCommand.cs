@@ -21,12 +21,12 @@ namespace AutoFindBot.Commands
             IActionService actionService, 
             ILogger<StartCommand> logger, 
             IMessageService messageService,
-            TelegramBot telegramBot)
+            TelegramBotService telegramBotService)
         {
             _actionService = actionService;
             _logger = logger;
             _messageService = messageService;
-            _botClient = telegramBot.GetBot().Result;
+            _botClient = telegramBotService.GetBotAsync().Result;
         }
 
         public override async Task ExecuteAsync(Update update, AppUser user)
