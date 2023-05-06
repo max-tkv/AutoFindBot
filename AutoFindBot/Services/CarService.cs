@@ -6,11 +6,11 @@ namespace AutoFindBot.Services;
 
 public class CarService : ICarService
 {
-    private readonly ILogger<PaymentService> _logger;
+    private readonly ILogger<CarService> _logger;
     private readonly IUnitOfWork _unitOfWork;
 
     public CarService(
-        ILogger<PaymentService> logger, 
+        ILogger<CarService> logger, 
         IUnitOfWork unitOfWork)
     {
         _logger = logger;
