@@ -56,12 +56,12 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            _logger.LogWarning($"{nameof(AvitoHttpApiClient)}: {e.Message}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            _logger.LogError($"{nameof(AvitoHttpApiClient)}: {e.Message}");
             throw;
         }
     }
@@ -91,12 +91,12 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            _logger.LogWarning($"{nameof(AvitoHttpApiClient)}: {e.Message}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(AvitoHttpApiClient)}: {e.Message}");
+            _logger.LogError($"{nameof(AvitoHttpApiClient)}: {e.Message}");
             throw;
         }
     }

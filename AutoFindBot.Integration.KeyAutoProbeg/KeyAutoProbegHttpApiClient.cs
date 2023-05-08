@@ -119,12 +119,12 @@ public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpA
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning(e, $"{nameof(KeyAutoProbegHttpApiClient)}: {e.Message}");
+            _logger.LogWarning($"{nameof(KeyAutoProbegHttpApiClient)}: {e.Message}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(KeyAutoProbegHttpApiClient)}: {e.Message}");
+            _logger.LogError($"{nameof(KeyAutoProbegHttpApiClient)}: {e.Message}");
             throw;
         }
     }

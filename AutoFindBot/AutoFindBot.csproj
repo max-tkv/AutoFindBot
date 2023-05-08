@@ -20,7 +20,17 @@
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+      <PackageReference Include="OpenQA.Selenium.Winium" Version="1.0.0.4" />
       <PackageReference Include="Telegram.Bot" Version="16.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Resources\WebDrivers\Linux\chromedriver">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="Resources\WebDrivers\Win\chromedriver.exe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
 </Project>

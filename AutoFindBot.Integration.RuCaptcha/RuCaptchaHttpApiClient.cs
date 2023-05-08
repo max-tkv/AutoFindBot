@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using AutoFindBot.Abstractions.HttpClients;
+using AutoFindBot.Integration.RuCaptcha.Exceptions;
 using AutoFindBot.Integration.RuCaptcha.Invariants;
 using AutoFindBot.Integration.RuCaptcha.Options;
 using AutoFindBot.Models.Avito;
@@ -58,38 +59,30 @@ public class RuCaptchaHttpApiClient : JsonHttpApiClient, IRuCaptchaHttpApiClient
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(RuCaptchaHttpApiClient)}: {e.Message}");
+            _logger.LogError($"{nameof(RuCaptchaHttpApiClient)}: {e.Message}");
             throw;
         }
     }
 
     public async Task<string> GetResultCaptchaAsync(string id)
     {
-        try
-        {
-            ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(id);
 
-            var path = _options.BaseUrl + _options.ResQuery
-                .Replace(RuCaptchaHttpApiClientInvariants.ApiKey, _options.ApiKey)
-                .Replace(RuCaptchaHttpApiClientInvariants.Id, id);
-            
-            var response = await SendAsync(path, HttpMethod.Get);
-            var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode == false)
-            {
-                throw new Exception($"Произошла ошибка: {content}");
-            }
-            
-            var result = content.Split("|").Last();
+        var path = _options.BaseUrl + _options.ResQuery
+            .Replace(RuCaptchaHttpApiClientInvariants.ApiKey, _options.ApiKey)
+            .Replace(RuCaptchaHttpApiClientInvariants.Id, id);
 
-            ArgumentNullException.ThrowIfNull(result);
-            
-            return result;
-        }
-        catch (Exception e)
+        var response = await SendAsync(path, HttpMethod.Get);
+        var content = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode == false)
         {
-            _logger.LogError(e, $"{nameof(RuCaptchaHttpApiClient)}: {e.Message}");
-            throw;
+            throw new Exception($"Произошла ошибка: {content}");
         }
+
+        var result = content.Split("|").Last();
+
+        ArgumentNullException.ThrowIfNull(result);
+
+        return result;
     }
 }

@@ -1,11 +1,14 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.ObjectModel;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using System.Web;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Exceptions;
+using AutoFindBot.Invariants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 
 namespace AutoFindBot.Services;
 
@@ -27,49 +30,85 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         ArgumentNullException.ThrowIfNull(_baseUrl);
     }
 
-    public async Task SolutionAsync(string html)
+    public async Task SolutionAsync(HttpRequestMessage httpResponseMessage)
     {
         try
         {
-            var pathCaptcha = GetCaptchaPath(html);
-            var actionPage = await GetCaptchaActionPageAsync(pathCaptcha);
-            var imageCaptchaUrl = GetCaptchaImageUrl(actionPage);
-            var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl);
-        
-            var captchaId = await _ruCaptchaHttpApiClient.SendCaptchaAsync(imageCaptcha);
-            var code = await GetResultCaptchaWithRetriesAsync(captchaId);
+            var options = new ChromeOptions();
+            options.AddArgument("--headless");
+            using (var driver = new ChromeDriver(@"..\AutoFindBot\Resources\WebDrivers\Win", options))
+            {
+                var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
+                driver.Navigate().GoToUrl(showCaptchaPath);
 
-            await SendCaptchaCodeAsync(actionPage, code);
+                var buttonCaptcha = driver.FindElement(By.Id("js-button"));
+                buttonCaptcha.Click();
+                await Task.Delay(1000);
+            
+                var buttonConfirmStart = driver.FindElements(By.Id("confirm-button")).FirstOrDefault();
+                if (buttonConfirmStart != null)
+                {
+                    buttonConfirmStart.Click();
+                    
+                    var driverCookies1 = driver.Manage().Cookies.AllCookies;
+                    SetCookiesAndToken(httpResponseMessage, driverCookies1);
+                    SetRedirect(httpResponseMessage, driver);
+                    
+                    return;
+                }
+                
+                var actionPage = driver.PageSource;
+                var imageCaptchaUrl = GetCaptchaImageUrl(actionPage);
+                var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl);
+        
+                var captchaId = await _ruCaptchaHttpApiClient.SendCaptchaAsync(imageCaptcha);
+                var code = await GetResultCaptchaWithRetriesAsync(captchaId);
+
+                var inputCode = driver.FindElement(By.Id("xuniq-0-1"));
+                inputCode.SendKeys(code);
+                await Task.Delay(1000);
+            
+                var button = driver.FindElement(By.CssSelector("button[data-testid='submit']"));
+                button.Click();
+                await Task.Delay(1000);
+            
+                var buttonConfirm = driver.FindElement(By.Id("confirm-button"));
+                buttonConfirm.Click();
+                await Task.Delay(1000);
+                
+                var driverCookies = driver.Manage().Cookies.AllCookies;
+                SetCookiesAndToken(httpResponseMessage, driverCookies);
+                SetRedirect(httpResponseMessage, driver);
+            }
         }
         catch (Exception e)
         {
-            throw new CaptchaSolutionsServiceException($"Произошла ошибка при решении капчи: {e}");
+            throw new CaptchaSolutionsServiceException(CaptchaInvariants.SolvingError
+                .Replace(":errorMessage", e.Message));
         }
     }
 
-    private async Task SendCaptchaCodeAsync(string actionPage, string code)
+    private void SetRedirect(HttpRequestMessage httpRequest, ChromeDriver driver)
     {
-        var handler = new HttpClientHandler()
-        {
-            AllowAutoRedirect = true
-        };
-        
-        var pathCaptcha = GetCaptchaPath(actionPage);
-        var client = new HttpClient(handler);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"https://auto.ru{pathCaptcha}&rep={HttpUtility.UrlEncode(code)}");
-        //request.Headers.Add("Cookie", "_csrf_token=2d255fa2112b43736d05e53ea61580a5542f5066b48dd21f; _yasc=s5HWgnRmcABf/i+VVVTZqhZoacJ6Bh49y1uj2jOAWSMSHBvsi81Wb2Kg9dBKaA==; autoru_sid=a%3Ag6438768d2g1ncdbbho5hsceunla0grj.8b3ed8e89fc864c02cd1b08ecacc755c%7C1681421965442.604800.Zwt2-tRRZxys9-LYlIbwTQ.Ft1Mifj2gL_zrtYYtLKO1L8vfzoYHGzKTLW6JKveXZ4; autoruuid=g6438768d2g1ncdbbho5hsceunla0grj.8b3ed8e89fc864c02cd1b08ecacc755c; from=direct; from_lifetime=1681422086017; spravka=dD0xNjgxNDIyMDgxO2k9NS4xNTQuMTgxLjIzO0Q9QjlEQjAyMDNFNzU2NTMzNzFEQTM3OUZDMDJCMTQ1RkEwNDY3M0NCNzFERDYxRTVENzhCMTU1M0U5M0FGQzk4MDgwOTkyQ0I2NUFFRTAxMzc0RjEzMTQwMDgwNzQ7dT0xNjgxNDIyMDgxNjQzNzY5NzQ1O2g9NjBhYTY2OWY0YWFkMmI3OTRlYjk0ZTMzMTRiNWQ5YmE=; suid=2afc6962d68530d543dbe5421e57d6d7.282681e87b11f82df17b6fcad548c8d8");
-        var content = new MultipartFormDataContent();
-        content.Add(new StringContent(code), "rep");
-        content.Add(new StringContent(""), "rdata");
-        content.Add(new StringContent(""), "aesKey");
-        content.Add(new StringContent(""), "signKey");
-        content.Add(new StringContent(""), "pdata");
-        content.Add(new StringContent(""), "tdata");
-        request.Content = content;
-        var response = await client.SendAsync(request);
-        //response.EnsureSuccessStatusCode();
-        var d = await response.Content.ReadAsStringAsync();
-        Console.WriteLine();
+        httpRequest.Method = HttpMethod.Post;
+        httpRequest.RequestUri = new Uri(driver.Url);
+    }
+
+    private void SetCookiesAndToken(HttpRequestMessage httpRequest, ReadOnlyCollection<Cookie> driverCookies)
+    {
+        var cookieValue = string.Join("; ", driverCookies.Select(cookie => $"{cookie.Name}={cookie.Value}"));
+        cookieValue += "; yandex_login=max.tkv; " +
+                       "Session_id=3:1683577497.5.0.1674329708913:lBY-Lg:31.1.1:czoxNjY4ODg5OTk5NDY5OmxCWS1MZzo0NA.2:1|1370033367.-1.2|385032602.1068.2.2:1068|61:10013057.285914.XDsSxbOG95auiz5S7pyhApBbG7I; " +
+                       "ys=udn.cDptYXgudGt2#c_chck.647594796; " +
+                       "mda2_beacon=1683577497563; " +
+                       "sso_status=sso.passport.yandex.ru:synchronized; " +
+                       "cycada=EEZhwoin9/0I8xM8HNULp7e9a+uIKehYp+cFw1YoWmI=; " +
+                       "_ym_d=1683577509; " +
+                       "_yasc=5B7NQJ1PAT2M5j8ZMncY++V0zBceLtKRy7+1ZTFNrnLDUl8XiO5xDQdQWUpObaI=; " +
+                       "count-visits=2; " +
+                       "from_lifetime=1683577753449";
+        httpRequest.Headers.Add("Cookie", cookieValue);
+        httpRequest.Headers.Add("x-csrf-token", driverCookies.Single(x => x.Name == "_csrf_token").Value);
     }
 
     public async Task<string> GetResultCaptchaWithRetriesAsync(string id, int retryCount = 8, int delaySeconds = 10)
@@ -80,61 +119,45 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             {
                 return await _ruCaptchaHttpApiClient.GetResultCaptchaAsync(id);
             }
+            catch (CaptchaNotReadyException e)
+            {
+                _logger.LogInformation($"{nameof(CaptchaSolutionsService)}: {e.Message}");
+                await Task.Delay(delaySeconds * 1000);
+            }
             catch (Exception ex)
             {
-                // Log the error if necessary
-                _logger.LogError(ex, $"Retry {i + 1} failed: {ex.Message}");
-
-                // Wait for the specified delay before retrying
+                _logger.LogInformation(CaptchaInvariants.RetryExecutionError
+                    .Replace(":i", i.ToString())
+                    .Replace(":errorMessage", ex.Message));
                 await Task.Delay(delaySeconds * 1000);
             }
         }
 
-        throw new CaptchaSolutionsServiceException($"Retry count of {retryCount} exceeded.");
+        throw new CaptchaSolutionsServiceException(CaptchaInvariants.RetryLimitExceeded
+            .Replace(":retryCount", retryCount.ToString()));
     }
 
-    private async Task<string> GetCaptchaActionPageAsync(string pathCaptcha)
-    {
-        ArgumentNullException.ThrowIfNull(pathCaptcha);
-
-        using (var httpClient = new HttpClient(){ BaseAddress = new Uri(_baseUrl) })
-        {
-            try
-            {
-                var response = await httpClient.GetAsync(pathCaptcha, HttpCompletionOption.ResponseContentRead);
-                response.EnsureSuccessStatusCode();
-                
-                return await response.Content.ReadAsStringAsync();
-            }
-            catch (HttpRequestException ex) when (ex.InnerException is SocketException socketEx)
-            {
-                throw new CaptchaSolutionsServiceException($"Не удалось подключиться к серверу: {socketEx}");
-            }
-            catch (HttpRequestException ex)
-            {
-                throw new CaptchaSolutionsServiceException($"Произошла ошибка получении страницы с капчей: {ex}");
-            }
-        }
-    }
-    
     private async Task<byte[]> DownloadImageAsync(string imageUrl)
     {
-        using (var httpClient = new HttpClient())
+        try
         {
-            try
+            using (var httpClient = new HttpClient())
             {
-                var response = await httpClient.GetAsync(imageUrl);
+                var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
+                var response = await httpClient.SendAsync(request, new CancellationToken());
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsByteArrayAsync();
+                return await response.Content.ReadAsByteArrayAsync();   
             }
-            catch (HttpRequestException ex) when (ex.InnerException is SocketException socketEx)
-            {
-                throw new CaptchaSolutionsServiceException($"Не удалось подключиться к серверу: {socketEx}");
-            }
-            catch (HttpRequestException ex)
-            {
-                throw new CaptchaSolutionsServiceException($"Произошла ошибка при загрузке изображения: {ex}");
-            }
+        }
+        catch (HttpRequestException ex) when (ex.InnerException is SocketException socketEx)
+        {
+            throw new CaptchaSolutionsServiceException(CaptchaInvariants.MessageServerConnection
+                .Replace(":errorMessage", socketEx.Message));
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new CaptchaSolutionsServiceException(CaptchaInvariants.ImageLoadingError
+                .Replace(":errorMessage", ex.Message));
         }
     }
     
@@ -147,18 +170,6 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             return match.Groups[1].Value;
         }
         
-        throw new CaptchaSolutionsServiceException("HTML не содержит капчу");
-    }
-
-    private string GetCaptchaPath(string html)
-    {
-        string pattern = @"action=""([^""]+)""";
-        Match match = Regex.Match(html, pattern);
-        if (match.Success) 
-        {
-            return match.Groups[1].Value;
-        }
-        
-        throw new CaptchaSolutionsServiceException("Не удалось определить путь к капче.");
+        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml);
     }
 }

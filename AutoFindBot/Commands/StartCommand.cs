@@ -51,7 +51,7 @@ namespace AutoFindBot.Commands
             catch (Exception e)
             {
                 await _messageService.SendErrorMessageAsync(_botClient, user, CommandHelpers.GetErrorMessage(Name));
-                _logger.LogError(e, $"UserID: {user.Id} CommandName: {Name} Error: {e.Message} Trace: {e.StackTrace}");
+                _logger.LogError($"UserID: {user.Id} CommandName: {Name} Error: {e.Message} Trace: {e.StackTrace}");
             }
         }
     }

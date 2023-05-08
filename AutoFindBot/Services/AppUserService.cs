@@ -127,12 +127,12 @@ public class AppUserService : IAppUserService
         }
         catch (RequiredSubscriptionsException e)
         {
-            _logger.LogInformation(e, e.Message);
+            _logger.LogInformation(e.Message);
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            _logger.LogError(e.Message);
         }
     }
 

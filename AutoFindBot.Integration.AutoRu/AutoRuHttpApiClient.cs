@@ -70,12 +70,12 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogWarning($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogError($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             throw;
         }
     }
@@ -117,12 +117,12 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogWarning($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogError($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
             throw;
         }
     }

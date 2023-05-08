@@ -2,5 +2,5 @@
 
 public interface ICaptchaSolutionsService
 {
-    Task SolutionAsync(string html);
+    Task SolutionAsync(HttpRequestMessage httpRequestMessage);
 }
