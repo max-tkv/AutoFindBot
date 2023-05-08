@@ -36,7 +36,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
             .ForMember(x => x.OriginId, o => o.MapFrom(x => x.Id))
             .ForMember(x => x.Id, o => o.MapFrom(x => 0))
-            .ForMember(x => x.Сity, o => o.MapFrom(x => x.Company.Сity.Title))
+            .ForMember(x => x.Сity, o => o.MapFrom(x => x.Company.City.Title))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => x.PublishedAt))
             .ForMember(x => x.Url, o => o.MapFrom(x => $"{x.Brand.Alias}/{x.Generation!.Alias ?? x.Model!.Alias}/{x.Id}"))
             .ForMember(x => x.ImageUrls, o => o.MapFrom(x => 

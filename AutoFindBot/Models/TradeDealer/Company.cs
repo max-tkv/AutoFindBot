@@ -2,5 +2,5 @@
 
 public class Company
 {
-    public Сity Сity { get; set; }
+    public City City { get; set; }
 }

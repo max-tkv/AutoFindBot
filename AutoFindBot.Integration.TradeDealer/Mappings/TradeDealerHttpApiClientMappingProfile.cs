@@ -14,9 +14,9 @@ public class TradeDealerHttpApiClientMappingProfile : Profile
          CreateMap<CarInfoResponse, CarInfo>(MemberList.Destination);
          
          CreateMap<CompanyResponse, Company>()
-             .ForMember(x => x.Сity, o => o.MapFrom(x => x.City));
+             .ForMember(x => x.City, o => o.MapFrom(x => x.City));
          
-         CreateMap<СityResponse, Сity>(MemberList.Destination);
+         CreateMap<СityResponse, City>(MemberList.Destination);
          
          CreateMap<BrandResponse, Brand>(MemberList.Destination);
          
