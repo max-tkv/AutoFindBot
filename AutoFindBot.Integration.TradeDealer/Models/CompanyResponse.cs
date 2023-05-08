@@ -5,5 +5,5 @@ namespace AutoFindBot.Integration.Models;
 public class CompanyResponse
 {
     [JsonProperty("city")]
-    public СityResponse City { get; set; }
+    public CityResponse City { get; set; }
 }
