@@ -45,4 +45,4 @@ RUN apt-get update && apt-get install -y google-chrome-stable
 COPY AutoFindBot/Resources/WebDrivers/Linux/chromedriver /usr/local/bin/chromedriver
 RUN chmod +x /usr/local/bin/chromedriver
 
-ENTRYPOINT ["xvfb-run", "dotnet", "AutoFindBot.Web.dll"]
+ENTRYPOINT ["xvfb-run", "--server-args='-screen 0 1024x768x24'", "dotnet", "AutoFindBot.Web.dll"]
