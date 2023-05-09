@@ -43,18 +43,18 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
                 driver.Navigate().GoToUrl(showCaptchaPath);
 
-                try
+                var buttonAllCookies = driver.FindElements(By.CssSelector("button[data-id='button-all']")).FirstOrDefault();
+                if (buttonAllCookies != null)
                 {
-                    var buttonCaptcha = driver.FindElements(By.Id("js-button")).FirstOrDefault();
-                    if (buttonCaptcha != null)
-                    {
-                        buttonCaptcha.Click();
-                        await Task.Delay(2000);
-                    }
+                    buttonAllCookies?.Click();
+                    await Task.Delay(1000);
                 }
-                catch (Exception e)
+                
+                var buttonCaptcha = driver.FindElements(By.Id("js-button")).FirstOrDefault();
+                if (buttonCaptcha != null)
                 {
-                    throw new Exception("Exception by Click 'js-button']': " + driver.PageSource);
+                    buttonCaptcha.Click();
+                    await Task.Delay(2000);
                 }
 
                 var buttonConfirmStart = driver.FindElements(By.Id("confirm-button")).FirstOrDefault();
