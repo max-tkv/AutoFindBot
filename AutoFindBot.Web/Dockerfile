@@ -27,28 +27,17 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# Install dependencies
-RUN apt-get update && apt-get install -y curl gnupg2 xvfb unzip
-
-# Install Chrome
+# Install Chrome and dependencies
+RUN apt-get update && apt-get install -y curl gnupg2 libgconf-2-4
 RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
 RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
 RUN apt-get update && apt-get install -y google-chrome-stable
 
-# Install ChromeDriver
-ARG CHROME_DRIVER_VERSION=113.0.5672.63
-RUN curl -sSL https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -o /tmp/chromedriver.zip && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin && \
-    chmod +x /usr/local/bin/chromedriver && \
-    rm /tmp/chromedriver.zip
-
-# Set up Xvfb
-RUN Xvfb :99 -ac -screen 0 1280x1024x16 +extension RANDR &
-
-# Set environment variables
+# Set up Chrome for headless mode
 ENV DISPLAY=:99
+RUN apt-get install -y xvfb
+RUN Xvfb :99 -screen 0 1024x768x16 &
 
-# Copy the published application
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "AutoFindBot.Web.dll"]
