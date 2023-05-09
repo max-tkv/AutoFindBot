@@ -36,7 +36,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         {
             var options = new ChromeOptions();
             options.AddArgument("--headless");
-            using (var driver = new ChromeDriver(options))
+            using (var driver = new ChromeDriver("/usr/local/bin", options))
             {
                 var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
                 driver.Navigate().GoToUrl(showCaptchaPath);

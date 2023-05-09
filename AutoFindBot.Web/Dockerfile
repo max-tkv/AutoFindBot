@@ -11,9 +11,6 @@ COPY ["AutoFindBot.Integration.KeyAutoProbeg/AutoFindBot.Integration.KeyAutoProb
 COPY ["AutoFindBot.Integration.TradeDealer/AutoFindBot.Integration.TradeDealer.csproj", "AutoFindBot.Integration.TradeDealer/"]
 COPY ["AutoFindBot.Storage/AutoFindBot.Storage.csproj", "AutoFindBot.Storage/"]
 
-# Copy ChromeDriver
-COPY ["AutoFindBot/Resources/WebDrivers/Linux/chromedriver", "/app/"]
-
 RUN dotnet restore "AutoFindBot.Web/AutoFindBot.Web.csproj"
 
 COPY . .
@@ -37,5 +34,9 @@ RUN apt-get update && apt-get install -y curl gnupg2
 RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
 RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
 RUN apt-get update && apt-get install -y google-chrome-stable
+
+# Copy ChromeDriver
+COPY AutoFindBot/Resources/WebDrivers/Linux/chromedriver /usr/local/bin/chromedriver
+RUN chmod +x /usr/local/bin/chromedriver
 
 ENTRYPOINT ["dotnet", "AutoFindBot.Web.dll"]
