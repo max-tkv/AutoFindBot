@@ -43,7 +43,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
 
                 var buttonCaptcha = driver.FindElement(By.Id("js-button"));
                 buttonCaptcha.Click();
-                await Task.Delay(1000);
+                await Task.Delay(2000);
             
                 var buttonConfirmStart = driver.FindElements(By.Id("confirm-button")).FirstOrDefault();
                 if (buttonConfirmStart != null)
