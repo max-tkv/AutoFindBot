@@ -38,7 +38,7 @@ ARG CHROME_DRIVER_VERSION=113.0.5672.63
 RUN curl -sSL https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -o /tmp/chromedriver.zip && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin && \
     chmod +x /usr/local/bin/chromedriver && \
-    rm /tmp/chromedriver.zip \
+    rm /tmp/chromedriver.zip
     
 # Set up Chrome for headless mode
 ENV DISPLAY=:99
