@@ -12,7 +12,7 @@ COPY ["AutoFindBot.Integration.TradeDealer/AutoFindBot.Integration.TradeDealer.c
 COPY ["AutoFindBot.Storage/AutoFindBot.Storage.csproj", "AutoFindBot.Storage/"]
 
 # Copy ChromeDriver
-COPY ["AutoFindBot/Resources/WebDrivers/Linux", "/app/WebDrivers"]
+COPY ["AutoFindBot/Resources/WebDrivers/Linux/chromedriver", "/app/"]
 
 RUN dotnet restore "AutoFindBot.Web/AutoFindBot.Web.csproj"
 
