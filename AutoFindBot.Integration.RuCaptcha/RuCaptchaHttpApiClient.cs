@@ -1,16 +1,12 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-using AutoFindBot.Abstractions.HttpClients;
-using AutoFindBot.Integration.RuCaptcha.Exceptions;
+﻿using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Integration.RuCaptcha.Invariants;
 using AutoFindBot.Integration.RuCaptcha.Options;
-using AutoFindBot.Models.Avito;
 using AutoFindBot.Utils.Http;
 using Microsoft.Extensions.Logging;
 
 namespace AutoFindBot.Integration.RuCaptcha;
 
-public class RuCaptchaHttpApiClient : JsonHttpApiClient, IRuCaptchaHttpApiClient
+public class RuCaptchaHttpApiClient : HttpApiClient, IRuCaptchaHttpApiClient
 {
     private readonly RuCaptchaHttpApiClientOptions _options;
     private readonly ILogger<RuCaptchaHttpApiClient> _logger;
@@ -39,7 +35,7 @@ public class RuCaptchaHttpApiClient : JsonHttpApiClient, IRuCaptchaHttpApiClient
                     formDataContent.Add(new StreamContent(new MemoryStream(file)), "file", "file.png");
 
                     request.Content = formDataContent;
-                    using (var response = await SendAsync(request))
+                    using (var response = await HttpClient.SendAsync(request))
                     {
                         if (response.IsSuccessStatusCode == false)
                         {

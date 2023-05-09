@@ -1,6 +1,7 @@
-﻿using AutoFindBot.Abstractions.HttpClients;
+﻿using System.Net.Http.Headers;
+using System.Text;
+using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Exceptions;
-using AutoFindBot.Integration.AutoRu.Exceptions;
 using AutoFindBot.Integration.AutoRu.Models;
 using AutoFindBot.Integration.AutoRu.Options;
 using AutoFindBot.Models.AutoRu;
@@ -9,10 +10,11 @@ using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace AutoFindBot.Integration.AutoRu;
 
-public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
+public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
 {
     private readonly ILogger<AutoRuHttpApiClient> _logger;
     private readonly IMapper _mapper;
@@ -32,12 +34,11 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         _defaultFilterOptions = defaultFilterOptions;
     }
 
-    public async Task<AutoRuResult> GetAutoByFilterAsync(AutoRuFilter filter)
+    public async Task<AutoRuResult> GetAllNewAutoAsync()
     {
         try
         {
             NotActiveSourceException.ThrowIfNotActive(nameof(AutoRuHttpApiClient), _options.Active);
-            ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
             var request = new AutoRuRequest()
@@ -46,8 +47,7 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
                 Section = "used",
                 PriceFrom = _defaultFilterOptions.Value.PriceMin,
                 PriceTo = _defaultFilterOptions.Value.PriceMax,
-                YearFrom = 2010,
-                Sort = "price-asc",
+                Sort = "cr_date-desc",
                 OutputType = "list",
                 GeoId = new List<int>()
                 {
@@ -55,14 +55,21 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
                 }
             };
 
-            var response = await SendAsync(path, HttpMethod.Post, GetContent(request));
+            var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, path)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
+            });
             var content = await response.Content.ReadAsStringAsync();
-
-            var autoRuResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<AutoRuResponse>(content);
-
+            var autoRuResponse = JsonConvert.DeserializeObject<AutoRuResponse>(content);
             ArgumentNullException.ThrowIfNull(autoRuResponse);
 
             return _mapper.Map<AutoRuResult>(autoRuResponse);
+        }
+        catch (SuccessSolutionAutoRuException ex)
+        {
+            SetDefaultHeadersToHttpClient(ex.Headers);
+            _logger.LogInformation($"{nameof(AutoRuHttpApiClient)}: Капча успешно решена.");
+            return new AutoRuResult();
         }
         catch (AutoRuCaptchaException)
         {
@@ -80,50 +87,16 @@ public class AutoRuHttpApiClient : JsonHttpApiClient, IAutoRuHttpApiClient
         }
     }
 
-    public async Task<AutoRuResult> GetAllNewAutoAsync()
+    private void SetDefaultHeadersToHttpClient(HttpResponseHeaders headers)
     {
-        try
+        if (HttpClient.DefaultRequestHeaders.Any(x => x.Key == "x-csrf-token"))
         {
-            NotActiveSourceException.ThrowIfNotActive(nameof(AutoRuHttpApiClient), _options.Active);
-
-            var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
-            var request = new AutoRuRequest()
-            {
-                Category = "cars",
-                Section = "used",
-                PriceFrom = 1,
-                PriceTo = 100000000,
-                YearFrom = 2010,
-                Sort = "price-asc",
-                OutputType = "list",
-                GeoId = new List<int>()
-                {
-                    8
-                }
-            };
-
-            var response = await SendAsync(path, HttpMethod.Post, GetContent(request));
-            var content = await response.Content.ReadAsStringAsync();
-
-            var autoRuResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<AutoRuResponse>(content);
-
-            ArgumentNullException.ThrowIfNull(autoRuResponse);
-
-            return _mapper.Map<AutoRuResult>(autoRuResponse);
+            return;
         }
-        catch (AutoRuCaptchaException)
+        
+        foreach (var header in headers)
         {
-            throw;
-        }
-        catch (NotActiveSourceException e)
-        {
-            _logger.LogWarning($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
-            throw;
+            HttpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
         }
     }
 }

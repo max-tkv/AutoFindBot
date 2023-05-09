@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace AutoFindBot.Integration.KeyAutoProbeg;
 
-public class KeyAutoProbegHttpApiClient : JsonHttpApiClient, IKeyAutoProbegHttpApiClient
+public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiClient
 {
     private readonly ILogger<KeyAutoProbegHttpApiClient> _logger;
     private readonly KeyAutoProbegHttpApiClientOptions _options;

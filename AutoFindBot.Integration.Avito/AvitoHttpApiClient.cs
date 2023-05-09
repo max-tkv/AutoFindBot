@@ -9,10 +9,11 @@ using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace AutoFindBot.Integration.Avito;
 
-public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
+public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
 {
     private readonly ILogger<AvitoHttpApiClient> _logger;
     private readonly AvitoHttpApiClientOptions _options;
@@ -48,7 +49,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
                 throw new Exception($"Произошла ошибка: {content}");
             }
             
-            var avitoResponse = GetObjectFromResponse<AvitoRootResponse>(content);
+            var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
 
             ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
             
@@ -83,7 +84,7 @@ public class AvitoHttpApiClient : JsonHttpApiClient, IAvitoHttpApiClient
                 throw new Exception($"Произошла ошибка: {content}");
             }
             
-            var avitoResponse = GetObjectFromResponse<AvitoRootResponse>(content);
+            var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
 
             ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
             

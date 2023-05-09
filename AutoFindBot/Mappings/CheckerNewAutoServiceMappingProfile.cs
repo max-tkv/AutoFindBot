@@ -101,7 +101,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Id, o => o.MapFrom(x => 0))
             .ForMember(x => x.Сity, o => o.MapFrom(x => x.Seller.Location.RegionInfo.Name))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => DateTime.Now))
-            .ForMember(x => x.Url, o => o.MapFrom(x => $"/cars/used/sale/{x.VehicleInfo.MarkInfo.Name}/{x.VehicleInfo.ModelInfo.Name}/{x.SaleId}/"))
+            .ForMember(x => x.Url, o => o.MapFrom(x => $"/cars/used/sale/{x.VehicleInfo.MarkInfo.Code}/{x.VehicleInfo.ModelInfo.Code}/{x.SaleId}/"))
             .ForMember(x => x.ImageUrls, o => o.MapFrom(x => x.State.ImageUrls));
         
         CreateMap<AutoRuResultOfferStateImageUrl, Image>()

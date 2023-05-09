@@ -9,10 +9,11 @@ using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace AutoFindBot.Integration;
 
-public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiClient
+public class TradeDealerHttpApiClient : HttpApiClient, ITradeDealerHttpApiClient
 {
     private readonly IMapper _mapper;
     private readonly ILogger<TradeDealerHttpApiClient> _logger;
@@ -48,7 +49,7 @@ public class TradeDealerHttpApiClient : JsonHttpApiClient, ITradeDealerHttpApiCl
                 throw new TradeDealerClientException($"Произошла ошибка: {content}");
             }
             
-            var tradeDealerResponse = GetObjectFromResponse<TradeDealerResponse>(content);
+            var tradeDealerResponse = JsonConvert.DeserializeObject<TradeDealerResponse>(content);
 
             ArgumentNullException.ThrowIfNull(tradeDealerResponse.CarInfoResponses);
     
