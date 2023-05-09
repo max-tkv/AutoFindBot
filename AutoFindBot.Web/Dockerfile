@@ -44,4 +44,4 @@ RUN Xvfb :99 -screen 0 1024x768x16 &
 
 COPY --from=publish /app/publish .
 
-ENTRYPOINT ["dotnet", "AutoFindBot.Web.dll", "--urls", "http://0.0.0.0:80"]
+ENTRYPOINT ["dotnet", "AutoFindBot.Web.dll"]
