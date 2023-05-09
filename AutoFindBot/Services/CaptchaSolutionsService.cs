@@ -36,6 +36,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         {
             var options = new ChromeOptions();
             options.AddArgument("--headless");
+            options.AddArgument("--no-sandbox");
+            options.AddArgument("--disable-dev-shm-usage");
             using (var driver = new ChromeDriver("/usr/local/bin", options))
             {
                 var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
