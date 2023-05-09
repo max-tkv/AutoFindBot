@@ -29,6 +29,12 @@ EXPOSE 443
 
 COPY --from=publish /app/publish .
 
+# Install xvfb
+RUN apt-get update && apt-get install -y xvfb
+
+# Set the DISPLAY environment variable
+ENV DISPLAY=:9
+
 # Install Chrome
 RUN apt-get update && apt-get install -y curl gnupg2
 RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -39,4 +45,4 @@ RUN apt-get update && apt-get install -y google-chrome-stable
 COPY AutoFindBot/Resources/WebDrivers/Linux/chromedriver /usr/local/bin/chromedriver
 RUN chmod +x /usr/local/bin/chromedriver
 
-ENTRYPOINT ["dotnet", "AutoFindBot.Web.dll"]
+ENTRYPOINT ["xvfb-run", "dotnet", "AutoFindBot.Web.dll"]
