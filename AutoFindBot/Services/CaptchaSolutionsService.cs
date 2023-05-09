@@ -42,6 +42,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             {
                 var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
                 driver.Navigate().GoToUrl(showCaptchaPath);
+                await Task.Delay(1000);
 
                 var buttonAllCookies = driver.FindElements(By.CssSelector("button[data-id='button-all']")).FirstOrDefault();
                 if (buttonAllCookies != null)
