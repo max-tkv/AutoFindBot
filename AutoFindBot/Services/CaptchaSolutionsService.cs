@@ -43,13 +43,20 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
                 driver.Navigate().GoToUrl(showCaptchaPath);
 
-                var buttonCaptcha = driver.FindElements(By.Id("js-button")).FirstOrDefault();
-                if (buttonCaptcha != null)
+                try
                 {
-                    buttonCaptcha.Click();
-                    await Task.Delay(2000);
+                    var buttonCaptcha = driver.FindElements(By.Id("js-button")).FirstOrDefault();
+                    if (buttonCaptcha != null)
+                    {
+                        buttonCaptcha.Click();
+                        await Task.Delay(2000);
+                    }
                 }
-            
+                catch (Exception e)
+                {
+                    throw new Exception("Exception by Click 'js-button']': " + driver.PageSource);
+                }
+
                 var buttonConfirmStart = driver.FindElements(By.Id("confirm-button")).FirstOrDefault();
                 if (buttonConfirmStart != null)
                 {
