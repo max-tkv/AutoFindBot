@@ -43,12 +43,9 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 var showCaptchaPath = httpResponseMessage.RequestUri?.ToString();
                 driver.Navigate().GoToUrl(showCaptchaPath);
 
-                var buttonCaptcha = driver.FindElements(By.Id("js-button")).FirstOrDefault();
-                if (buttonCaptcha != null)
-                {
-                    buttonCaptcha.Click();
-                    await Task.Delay(2000);
-                }
+                var buttonCaptcha = driver.FindElement(By.Id("js-button"));
+                buttonCaptcha.Click();
+                await Task.Delay(2000);
             
                 var buttonConfirmStart = driver.FindElements(By.Id("confirm-button")).FirstOrDefault();
                 if (buttonConfirmStart != null)
@@ -69,28 +66,16 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 var captchaId = await _ruCaptchaHttpApiClient.SendCaptchaAsync(imageCaptcha);
                 var code = await GetResultCaptchaWithRetriesAsync(captchaId);
 
-                var inputCode = driver.FindElements(By.Id("xuniq-0-1")).FirstOrDefault();
-                if (inputCode == null)
-                {
-                    throw new Exception("Not found 'xuniq-0-1': " + driver.PageSource);
-                }
-                inputCode?.SendKeys(code);
+                var inputCode = driver.FindElement(By.Id("xuniq-0-1"));
+                inputCode.SendKeys(code);
                 await Task.Delay(1000);
             
-                var button = driver.FindElements(By.CssSelector("button[data-testid='submit']")).FirstOrDefault();
-                if (button == null)
-                {
-                    throw new Exception("Not found 'button[data-testid='submit']': " + driver.PageSource);
-                }
-                button?.Click();
+                var button = driver.FindElement(By.CssSelector("button[data-testid='submit']"));
+                button.Click();
                 await Task.Delay(1000);
             
-                var buttonConfirm = driver.FindElements(By.Id("confirm-button")).FirstOrDefault();
-                if (buttonConfirm == null)
-                {
-                    throw new Exception("Not found 'confirm-button']': " + driver.PageSource);
-                }
-                buttonConfirm?.Click();
+                var buttonConfirm = driver.FindElement(By.Id("confirm-button"));
+                buttonConfirm.Click();
                 await Task.Delay(1000);
                 
                 var driverCookies = driver.Manage().Cookies.AllCookies;
