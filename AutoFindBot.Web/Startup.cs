@@ -23,6 +23,7 @@ using AutoFindBot.Mappings;
 using AutoFindBot.Services;
 using AutoFindBot.Storage;
 using AutoFindBot.Storage.PostgreSql.Extensions;
+using NLog.Extensions.Logging;
 
 namespace AutoFindBot.Web
 {
@@ -58,6 +59,11 @@ namespace AutoFindBot.Web
             services.AddRuCaptchaHttpApiClient(_configuration);
 
             services.RegisterApiWithSwagger(_configuration);
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+                loggingBuilder.AddNLog();
+            });
             
             var serviceProvider = services.BuildServiceProvider();
             ServiceLocator.SetProvider(serviceProvider);
@@ -66,7 +72,7 @@ namespace AutoFindBot.Web
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, 
-            ILogger<Startup> logger, IHostApplicationLifetime lifetime)
+            ILogger logger, IHostApplicationLifetime lifetime)
         {
             MigrationsRunner.ApplyMigrations(logger, serviceProvider, "AutoFindBot.Web").Wait();
             RegisterLifetimeLogging(lifetime, logger);
@@ -82,20 +88,19 @@ namespace AutoFindBot.Web
                 var apiVersionDescriptionProvider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
                 app.UseSwaggerWithVersion(apiVersionDescriptionProvider);
             }
-
-            //serviceProvider.GetRequiredService<TelegramBot>().GetBot().Wait();
+            
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
         }
         
-        private static void RegisterLifetimeLogging(IHostApplicationLifetime lifetime, ILogger<Startup> logger)
+        private static void RegisterLifetimeLogging(IHostApplicationLifetime lifetime, ILogger logger)
         {
             lifetime.ApplicationStarted.Register(() => logger.LogInformation("App started"));
             lifetime.ApplicationStopped.Register(() => logger.LogInformation("App stopped"));
+            lifetime.ApplicationStopping.Register(() => logger.LogInformation("App stopped"));
         }
     }
 }
