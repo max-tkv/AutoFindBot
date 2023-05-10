@@ -147,7 +147,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             }
             catch (CaptchaNotReadyException e)
             {
-                _logger.LogInformation($"{nameof(CaptchaSolutionsService)}: {e.Message}");
+                _logger.LogInformation(e.Message);
                 await Task.Delay(delaySeconds * 1000);
             }
             catch (Exception ex)

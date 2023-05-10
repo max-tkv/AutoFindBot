@@ -6,6 +6,8 @@ using AutoFindBot.Storage.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace AutoFindBot.Storage.PostgreSql.Extensions;
 
@@ -32,6 +34,12 @@ public static class RegisterPostgreSqlStorageExtension
             .AddDbContextPool<AppDbContext>(context =>
             {
                 context.UseNpgsql(options.ConnectionString);
+                context.UseLoggerFactory(LoggerFactory.Create(builder =>
+                {
+                    builder.AddFilter((category, level) =>
+                            category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Error)
+                        .AddProvider(new NLogLoggerProvider());
+                }));
             });
 
         return serviceCollection

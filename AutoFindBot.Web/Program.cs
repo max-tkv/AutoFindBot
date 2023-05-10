@@ -10,7 +10,7 @@ namespace AutoFindBot.Web
 {
     public class Program
     {
-        private static readonly ILogger SystemLogger  = CreateLoggerFactory(withConfiguration: true)
+        private static readonly ILogger SystemLogger  = CreateLoggerFactory()
             .CreateLogger<Program>();
         
         public static async Task Main(string[] args)
@@ -33,11 +33,14 @@ namespace AutoFindBot.Web
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddUserSecrets("29fcca43-5108-472b-9e49-c868a5646ca9")
+                .AddEnvironmentVariables();
             builder.Logging
                 .AddConfiguration(builder.Configuration.GetSection("Logging"))
-                .ClearProviders();
+                .ClearProviders()
+                .AddNLog();
             
             var startup = new Startup(builder.Configuration);
             startup.ConfigureServices(builder.Services);
@@ -70,7 +73,7 @@ namespace AutoFindBot.Web
             SystemLogger.LogError(ex, "Unhandled exception in global handler");
         }
         
-        private static ILoggerFactory CreateLoggerFactory(bool withConfiguration = true)
+        private static ILoggerFactory CreateLoggerFactory()
         {
             try
             {
@@ -81,14 +84,9 @@ namespace AutoFindBot.Web
                 var logger = new ServiceCollection()
                     .AddLogging(builder =>
                     {
+                        builder.AddConfiguration(configuration.GetSection("Logging"));
                         builder.ClearProviders();
-                        builder.SetMinimumLevel(LogLevel.Trace);
                         builder.AddNLog();
-
-                        if (withConfiguration)
-                        {
-                            builder.AddConfiguration(configuration.GetSection("Logging"));
-                        }
                     })
                     .BuildServiceProvider()
                     .GetRequiredService<ILoggerFactory>();

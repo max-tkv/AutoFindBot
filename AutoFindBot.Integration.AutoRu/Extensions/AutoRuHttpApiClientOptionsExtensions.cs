@@ -95,7 +95,6 @@ public static class AutoRuHttpApiClientOptionsExtensions
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<AutoRuHttpApiClient>>();
                 logger!.LogWarning(
-                    $"{nameof(AutoRuHttpApiClient)}: " +
                     $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: " +
                     $"{exception?.Exception?.Message ?? await exception?.Result?.Content.ReadAsStringAsync()}");
             });

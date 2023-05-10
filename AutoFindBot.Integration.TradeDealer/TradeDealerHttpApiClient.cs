@@ -57,12 +57,12 @@ public class TradeDealerHttpApiClient : HttpApiClient, ITradeDealerHttpApiClient
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning($"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
+            _logger.LogWarning(e.Message);
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"{nameof(TradeDealerHttpApiClient)}: {e.Message}");
+            _logger.LogError(e.Message);
             throw;
         }
     }

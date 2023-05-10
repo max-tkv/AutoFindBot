@@ -68,7 +68,7 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
         catch (SuccessSolutionAutoRuException ex)
         {
             SetDefaultHeadersToHttpClient(ex.Headers);
-            _logger.LogInformation($"{nameof(AutoRuHttpApiClient)}: Капча успешно решена.");
+            _logger.LogInformation("Капча успешно решена.");
             return new AutoRuResult();
         }
         catch (AutoRuCaptchaException)
@@ -77,12 +77,12 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
         }
         catch (NotActiveSourceException e)
         {
-            _logger.LogWarning($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogWarning(e.Message);
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"{nameof(AutoRuHttpApiClient)}: {e.Message}");
+            _logger.LogError(e.Message);
             throw;
         }
     }

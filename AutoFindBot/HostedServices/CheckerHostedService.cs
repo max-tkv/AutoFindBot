@@ -11,7 +11,6 @@ public class CheckerHostedService : IHostedService, IDisposable
 {
     private readonly ILogger<CheckerHostedService> _logger;
     private Timer? _timer;
-    private readonly IAppUserService _appUserService;
     private readonly ICheckingNewAutoService _checkingNewAutoService;
     private readonly TelegramBotClient _botClient;
     private readonly IConfiguration _configuration;
@@ -20,7 +19,6 @@ public class CheckerHostedService : IHostedService, IDisposable
     {
         _logger = logger;
         _configuration = configuration;
-        _appUserService = ServiceLocator.GetService<IAppUserService>();
         _checkingNewAutoService = ServiceLocator.GetService<ICheckingNewAutoService>();
         
         var telegramBot = ServiceLocator.GetService<TelegramBotService>();
@@ -29,7 +27,7 @@ public class CheckerHostedService : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"{nameof(CheckerHostedService)} running.");
+        _logger.LogInformation($"Is running StartAsync ...");
 
         var checkTimer = _configuration.GetValue<int>("CheckTimer");
         _timer = new Timer(DoWork, null, TimeSpan.Zero,
@@ -42,21 +40,21 @@ public class CheckerHostedService : IHostedService, IDisposable
     {
         try
         {
-            _logger.LogInformation($"{nameof(CheckerHostedService)}: Start CheckerHostedService.DoWork method.");
+            _logger.LogInformation($"Start DoWork method.");
 
             await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient);
             
-            _logger.LogInformation($"{nameof(CheckerHostedService)}: End CheckerHostedService.DoWork method.");
+            _logger.LogInformation($"End DoWork method.");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error to {nameof(CheckerHostedService)}: {ex.Message}");
+            _logger.LogError(ex.Message);
         }
     }
 
     public Task StopAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"{nameof(CheckerHostedService)} is stopping.");
+        _logger.LogInformation($"Is stopping.");
 
         _timer?.Change(Timeout.Infinite, 0);
 

@@ -55,7 +55,7 @@ public class RuCaptchaHttpApiClient : HttpApiClient, IRuCaptchaHttpApiClient
         }
         catch (Exception e)
         {
-            _logger.LogError($"{nameof(RuCaptchaHttpApiClient)}: {e.Message}");
+            _logger.LogError(e.Message);
             throw;
         }
     }

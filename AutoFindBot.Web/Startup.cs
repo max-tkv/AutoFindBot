@@ -38,6 +38,13 @@ namespace AutoFindBot.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder
+                    .AddNLog()
+                    .AddConfiguration(_configuration.GetSection("Logging"));
+            });
+            
             services.RegisterPostgreSqlStorage(_configuration);
             
             services.AddSingleton(new MapperConfiguration(mc =>
@@ -59,12 +66,7 @@ namespace AutoFindBot.Web
             services.AddRuCaptchaHttpApiClient(_configuration);
 
             services.RegisterApiWithSwagger(_configuration);
-            services.AddLogging(loggingBuilder =>
-            {
-                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
-                loggingBuilder.AddNLog();
-            });
-            
+
             var serviceProvider = services.BuildServiceProvider();
             ServiceLocator.SetProvider(serviceProvider);
 
