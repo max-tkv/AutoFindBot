@@ -1,10 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 
@@ -12,7 +10,7 @@ namespace AutoFindBot.Web
 {
     public class Program
     {
-        private static readonly ILogger SystemLogger  = CreateLoggerFactory(withConfiguration: false, withConsole: true)
+        private static readonly ILogger SystemLogger  = CreateLoggerFactory(withConfiguration: true)
             .CreateLogger<Program>();
         
         public static async Task Main(string[] args)
@@ -45,7 +43,7 @@ namespace AutoFindBot.Web
             startup.ConfigureServices(builder.Services);
 
             var app = builder.Build();
-            startup.Configure(app, app.Environment, app.Services, app.Logger, app.Lifetime );
+            startup.Configure(app, app.Environment, app.Services, app.Logger, app.Lifetime);
 
             await app.RunAsync();
         }
@@ -72,7 +70,7 @@ namespace AutoFindBot.Web
             SystemLogger.LogError(ex, "Unhandled exception in global handler");
         }
         
-        private static ILoggerFactory CreateLoggerFactory(bool withConfiguration = true, bool withConsole = false)
+        private static ILoggerFactory CreateLoggerFactory(bool withConfiguration = true)
         {
             try
             {

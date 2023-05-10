@@ -88,7 +88,7 @@ namespace AutoFindBot.Web
                 var apiVersionDescriptionProvider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
                 app.UseSwaggerWithVersion(apiVersionDescriptionProvider);
             }
-            
+
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

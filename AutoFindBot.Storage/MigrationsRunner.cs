@@ -17,7 +17,7 @@ namespace AutoFindBot.Storage
             {
                 using (var serviceScope = serviceProvider.CreateScope())
                 {
-                    var dbContext = serviceScope.ServiceProvider.GetService<AppDbContext>();
+                    var dbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
                     await dbContext.Database.MigrateAsync();
                 }
 
