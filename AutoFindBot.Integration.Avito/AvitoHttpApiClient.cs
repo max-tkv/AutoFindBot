@@ -35,36 +35,23 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
 
     public async Task<List<AvitoResult>> GetAllNewAutoAsync()
     {
-        try
-        {
-            NotActiveSourceException.ThrowIfNotActive(nameof(AvitoHttpApiClient), _options.Active);
+        NotActiveSourceException.ThrowIfNotActive(nameof(AvitoHttpApiClient), _options.Active);
 
-            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
-                .Replace(AvitoHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
-                .Replace(AvitoHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
-            var response = await SendAsync(path, HttpMethod.Get);
-            var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode == false)
-            {
-                throw new Exception($"Произошла ошибка: {content}");
-            }
+        var path = _options.BaseUrl + _options.GetAutoByFilterQuery
+            .Replace(AvitoHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
+            .Replace(AvitoHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
+        var response = await SendAsync(path, HttpMethod.Get);
+        var content = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode == false)
+        {
+            throw new Exception($"Произошла ошибка: {content}");
+        }
             
-            var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
+        var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
 
-            ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
-            
-            return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
-        }
-        catch (NotActiveSourceException e)
-        {
-            _logger.LogWarning(e.Message);
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            throw;
-        }
+        ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
+
+        return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
     }
 
     public async Task<List<AvitoResult>> GetAutoByFilterAsync(AvitoFilter filter)
@@ -89,11 +76,6 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
             ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
             
             return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
-        }
-        catch (NotActiveSourceException e)
-        {
-            _logger.LogWarning(e.Message);
-            throw;
         }
         catch (Exception e)
         {

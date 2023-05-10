@@ -35,35 +35,22 @@ public class TradeDealerHttpApiClient : HttpApiClient, ITradeDealerHttpApiClient
 
     public async Task<TradeDealerResult> GetAllNewAutoAsync()
     {
-        try
-        {
-            NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
+        NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
 
-            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
-                .Replace(TradeDealerHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
-                .Replace(TradeDealerHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
-            var response = await SendAsync(path, HttpMethod.Get);
-            var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode == false)
-            {
-                throw new TradeDealerClientException($"Произошла ошибка: {content}");
-            }
+        var path = _options.BaseUrl + _options.GetAutoByFilterQuery
+            .Replace(TradeDealerHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
+            .Replace(TradeDealerHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
+        var response = await SendAsync(path, HttpMethod.Get);
+        var content = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode == false)
+        {
+            throw new TradeDealerClientException($"Произошла ошибка: {content}");
+        }
             
-            var tradeDealerResponse = JsonConvert.DeserializeObject<TradeDealerResponse>(content);
+        var tradeDealerResponse = JsonConvert.DeserializeObject<TradeDealerResponse>(content);
 
-            ArgumentNullException.ThrowIfNull(tradeDealerResponse.CarInfoResponses);
+        ArgumentNullException.ThrowIfNull(tradeDealerResponse?.CarInfoResponses);
     
-            return _mapper.Map<TradeDealerResult>(tradeDealerResponse);
-        }
-        catch (NotActiveSourceException e)
-        {
-            _logger.LogWarning(e.Message);
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            throw;
-        }
+        return _mapper.Map<TradeDealerResult>(tradeDealerResponse);
     }
 }

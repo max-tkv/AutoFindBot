@@ -1,6 +1,7 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
+using AutoFindBot.Exceptions;
 using AutoFindBot.Repositories;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -171,6 +172,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var avitoResult = await _avitoHttpApiClient.GetAllNewAutoAsync();
             var newCars = _mapper.Map<List<Car>>(avitoResult);
             cars.AddRange(newCars);
+            
+            _logger.LogInformation($"Request by GetCarsFromAvitoAsync is success. " +
+                                   $"Found cars: {newCars.Count}");
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e.Message);
         }
         catch (Exception e)
         {
@@ -186,6 +194,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAllNewAutoAsync();
             var newCars = _mapper.Map<List<Car>>(keyAutoProbegResult);
             cars.AddRange(newCars);
+            
+            _logger.LogInformation($"Request by GetCarsFromKeyAutoProbegAsync is success. " +
+                                   $"Found cars: {newCars.Count}");
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e.Message);
         }
         catch (Exception e)
         {
@@ -201,6 +216,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var tradeDealerResult = await _tradeDealerHttpApiClient.GetAllNewAutoAsync();
             var newCars = _mapper.Map<List<Car>>(tradeDealerResult.CarInfos);
             cars.AddRange(newCars);
+            
+            _logger.LogInformation($"Request by GetCarsFromTradeDealerAsync is success. " +
+                                   $"Found cars: {newCars.Count}");
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e.Message);
         }
         catch (Exception e)
         {
@@ -216,6 +238,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var autoRuResult = await _autoRuHttpApiClient.GetAllNewAutoAsync();
             var newCars = _mapper.Map<List<Car>>(autoRuResult.Offers);
             cars.AddRange(newCars);
+            
+            _logger.LogInformation($"Request by GetCarsFromAutoRuAsync is success. " +
+                                   $"Found cars: {newCars.Count}");
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e.Message);
         }
         catch (Exception e)
         {

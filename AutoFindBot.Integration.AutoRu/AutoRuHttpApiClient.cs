@@ -71,20 +71,6 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
             _logger.LogInformation("Капча успешно решена.");
             return new AutoRuResult();
         }
-        catch (AutoRuCaptchaException)
-        {
-            throw;
-        }
-        catch (NotActiveSourceException e)
-        {
-            _logger.LogWarning(e.Message);
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            throw;
-        }
     }
 
     private void SetDefaultHeadersToHttpClient(HttpResponseHeaders headers)
