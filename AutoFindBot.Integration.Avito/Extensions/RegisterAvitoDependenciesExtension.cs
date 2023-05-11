@@ -51,9 +51,8 @@ public static class RegisterAvitoDependenciesExtension
     private static IServiceCollection RegisterAvitoApiClient(
         this IServiceCollection services)
     {
-        var retryPolicy = CreateRetryPolicy(services).Result;
         services
-            .AddHttpClient<IAvitoHttpApiClient, AvitoHttpApiClient>((serviceProvider, httpClient) => 
+            .AddHttpClient<IAvitoHttpApiClient, AvitoHttpApiClient>((serviceProvider, httpClient) =>
             {
                 var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
                 httpClient.BaseAddress = new Uri(options.BaseUrl);
@@ -62,48 +61,26 @@ public static class RegisterAvitoDependenciesExtension
             .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
             {
                 var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
-                
+
                 var handler = new HttpClientHandler();
                 handler.CookieContainer = new CookieContainer();
                 handler.CookieContainer.Add(new Cookie("u", options.Cookie.U) { Domain = "avito.ru" });
                 handler.CookieContainer.Add(new Cookie("v", options.Cookie.V) { Domain = "avito.ru" });
                 return handler;
             })
-            .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
-            {
-                var handler = new HttpClientHandler();
-                var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
-                if (options.ProxyData.Active)
-                {
-                    handler.Proxy = new WebProxy(options?.ProxyData.Proxy);
-                    if (!string.IsNullOrWhiteSpace(options?.ProxyData.Login))
-                    {
-                        handler.UseDefaultCredentials = false;
-                        handler.Credentials = new NetworkCredential(
-                            options?.ProxyData.Login, 
-                            options?.ProxyData.Password);   
-                    }
-                }
-                
-                return handler;
-            });
-            // .AddPolicyHandler(retryPolicy)
+            .AddPolicyHandler(CreateRetryPolicy(services));
 
         return services;
     }
     
-    private async static Task<AsyncRetryPolicy<HttpResponseMessage>> CreateRetryPolicy(IServiceCollection services)
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy(IServiceCollection services)
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
             .OrResult(response => response.StatusCode == HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(new[]
             {
-                TimeSpan.FromSeconds(3),
-                TimeSpan.FromSeconds(3),
-                TimeSpan.FromSeconds(3),
-                TimeSpan.FromSeconds(5),
-                TimeSpan.FromSeconds(8)
+                TimeSpan.FromSeconds(3)
             }, async (exception, timeSpan, retryCount, context) =>
             {
                 var serviceProvider = services.BuildServiceProvider();
