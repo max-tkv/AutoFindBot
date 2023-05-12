@@ -42,8 +42,8 @@ ENV DISPLAY=:99
 RUN apt-get install -y xvfb
 RUN Xvfb :99 -screen 0 1024x768x16 &
 
-RUN sudo echo "Europe/Moscow" > /etc/timezone
-RUN sudo dpkg-reconfigure -f noninteractive tzdata
+ENV TZ=Europe/Moscow
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY --from=publish /app/publish .
 
