@@ -42,6 +42,9 @@ ENV DISPLAY=:99
 RUN apt-get install -y xvfb
 RUN Xvfb :99 -screen 0 1024x768x16 &
 
+RUN sudo echo "Europe/Moscow" > /etc/timezone
+RUN sudo dpkg-reconfigure -f noninteractive tzdata
+
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "AutoFindBot.Web.dll", "--urls", "http://0.0.0.0:80"]
