@@ -87,7 +87,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
     
     public async Task SolutionKeyAutoProbegAsync(HttpRequestMessage httpRequestMessage)
     {
-        using var driver = _webDriverService.CreateChromeDriver(false);
+        using var driver = _webDriverService.CreateChromeDriver();
         driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
 
         await _webDriverService.FindElementByIdAsync("app");
