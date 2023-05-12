@@ -34,7 +34,6 @@ namespace AutoFindBot.Web
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration
                 .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddUserSecrets("29fcca43-5108-472b-9e49-c868a5646ca9")
                 .AddEnvironmentVariables();
             builder.Logging
