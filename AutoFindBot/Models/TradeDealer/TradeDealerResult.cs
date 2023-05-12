@@ -2,5 +2,5 @@
 
 public class TradeDealerResult
 {
-    public List<CarInfo> CarInfos { get; set; }
+    public List<CarResult> CarInfos { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace AutoFindBot.Models.TradeDealer;
 
-public class CarInfo : BaseCarInfo
+public class CarResult : BaseCarResult
 {
     public int Year { get; set; }
 

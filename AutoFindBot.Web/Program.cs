@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,9 @@ namespace AutoFindBot.Web
             {
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
                 TaskScheduler.UnobservedTaskException += OnTaskSchedulerOnUnobservedTaskException;
+                
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                Encoding.GetEncoding("windows-1254");
 
                 await RunWebApplication(args);
             }

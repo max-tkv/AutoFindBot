@@ -21,8 +21,6 @@ public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiCl
     private IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClientImplementation;
     private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
 
-    private const string CarNodePath = "//a[contains(@class, 'w-full py-8 flex flex-col sm:flex-row justify-between blank car-hor')]";
-
     public KeyAutoProbegHttpApiClient(
         HttpClient httpClient,
         KeyAutoProbegHttpApiClientOptions options,
@@ -63,7 +61,7 @@ public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiCl
             if (carNodes == null || !carNodes.Any())
             {
                 throw new Exception(
-                    $"Nodes {CarNodePath}: не удалось получить.");
+                    $"Nodes '//a[contains(@class, 'w-full py-8 flex flex-col sm:flex-row justify-between blank car-hor')]': не удалось получить.");
             }
 
             var result = new List<KeyAutoProbegResult>();

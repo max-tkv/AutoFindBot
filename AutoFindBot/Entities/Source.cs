@@ -3,7 +3,12 @@
 public enum Source
 {
     TradeDealer = 1,
+    
     KeyAutoProbeg = 2,
+    
     Avito = 3,
-    AutoRu = 4
+    
+    AutoRu = 4,
+    
+    Drom = 5
 }

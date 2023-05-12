@@ -186,6 +186,7 @@ public class MessageService : IMessageService
             Source.TradeDealer => $"{_configuration[SourceCarBaseUrlPaths.TradeDealer]}/{car.Url}",
             Source.AutoRu => $"{_configuration[SourceCarBaseUrlPaths.AutoRu]}{car.Url}",
             Source.KeyAutoProbeg => $"{car.Url}",
+            Source.Drom => $"{car.Url}",
             _ => throw new ArgumentOutOfRangeException()
         };
     }

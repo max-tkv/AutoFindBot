@@ -1,6 +1,6 @@
-﻿namespace AutoFindBot.Models.KeyAutoProbeg;
+﻿namespace AutoFindBot.Models.Drom;
 
-public class KeyAutoProbegResult : BaseCarResult
+public class DromResult : BaseCarResult
 {
     public string OriginId { get; set; }
     

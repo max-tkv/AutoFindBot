@@ -15,6 +15,8 @@ using AutoFindBot.Integration.AutoRu.Extensions;
 using AutoFindBot.Integration.AutoRu.Mappings;
 using AutoFindBot.Integration.Avito.Extensions;
 using AutoFindBot.Integration.Avito.Mappings;
+using AutoFindBot.Integration.Drom.Extensions;
+using AutoFindBot.Integration.Drom.Mappings;
 using AutoFindBot.Integration.Extensions;
 using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
@@ -54,6 +56,7 @@ namespace AutoFindBot.Web
                 mc.AddProfile(new CheckerNewAutoServiceMappingProfile());
                 mc.AddProfile(new AvitoHttpApiClientMappingProfile());
                 mc.AddProfile(new AutoRuHttpApiClientMappingProfile());
+                mc.AddProfile(new DromHttpApiClientMappingProfile());
             }).CreateMapper());
 
             services.RegisterDomain(_configuration);
@@ -64,6 +67,7 @@ namespace AutoFindBot.Web
             services.AddAvitoHttpApiClient(_configuration);
             services.AddAutoRuHttpApiClient(_configuration);
             services.AddRuCaptchaHttpApiClient(_configuration);
+            services.AddDromHttpApiClient(_configuration);
 
             services.RegisterApiWithSwagger(_configuration);
 

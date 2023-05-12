@@ -2,7 +2,7 @@
 
 namespace AutoFindBot.Models;
 
-public class BaseCarInfo
+public class BaseCarResult
 {
     public Source Source { get; set; }
 }

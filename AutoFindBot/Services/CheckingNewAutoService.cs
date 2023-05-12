@@ -22,6 +22,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IAutoRuHttpApiClient _autoRuHttpApiClient;
     private readonly IAppUserService _appUserService;
     private readonly ISourceCheckRepository _sourceCheckRepository;
+    private readonly IDromHttpApiClient _dromHttpApiClient;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
@@ -34,7 +35,8 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         ICarService carService,
         IMapper mapper,
         IAppUserService appUserService,
-        ISourceCheckRepository sourceCheckRepository)
+        ISourceCheckRepository sourceCheckRepository,
+        IDromHttpApiClient dromHttpApiClient)
     {
         _logger = logger;
         _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
@@ -47,6 +49,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         _mapper = mapper;
         _appUserService = appUserService;
         _sourceCheckRepository = sourceCheckRepository;
+        _dromHttpApiClient = dromHttpApiClient;
     }
 
     public async Task CheckAndSendMessageAsync(TelegramBotClient botClient, AppUser? user = null)
@@ -161,8 +164,31 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         await GetCarsFromTradeDealerAsync(cars);
         await GetCarsFromKeyAutoProbegAsync(cars);
         await GetCarsFromAvitoAsync(cars);
+        await GetCarsFromDromAsync(cars);
 
         return cars;
+    }
+
+    private async Task GetCarsFromDromAsync(List<Car> cars)
+    {
+        try
+        {
+            var avitoResult = await _dromHttpApiClient.GetAllNewAutoAsync();
+            var newCars = _mapper.Map<List<Car>>(avitoResult);
+            cars.AddRange(newCars);
+            
+            _logger.LogInformation($"Request by GetCarsFromDromAsync is success. " +
+                                   $"Found: {newCars.Count}");
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(
+                $"Method GetCarsFromDromAsync: {e.Message}");
+        }
     }
 
     private async Task GetCarsFromAvitoAsync(List<Car> cars)
@@ -174,7 +200,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             cars.AddRange(newCars);
             
             _logger.LogInformation($"Request by GetCarsFromAvitoAsync is success. " +
-                                   $"Found cars: {newCars.Count}");
+                                   $"Found: {newCars.Count}");
         }
         catch (NotActiveSourceException e)
         {
@@ -196,7 +222,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             cars.AddRange(newCars);
             
             _logger.LogInformation($"Request by GetCarsFromKeyAutoProbegAsync is success. " +
-                                   $"Found cars: {newCars.Count}");
+                                   $"Found: {newCars.Count}");
         }
         catch (NotActiveSourceException e)
         {
@@ -218,7 +244,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             cars.AddRange(newCars);
             
             _logger.LogInformation($"Request by GetCarsFromTradeDealerAsync is success. " +
-                                   $"Found cars: {newCars.Count}");
+                                   $"Found: {newCars.Count}");
         }
         catch (NotActiveSourceException e)
         {
@@ -240,7 +266,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             cars.AddRange(newCars);
             
             _logger.LogInformation($"Request by GetCarsFromAutoRuAsync is success. " +
-                                   $"Found cars: {newCars.Count}");
+                                   $"Found: {newCars.Count}");
         }
         catch (NotActiveSourceException e)
         {

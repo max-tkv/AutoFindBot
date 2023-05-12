@@ -1,6 +1,6 @@
-﻿namespace AutoFindBot.Models.KeyAutoProbeg;
+﻿namespace AutoFindBot.Models.Drom;
 
-public class KeyAutoProbegFilter
+public class DromFilter
 {
     public string PriceMin { get; set; }
     

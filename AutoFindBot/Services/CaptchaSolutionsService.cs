@@ -95,6 +95,11 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         SetKeyAutoProbegCookies(httpRequestMessage, driver.Manage().Cookies.AllCookies);
     }
 
+    public Task SolutionDromAsync(HttpRequestMessage request)
+    {
+        throw new NotImplementedException();
+    }
+
     private void SetRedirect(HttpRequestMessage httpRequest, HttpMethod newMethod, string newUrl)
     {
         Guard.Against.Null(httpRequest, nameof(httpRequest));
