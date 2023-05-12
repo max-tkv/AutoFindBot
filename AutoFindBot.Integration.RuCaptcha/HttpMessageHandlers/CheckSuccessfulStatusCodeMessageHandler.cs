@@ -11,28 +11,14 @@ public class CheckSuccessfulStatusCodeMessageHandler : DelegatingHandler
         CancellationToken cancellationToken)
     {
         var response = await base.SendAsync(request, cancellationToken);
-        if (!response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
-            string errorMessage = RuCaptchaHttpApiClientInvariants.HttpErrorMessage
-                .Replace(":requestUri", response.RequestMessage?.RequestUri?.ToString())
-                .Replace(":content", await response.Content.ReadAsStringAsync(cancellationToken));
-            throw new RuCaptchaHttpApiClientException(errorMessage);
+            return response;
         }
         
-        var content = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (!content.Contains("OK|"))
-        {
-            if (content == RuCaptchaHttpApiClientInvariants.CaptchaNotReady)
-            {
-                throw new CaptchaNotReadyException(RuCaptchaHttpApiClientInvariants.CaptchaNotReadyMessage);
-            }
-            
-            string errorMessage = RuCaptchaHttpApiClientInvariants.HttpErrorMessage
-                .Replace(":requestUri", response.RequestMessage?.RequestUri?.ToString())
-                .Replace(":content", content);
-            throw new RuCaptchaHttpApiClientException(errorMessage);
-        }
-
-        return response;
+        string errorMessage = RuCaptchaHttpApiClientInvariants.HttpErrorMessage
+            .Replace(":requestUri", response.RequestMessage?.RequestUri?.ToString())
+            .Replace(":content", await response.Content.ReadAsStringAsync(cancellationToken));
+        throw new RuCaptchaHttpApiClientException(errorMessage);
     }
 }

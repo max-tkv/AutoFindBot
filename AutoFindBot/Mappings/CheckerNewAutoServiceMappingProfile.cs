@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using AutoFindBot.Entities;
 using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.KeyAutoProbeg;
@@ -41,7 +40,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Url, o => o.MapFrom(x => $"{x.Brand.Alias}/{x.Generation!.Alias ?? x.Model!.Alias}/{x.Id}"))
             .ForMember(x => x.ImageUrls, o => o.MapFrom(x => 
                 x.OriginalPhotos
-                    .Select(z => new Image()
+                    .Select(z => new Entities.Image()
                     {
                         Urls = new Dictionary<string, string>()
                         {
@@ -52,7 +51,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<KeyAutoProbegResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.TradeDealer))
+            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.KeyAutoProbeg))
             .ForMember(x => x.Title, o => o.MapFrom(x => x.Title))
             .ForMember(x => x.Vin, o => o.MapFrom(x => x.Vin))
             .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
@@ -63,7 +62,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Url, o => o.MapFrom(x => x.Url))
             .ForMember(x => x.ImageUrls, o => o.MapFrom(x => 
                 x.ImageUrls
-                    .Select(z => new Image()
+                    .Select(z => new Entities.Image()
                     {
                         Urls = new Dictionary<string, string>()
                         {
@@ -85,7 +84,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Url, o => o.MapFrom(x => x.Url))
             .ForMember(x => x.ImageUrls, o => o.MapFrom(x => x.Images));
         
-        CreateMap<AvitoImage, Image>()
+        CreateMap<AvitoImage, Entities.Image>()
             .ForMember(x => x.Urls, o => o.MapFrom(x => x.Urls));
         
         CreateMap<AutoRuResultOffer, Entities.Car>()
@@ -104,7 +103,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
             .ForMember(x => x.Url, o => o.MapFrom(x => $"/cars/used/sale/{x.VehicleInfo.MarkInfo.Code}/{x.VehicleInfo.ModelInfo.Code}/{x.SaleId}/"))
             .ForMember(x => x.ImageUrls, o => o.MapFrom(x => x.State.ImageUrls));
         
-        CreateMap<AutoRuResultOfferStateImageUrl, Image>()
+        CreateMap<AutoRuResultOfferStateImageUrl, Entities.Image>()
             .ForMember(x => x.Urls, o => o.MapFrom(x => x.Sizes));
     }
 

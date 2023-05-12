@@ -2,10 +2,11 @@
 
 namespace AutoFindBot.Exceptions;
 
-public class SuccessSolutionAutoRuException : Exception
+public class SuccessSolutionException : Exception
 {
     public HttpResponseHeaders Headers;
-    public SuccessSolutionAutoRuException(HttpResponseHeaders headers)
+    
+    public SuccessSolutionException(HttpResponseHeaders headers)
     {
         Headers = headers;
     }

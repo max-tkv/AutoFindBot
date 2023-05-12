@@ -52,7 +52,6 @@ public static class RuCaptchaHttpApiClientOptionsExtensions
     private static IServiceCollection RegisterRuCaptchaApiClient(
         this IServiceCollection services)
     {
-        var retryPolicy = CreateRetryPolicy(services).Result;
         services
             .AddTransient<CheckSuccessfulStatusCodeMessageHandler>()
             .AddHttpClient<IRuCaptchaHttpApiClient, RuCaptchaHttpApiClient>((serviceProvider, httpClient) => 
@@ -63,31 +62,29 @@ public static class RuCaptchaHttpApiClientOptionsExtensions
             .AddHttpMessageHandlers(new List<Func<IServiceProvider, DelegatingHandler>>
             {
                 container => container.GetRequiredService<CheckSuccessfulStatusCodeMessageHandler>()
-            });
-            // .AddPolicyHandler(retryPolicy)
+            })
+            .AddPolicyHandler(CreateRetryPolicy(services));
 
         return services;
     }
     
-    private async static Task<AsyncRetryPolicy<HttpResponseMessage>> CreateRetryPolicy(IServiceCollection services)
+    private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy(IServiceCollection services)
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
-            .OrResult(response => response.StatusCode == HttpStatusCode.Forbidden)
+            .OrResult(response => response.Content.ReadAsStringAsync().Result.Contains("CAPCHA_NOT_READY"))
             .WaitAndRetryAsync(new[]
             {
                 TimeSpan.FromSeconds(3),
                 TimeSpan.FromSeconds(3),
-                TimeSpan.FromSeconds(3),
-                TimeSpan.FromSeconds(5),
-                TimeSpan.FromSeconds(8)
-            }, async (exception, timeSpan, retryCount, context) =>
+                TimeSpan.FromSeconds(3)
+            }, (exception, timeSpan, retryCount, context) =>
             {
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<RuCaptchaHttpApiClient>>();
-                logger!.LogWarning(
+                logger!.LogInformation(
                     $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: " +
-                    $"{exception?.Exception?.Message ?? await exception?.Result?.Content.ReadAsStringAsync()}");
+                    $"{RuCaptchaHttpApiClientInvariants.CaptchaNotReadyMessage}");
             });
     }
 }

@@ -1,18 +1,18 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Exceptions;
-using AutoFindBot.Integration.AutoRu.Exceptions;
-using AutoFindBot.Integration.AutoRu.Invariants;
+using AutoFindBot.Integration.KeyAutoProbeg.Exceptions;
+using AutoFindBot.Integration.KeyAutoProbeg.Invariants;
 using Microsoft.Extensions.Logging;
 
-namespace AutoFindBot.Integration.AutoRu.HttpMessageHandlers;
+namespace AutoFindBot.Integration.KeyAutoProbeg.HttpMessageHandlers;
 
 public class CheckCaptchaHandler : DelegatingHandler
 {
     private readonly ICaptchaSolutionsService _captchaSolutionsService;
     private readonly ILogger<CheckCaptchaHandler> _logger;
-    
+
     public CheckCaptchaHandler(
-        ICaptchaSolutionsService captchaSolutionsService, 
+        ICaptchaSolutionsService captchaSolutionsService,
         ILogger<CheckCaptchaHandler> logger)
     {
         _captchaSolutionsService = captchaSolutionsService;
@@ -23,23 +23,19 @@ public class CheckCaptchaHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        string requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
-        
         var response = await base.SendAsync(request, cancellationToken);
-        
+
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0 || 
-            content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlagTwo, StringComparison.Ordinal) > 0 ||
+        if (content.IndexOf(KeyAutoProbegHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0 || 
             !response.IsSuccessStatusCode)
         {
-            await _captchaSolutionsService.SolutionAutoRuAsync(request);
-            request.Content = new StringContent(requestBody);
-            
+            await _captchaSolutionsService.SolutionKeyAutoProbegAsync(request);
+
             var checkResponse = await base.SendAsync(request, cancellationToken);
             var checkContent = await checkResponse.Content.ReadAsStringAsync(cancellationToken);
-            if (!checkContent.Contains("SUCCESS"))
+            if (!checkContent.Contains(KeyAutoProbegHttpApiClientInvariants.SuccessFlag))
             {
-                throw new AutoRuHttpApiClientException(checkContent);
+                throw new KeyAutoProbegHttpApiClientException(checkContent);
             }
 
             foreach (var requestHeader in request.Headers)

@@ -65,7 +65,7 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
 
             return _mapper.Map<AutoRuResult>(autoRuResponse);
         }
-        catch (SuccessSolutionAutoRuException ex)
+        catch (SuccessSolutionException ex)
         {
             SetDefaultHeadersToHttpClient(ex.Headers);
             _logger.LogInformation("Капча успешно решена.");

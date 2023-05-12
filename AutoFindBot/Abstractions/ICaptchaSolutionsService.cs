@@ -2,5 +2,7 @@
 
 public interface ICaptchaSolutionsService
 {
-    Task SolutionAsync(HttpRequestMessage httpRequestMessage);
+    Task SolutionAutoRuAsync(HttpRequestMessage httpRequestMessage);
+
+    Task SolutionKeyAutoProbegAsync(HttpRequestMessage httpRequestMessage);
 }

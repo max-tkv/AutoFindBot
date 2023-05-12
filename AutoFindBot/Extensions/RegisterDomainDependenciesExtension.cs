@@ -29,6 +29,7 @@ public static class RegisterDomainDependenciesExtension
         services.AddTransient<ICheckingNewAutoService, CheckingNewAutoService>();
         services.AddTransient<ICarService, CarService>();
         services.AddTransient<ICaptchaSolutionsService, CaptchaSolutionsService>();
+        services.AddTransient<IWebDriverService, WebDriverService>();
 
         // commands
         services.AddTransient<BaseCommand, StartCommand>();
