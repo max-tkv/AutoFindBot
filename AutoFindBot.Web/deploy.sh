@@ -40,6 +40,6 @@ echo "Удаление существующего контейнера, если
 docker rm -f autofindbot-container >/dev/null 2>&1 || true # игнорирование ошибки, если контейнер уже удален
 
 echo "Запуск нового контейнера..."
-docker run -d -p 5001:80 -e TZ=Europe/Moscow --name autofindbot-container autofindbot || { echo "Ошибка: не удалось запустить контейнер" >&2; exit 1; }
+docker run -d -p 5001:80 --name autofindbot-container autofindbot || { echo "Ошибка: не удалось запустить контейнер" >&2; exit 1; }
 
 echo "Готово!"
