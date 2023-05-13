@@ -2,6 +2,7 @@
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
+using AutoFindBot.Lookups;
 using AutoFindBot.Repositories;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -83,7 +84,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         {
             _logger.LogInformation($"User ID: {currentUser.Id}. Select Filter ID: {currentFilter.Id}");
             var isFoundNewAutoByFilter = false;
-            var newCarsGroupsBySource = newCars.GroupBy(x => x.Source);
+            var newCarsGroupsBySource = newCars.GroupBy(x => x.SourceType);
             foreach (var newCarsGroupBySource in newCarsGroupsBySource)
             {
                 var currentSource = newCarsGroupBySource.Key;
@@ -101,7 +102,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                     {
                         await _sourceCheckRepository.AddAsync(new SourceCheck()
                         {
-                            Source = currentSource,
+                            SourceType = currentSource,
                             UserFilterId = currentFilter.Id
                         });
                         if (!currentUser.Confirm)
@@ -121,7 +122,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
 
-    private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter, Source source)
+    private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter, SourceType sourceType)
     {
         var result = new List<Car>();
         foreach (var newCar in newCars)
@@ -129,7 +130,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var filterSuccess = CheckAutoByUserFilter(currentFilter, newCar);
             if (filterSuccess)
             {
-                var checkedNewCar = await _carService.CheckExistNewCarAndSaveAsync(newCar, currentFilter, source);
+                var checkedNewCar = await _carService.CheckExistNewCarAndSaveAsync(newCar, currentFilter, sourceType);
                 if (checkedNewCar)
                 {
                     result.Add(newCar);

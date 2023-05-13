@@ -1,10 +1,10 @@
-﻿using AutoFindBot.Entities;
+﻿using AutoFindBot.Lookups;
 
 namespace AutoFindBot.Models.Avito;
 
 public class AvitoResult
 {
-    public Source Source { get; set; }
+    public SourceType SourceType { get; set; }
     public string OriginId { get; set; }
     public string Title { get; set; }
     public string Сity { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.Drom;
@@ -34,7 +35,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<CarResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.TradeDealer))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => SourceType.TradeDealer))
             .ForMember(x => x.Title, o => o.MapFrom(x => x.Title))
             .ForMember(x => x.Vin, o => o.MapFrom(x => x.Vin))
             .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
@@ -56,7 +57,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<KeyAutoProbegResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.KeyAutoProbeg))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => SourceType.KeyAutoProbeg))
             .ForMember(x => x.Title, o => o.MapFrom(x => x.Title))
             .ForMember(x => x.Vin, o => o.MapFrom(x => x.Vin))
             .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
@@ -78,7 +79,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<DromResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.Drom))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => SourceType.Drom))
             .ForMember(x => x.Title, o => o.MapFrom(x => x.Title))
             .ForMember(x => x.Vin, o => o.MapFrom(x => x.Vin))
             .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
@@ -100,7 +101,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<AvitoResult, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.Avito))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => SourceType.Avito))
             .ForMember(x => x.Title, o => o.MapFrom(x => x.Title))
             .ForMember(x => x.Vin, o => o.MapFrom(x => x.Vin))
             .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
@@ -116,7 +117,7 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<AutoRuResultOffer, Entities.Car>()
             .ForMember(x => x.Price, o => o.MapFrom(x => x.PriceInfo.Price))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Entities.Source.AutoRu))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => SourceType.AutoRu))
             .ForMember(x => x.Title, o => o.MapFrom(x => $"{x.VehicleInfo.MarkInfo.Name} " +
                                                          $"{x.VehicleInfo.ModelInfo.Name} " +
                                                          $"{x.VehicleInfo.TechParam.HumanName}, " +

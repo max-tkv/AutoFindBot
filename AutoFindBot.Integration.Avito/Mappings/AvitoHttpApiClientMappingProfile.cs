@@ -1,5 +1,5 @@
-﻿using AutoFindBot.Entities;
-using AutoFindBot.Integration.Avito.Models;
+﻿using AutoFindBot.Integration.Avito.Models;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Utils.Helpers;
 using AutoMapper;
@@ -19,7 +19,7 @@ public class AvitoHttpApiClientMappingProfile : Profile
             .ForMember(x => x.Year, o => o.MapFrom(x => 
                 x.Value.Title.Split(",", StringSplitOptions.TrimEntries)[1]))
             .ForMember(x => x.Сity, o => o.MapFrom(x => x.Value.Location))
-            .ForMember(x => x.Source, o => o.MapFrom(x => Source.Avito))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => SourceType.Avito))
             .ForMember(x => x.PublishedAt, o => o.MapFrom(x => 
                 DateTimeHelper.UnixTimeStampToDateTime(x.Value.Time)))
             .ForMember(x => x.Url, o => o.MapFrom(x => x.Value.UriMweb))

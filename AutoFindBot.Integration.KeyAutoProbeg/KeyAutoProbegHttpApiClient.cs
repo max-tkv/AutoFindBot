@@ -1,10 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using AutoFindBot.Abstractions.HttpClients;
-using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.KeyAutoProbeg.Invariants;
 using AutoFindBot.Integration.KeyAutoProbeg.Options;
-using AutoFindBot.Models.AutoRu;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Utils.Http;
@@ -111,7 +110,7 @@ public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiCl
 
                 result.Add(new KeyAutoProbegResult()
                 {
-                    Source = Source.KeyAutoProbeg,
+                    SourceType = SourceType.KeyAutoProbeg,
                     OriginId = href.Split("/", StringSplitOptions.RemoveEmptyEntries).Last(),
                     Title = title,
                     Сity = address,

@@ -1,6 +1,6 @@
-﻿namespace AutoFindBot.Entities;
+﻿namespace AutoFindBot.Lookups;
 
-public enum Source
+public enum SourceType
 {
     TradeDealer = 1,
     

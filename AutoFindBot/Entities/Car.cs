@@ -1,4 +1,6 @@
-﻿namespace AutoFindBot.Entities;
+﻿using AutoFindBot.Lookups;
+
+namespace AutoFindBot.Entities;
 
 public class Car : BaseEntity
 {
@@ -10,7 +12,7 @@ public class Car : BaseEntity
     
     public string Сity { get; set; }
     
-    public Source Source { get; set; }
+    public SourceType SourceType { get; set; }
     
     public int Year { get; set; }
     

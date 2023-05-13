@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using AutoFindBot.Entities;
+using AutoFindBot.Lookups;
 
 namespace AutoFindBot.Repositories;
 
@@ -9,7 +9,7 @@ public interface ISourceCheckRepository
 
     Task<Entities.SourceCheck?> GetLastByFilterAsync(Expression<Func<Entities.SourceCheck, bool>> predicate);
 
-    Task<bool> ExistsAsync(UserFilter filter, Source source);
+    Task<bool> ExistsAsync(Entities.UserFilter filter, SourceType sourceType);
 
-    Task<bool> UpdateDateTimeAsync(UserFilter filter, Source source);
+    Task<bool> UpdateDateTimeAsync(Entities.UserFilter filter, SourceType sourceType);
 }

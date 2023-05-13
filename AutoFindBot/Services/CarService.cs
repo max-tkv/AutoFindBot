@@ -1,5 +1,6 @@
 ﻿using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
+using AutoFindBot.Lookups;
 using AutoFindBot.Repositories;
 using Microsoft.Extensions.Logging;
 
@@ -21,12 +22,12 @@ public class CarService : ICarService
     public async Task<bool> CheckExistNewCarAndSaveAsync(
         Car newCar, 
         UserFilter userFilter,
-        Source source)
+        SourceType sourceType)
     {
         var car = await _carRepository
             .GetByFilterAsync(x => x.OriginId == newCar.OriginId
                                    && x.UserFilterId == userFilter.Id
-                                   && x.Source == source);
+                                   && x.SourceType == sourceType);
         if (car == null)
         {
             newCar.UserFilterId = userFilter.Id;

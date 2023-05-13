@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AutoFindBot.Entities;
+using AutoFindBot.Lookups;
 using AutoFindBot.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,20 +28,20 @@ public class SourceCheckRepository : ISourceCheckRepository
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync();
 
-    public async Task<bool> ExistsAsync(UserFilter filter, Source source)
+    public async Task<bool> ExistsAsync(UserFilter filter, SourceType sourceType)
     {
         return await GetLastByFilterAsync(x => 
                 x.UserFilterId == filter.Id &&
-                x.Source == source) switch
+                x.SourceType == sourceType) switch
             {
                 null => false,
                 _ => true
             };
     }
 
-    public async Task<bool> UpdateDateTimeAsync(UserFilter filter, Source source)
+    public async Task<bool> UpdateDateTimeAsync(UserFilter filter, SourceType sourceType)
     {
-        var sourceCheck = await _context.SourceChecks.SingleOrDefaultAsync(x => x.Source == source && x.UserFilterId == filter.Id);
+        var sourceCheck = await _context.SourceChecks.SingleOrDefaultAsync(x => x.SourceType == sourceType && x.UserFilterId == filter.Id);
         if (sourceCheck != null)
         {
             sourceCheck.UpdatedDateTime = DateTime.Now;

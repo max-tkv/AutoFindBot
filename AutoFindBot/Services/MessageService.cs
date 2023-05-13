@@ -2,6 +2,7 @@
 using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Invariants;
+using AutoFindBot.Lookups;
 using AutoFindBot.Repositories;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
@@ -180,13 +181,13 @@ public class MessageService : IMessageService
 
     private string GetUrlBySource(Car car)
     {
-        return car.Source switch
+        return car.SourceType switch
         {
-            Source.Avito => $"{_configuration[SourceCarBaseUrlPaths.Avito]}{car.Url}",
-            Source.TradeDealer => $"{_configuration[SourceCarBaseUrlPaths.TradeDealer]}/{car.Url}",
-            Source.AutoRu => $"{_configuration[SourceCarBaseUrlPaths.AutoRu]}{car.Url}",
-            Source.KeyAutoProbeg => $"{car.Url}",
-            Source.Drom => $"{car.Url}",
+            SourceType.Avito => $"{_configuration[SourceCarBaseUrlPaths.Avito]}{car.Url}",
+            SourceType.TradeDealer => $"{_configuration[SourceCarBaseUrlPaths.TradeDealer]}/{car.Url}",
+            SourceType.AutoRu => $"{_configuration[SourceCarBaseUrlPaths.AutoRu]}{car.Url}",
+            SourceType.KeyAutoProbeg => $"{car.Url}",
+            SourceType.Drom => $"{car.Url}",
             _ => throw new ArgumentOutOfRangeException()
         };
     }

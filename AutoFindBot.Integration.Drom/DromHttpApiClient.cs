@@ -1,10 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using Ardalis.GuardClauses;
 using AutoFindBot.Abstractions.HttpClients;
-using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.Drom.Invariants;
 using AutoFindBot.Integration.Drom.Options;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Models.Drom;
 using AutoFindBot.Utils.Http;
@@ -95,7 +95,7 @@ public class DromHttpApiClient : HttpApiClient, IDromHttpApiClient
 
                 result.Add(new DromResult()
                 {
-                    Source = Source.Drom,
+                    SourceType = SourceType.Drom,
                     OriginId = originId,
                     Title = titleName + ", " + description,
                     Сity = address,

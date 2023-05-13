@@ -1,8 +1,8 @@
-﻿using AutoFindBot.Entities;
+﻿using AutoFindBot.Lookups;
 
 namespace AutoFindBot.Models;
 
 public class BaseCarResult
 {
-    public Source Source { get; set; }
+    public SourceType SourceType { get; set; }
 }

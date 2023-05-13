@@ -12,7 +12,7 @@ public class CarConfiguration : IEntityTypeConfiguration<Entities.Car>
     public void Configure(EntityTypeBuilder<Car> builder)
     {
         builder.ToTable("Cars").HasKey(x => x.Id);
-        builder.HasIndex(x => new { x.Title, x.Price, x.Year, x.Source });
+        builder.HasIndex(x => new { x.Title, x.Price, x.Year, Source = x.SourceType });
         builder.Property(x => x.Id)
             .ValueGeneratedOnAdd()
             .IsRequired();
