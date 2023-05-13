@@ -162,6 +162,6 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             return match.Groups[1].Value;
         }
         
-        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml);
+        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml + $"HTML: {html}");
     }
 }
