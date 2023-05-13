@@ -26,6 +26,8 @@ namespace AutoFindBot.Storage
         {
             base.ChangeTracker.AutoDetectChangesEnabled = true;
             base.Database.AutoTransactionsEnabled = false;
+            
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
