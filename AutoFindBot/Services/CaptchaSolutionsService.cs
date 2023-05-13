@@ -35,10 +35,9 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
     {
         try
         {
-            var baseUrl = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:BaseUrl"));
-            var getAutoByFilterQuery = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:GetAutoByFilterQuery"));
+            var filterQuery = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:GetAutoByFilterQuery"));
 
-            using var driver = _webDriverService.CreateChromeDriver(false);
+            using var driver = _webDriverService.CreateChromeDriver();
             driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
 
             await _webDriverService.ClickElementByCssSelectorAsync("button[data-id='button-all']", false);
@@ -52,7 +51,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             }
             catch (NotFoundWebElementException)
             {
-                if (driver.Url.Contains(getAutoByFilterQuery))
+                if (driver.Url.Contains(filterQuery))
                 {
                     SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
                     SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
@@ -62,7 +61,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             }
             catch (CaptchaSolutionsServiceException)
             {
-                if (driver.Url.Contains(getAutoByFilterQuery))
+                if (driver.Url.Contains(filterQuery))
                 {
                     SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
                     SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
@@ -80,7 +79,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             await _webDriverService.ClickElementByCssSelectorAsync("button[data-testid='submit']");
             await _webDriverService.ClickElementByIdAsync("confirm-button");
 
-            if (!driver.Url.Contains(getAutoByFilterQuery))
+            if (!driver.Url.Contains(filterQuery))
             {
                 throw new CaptchaSolutionsServiceException(CaptchaInvariants.ErrorCaptchaSolveMessage);
             }
