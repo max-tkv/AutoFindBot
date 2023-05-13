@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AutoFindBot.Entities;
+namespace AutoFindBot.Lookups;
 
-public enum Categories
+public enum Category
 {
     [Display(Name = "Любая")]
     Any

@@ -14,16 +14,6 @@ public class KeyboardService : IKeyboardService
     {
         _requiredSubscriptionsOptions = requiredSubscriptionsOptions;
     }
-    
-    public IReplyMarkup GetResultKeyboard(IPaginationResult pagination)
-    {
-        // if (pagination is IPaginationResult<SearchResultItem> paginationResult)
-        // {
-        //     return GetPageResultKeyboard(paginationResult, false);
-        // }
-
-        throw new Exception("Не удалось определить тип ответа");
-    }
 
     public IReplyMarkup GetStartMenuKeyboard()
     {
