@@ -6,7 +6,7 @@ public class DromHttpApiClientInvariants
     
     public const string PriceMax = ":priceMax";
 
-    public const string CaptchaFlag = "";
+    public const string CaptchaFlag = "captcha";
     
-    public const string SuccessFlag = "";
+    public const string SuccessFlag = "bulls-list-auto";
 }
