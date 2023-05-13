@@ -48,6 +48,7 @@ public static class RegisterPostgreSqlStorageExtension
             .AddTransient<IPaymentRepository, PaymentRepository>()
             .AddTransient<ICarRepository, CarRepository>()
             .AddTransient<IUserFilterRepository, UserFilterRepository>()
-            .AddTransient<ISourceCheckRepository, SourceCheckRepository>();
+            .AddTransient<ISourceCheckRepository, SourceCheckRepository>()
+            .AddTransient<ISourceRepository, SourceRepository>();
     }
 }

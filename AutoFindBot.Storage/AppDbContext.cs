@@ -19,6 +19,8 @@ namespace AutoFindBot.Storage
         
         public DbSet<UserFilter> UserFilters { get; set; }
         
+        public DbSet<Source> Sources { get; set; }
+        
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -36,7 +38,8 @@ namespace AutoFindBot.Storage
                 .ApplyConfiguration(new PaymentConfiguration())
                 .ApplyConfiguration(new CarConfiguration())
                 .ApplyConfiguration(new UserFilterConfiguration())
-                .ApplyConfiguration(new SourceCheckConfiguration());
+                .ApplyConfiguration(new SourceCheckConfiguration())
+                .ApplyConfiguration(new SourceConfiguration());
         }
     }
 }
