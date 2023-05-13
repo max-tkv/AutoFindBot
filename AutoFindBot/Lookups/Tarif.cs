@@ -1,4 +1,4 @@
-namespace AutoFindBot.Entities;
+namespace AutoFindBot.Lookups;
 
 public enum Tarif
 {

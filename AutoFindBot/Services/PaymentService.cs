@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Invariants;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Repositories;
 using Telegram.Bot;
@@ -39,7 +40,7 @@ public class PaymentService : IPaymentService
             _paymentsOptions.Value.Currency,
             new List<LabeledPrice>()
             {
-                new LabeledPrice()
+                new()
                 {
                     Label = _paymentsOptions.Value.Price.Label,
                     Amount = _paymentsOptions.Value.Price.Amount,

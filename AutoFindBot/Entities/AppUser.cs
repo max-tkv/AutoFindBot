@@ -1,4 +1,6 @@
-﻿namespace AutoFindBot.Entities
+﻿using AutoFindBot.Lookups;
+
+namespace AutoFindBot.Entities
 {
     public class AppUser : BaseEntity
     {

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Repositories;
 using Telegram.Bot;

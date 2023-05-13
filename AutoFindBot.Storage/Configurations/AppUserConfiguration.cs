@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AutoFindBot.Entities;
+using AutoFindBot.Lookups;
 
 namespace AutoFindBot.Storage.Configurations;
 
