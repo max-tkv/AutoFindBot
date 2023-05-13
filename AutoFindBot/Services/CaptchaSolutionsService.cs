@@ -38,15 +38,17 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             var baseUrl = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:BaseUrl"));
             var getAutoByFilterQuery = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:GetAutoByFilterQuery"));
 
-            using var driver = _webDriverService.CreateChromeDriver();
+            using var driver = _webDriverService.CreateChromeDriver(false);
             driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
 
             await _webDriverService.ClickElementByCssSelectorAsync("button[data-id='button-all']", false);
-            await _webDriverService.ClickElementByIdAsync("js-button");
+            await _webDriverService.ClickElementByIdAsync("js-button", false);
 
+            string imageCaptchaUrl = "";
             try
             {
                 await _webDriverService.ClickElementByIdAsync("confirm-button");
+                imageCaptchaUrl = GetCaptchaImageUrl(driver.PageSource);
             }
             catch (NotFoundWebElementException)
             {
@@ -54,13 +56,21 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 {
                     SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
                     SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
-                    
+
                     return;
                 }
             }
+            catch (CaptchaSolutionsServiceException)
+            {
+                if (driver.Url.Contains(getAutoByFilterQuery))
+                {
+                    SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
+                    SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
 
-            var actionPage = driver.PageSource;
-            var imageCaptchaUrl = GetCaptchaImageUrl(actionPage);
+                    return;
+                }
+            }
+            
             var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl);
         
             var captchaId = await _ruCaptchaHttpApiClient.SendCaptchaAsync(imageCaptcha);
@@ -162,6 +172,6 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             return match.Groups[1].Value;
         }
         
-        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml + $"HTML: {html}");
+        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml);
     }
 }
