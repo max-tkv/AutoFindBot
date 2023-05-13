@@ -4,8 +4,10 @@ using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.AutoRu.Models;
 using AutoFindBot.Integration.AutoRu.Options;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.AutoRu;
 using AutoFindBot.Models.ConfigurationOptions;
+using AutoFindBot.Repositories;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -20,25 +22,29 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
     private readonly IMapper _mapper;
     private readonly AutoRuHttpApiClientOptions _options;
     private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
+    private readonly ISourceRepository _sourceRepository;
 
     public AutoRuHttpApiClient(
         HttpClient httpClient,
         ILogger<AutoRuHttpApiClient> logger,
         IMapper mapper,
         AutoRuHttpApiClientOptions options,
-        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
+        IOptions<DefaultFilterOptions> defaultFilterOptions,
+        ISourceRepository sourceRepository) : base(httpClient)
     {
         _logger = logger;
         _mapper = mapper;
         _options = options;
         _defaultFilterOptions = defaultFilterOptions;
+        _sourceRepository = sourceRepository;
     }
 
     public async Task<AutoRuResult> GetAllNewAutoAsync()
     {
         try
         {
-            NotActiveSourceException.ThrowIfNotActive(nameof(AutoRuHttpApiClient), _options.Active);
+            NotActiveSourceException.ThrowIfNotActive(
+                await _sourceRepository.GetByTypeAsync(SourceType.AutoRu));
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
             var request = new AutoRuRequest()

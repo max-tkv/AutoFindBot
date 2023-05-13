@@ -3,8 +3,10 @@ using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.Avito.Invariants;
 using AutoFindBot.Integration.Avito.Models;
 using AutoFindBot.Integration.Avito.Options;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.ConfigurationOptions;
+using AutoFindBot.Repositories;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -19,23 +21,27 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
     private readonly AvitoHttpApiClientOptions _options;
     private readonly IMapper _mapper;
     private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
+    private readonly ISourceRepository _sourceRepository;
 
     public AvitoHttpApiClient(
         IMapper mapper,
         HttpClient httpClient,
         ILogger<AvitoHttpApiClient> logger,
         AvitoHttpApiClientOptions options,
-        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
+        IOptions<DefaultFilterOptions> defaultFilterOptions,
+        ISourceRepository sourceRepository) : base(httpClient)
     {
         _logger = logger;
         _options = options;
         _mapper = mapper;
         _defaultFilterOptions = defaultFilterOptions;
+        _sourceRepository = sourceRepository;
     }
 
     public async Task<List<AvitoResult>> GetAllNewAutoAsync()
     {
-        NotActiveSourceException.ThrowIfNotActive(nameof(AvitoHttpApiClient), _options.Active);
+        NotActiveSourceException.ThrowIfNotActive(
+            await _sourceRepository.GetByTypeAsync(SourceType.Avito));
 
         var path = _options.BaseUrl + _options.GetAutoByFilterQuery
             .Replace(AvitoHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
@@ -58,7 +64,8 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
     {
         try
         {
-            NotActiveSourceException.ThrowIfNotActive(nameof(AvitoHttpApiClient), _options.Active);
+            NotActiveSourceException.ThrowIfNotActive(
+                await _sourceRepository.GetByTypeAsync(SourceType.Avito));
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery

@@ -3,8 +3,10 @@ using AutoFindBot.Exceptions;
 using AutoFindBot.Integration.Invariants;
 using AutoFindBot.Integration.Models;
 using AutoFindBot.Integration.Options;
+using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Models.TradeDealer;
+using AutoFindBot.Repositories;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -19,23 +21,27 @@ public class TradeDealerHttpApiClient : HttpApiClient, ITradeDealerHttpApiClient
     private readonly ILogger<TradeDealerHttpApiClient> _logger;
     private readonly TradeDealerHttpApiClientOptions _options;
     private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
+    private readonly ISourceRepository _sourceRepository;
 
     public TradeDealerHttpApiClient(
         HttpClient httpClient,
         IMapper mapper,
         TradeDealerHttpApiClientOptions options,
         ILogger<TradeDealerHttpApiClient> logger,
-        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
+        IOptions<DefaultFilterOptions> defaultFilterOptions,
+        ISourceRepository sourceRepository) : base(httpClient)
     {
         _options = options;
         _mapper = mapper;
         _logger = logger;
         _defaultFilterOptions = defaultFilterOptions;
+        _sourceRepository = sourceRepository;
     }
 
     public async Task<TradeDealerResult> GetAllNewAutoAsync()
     {
-        NotActiveSourceException.ThrowIfNotActive(nameof(TradeDealerHttpApiClient), _options.Active);
+        NotActiveSourceException.ThrowIfNotActive(
+            await _sourceRepository.GetByTypeAsync(SourceType.TradeDealer));
 
         var path = _options.BaseUrl + _options.GetAutoByFilterQuery
             .Replace(TradeDealerHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())

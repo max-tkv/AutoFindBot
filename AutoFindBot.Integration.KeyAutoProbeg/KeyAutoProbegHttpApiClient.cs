@@ -6,6 +6,7 @@ using AutoFindBot.Integration.KeyAutoProbeg.Options;
 using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Models.KeyAutoProbeg;
+using AutoFindBot.Repositories;
 using AutoFindBot.Utils.Http;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
@@ -19,21 +20,25 @@ public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiCl
     private readonly KeyAutoProbegHttpApiClientOptions _options;
     private IKeyAutoProbegHttpApiClient _keyAutoProbegHttpApiClientImplementation;
     private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
+    private readonly ISourceRepository _sourceRepository;
 
     public KeyAutoProbegHttpApiClient(
         HttpClient httpClient,
         KeyAutoProbegHttpApiClientOptions options,
         ILogger<KeyAutoProbegHttpApiClient> logger,
-        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
+        IOptions<DefaultFilterOptions> defaultFilterOptions,
+        ISourceRepository sourceRepository) : base(httpClient)
     {
         _logger = logger;
         _options = options;
         _defaultFilterOptions = defaultFilterOptions;
+        _sourceRepository = sourceRepository;
     }
 
     public async Task<List<KeyAutoProbegResult>> GetAllNewAutoAsync()
     {
-        NotActiveSourceException.ThrowIfNotActive(nameof(KeyAutoProbegHttpApiClient), _options.Active);
+        NotActiveSourceException.ThrowIfNotActive(
+            await _sourceRepository.GetByTypeAsync(SourceType.KeyAutoProbeg));
 
         try
         {

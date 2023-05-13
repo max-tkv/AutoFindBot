@@ -6,11 +6,11 @@ public class NotActiveSourceException : Exception
     {
     }
 
-    public static void ThrowIfNotActive(string httpApiClientName, bool optionsActive)
+    public static void ThrowIfNotActive(Entities.Source source)
     {
-        if (optionsActive == false)
+        if (source.Active == false)
         {
-            Throw($"{httpApiClientName} отключен.");
+            Throw($"{source.Name} отключен.");
         }
     }
     

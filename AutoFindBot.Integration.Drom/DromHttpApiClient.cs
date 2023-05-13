@@ -7,6 +7,7 @@ using AutoFindBot.Integration.Drom.Options;
 using AutoFindBot.Lookups;
 using AutoFindBot.Models.ConfigurationOptions;
 using AutoFindBot.Models.Drom;
+using AutoFindBot.Repositories;
 using AutoFindBot.Utils.Http;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
@@ -19,21 +20,25 @@ public class DromHttpApiClient : HttpApiClient, IDromHttpApiClient
     private readonly DromHttpApiClientOptions _options;
     private readonly ILogger<DromHttpApiClient> _logger;
     private readonly IOptions<DefaultFilterOptions> _defaultFilterOptions;
+    private readonly ISourceRepository _sourceRepository;
 
     public DromHttpApiClient(
         HttpClient httpClient,
         DromHttpApiClientOptions options,
         ILogger<DromHttpApiClient> logger,
-        IOptions<DefaultFilterOptions> defaultFilterOptions) : base(httpClient)
+        IOptions<DefaultFilterOptions> defaultFilterOptions,
+        ISourceRepository sourceRepository) : base(httpClient)
     {
         _options = Guard.Against.Null(options, nameof(options));
         _logger = Guard.Against.Null(logger, nameof(logger));
         _defaultFilterOptions = Guard.Against.Null(defaultFilterOptions, nameof(defaultFilterOptions));
+        _sourceRepository = Guard.Against.Null(sourceRepository, nameof(sourceRepository));
     }
     
     public async Task<List<DromResult>> GetAllNewAutoAsync()
     {
-        NotActiveSourceException.ThrowIfNotActive(nameof(DromHttpApiClient), _options.Active);
+        NotActiveSourceException.ThrowIfNotActive(
+            await _sourceRepository.GetByTypeAsync(SourceType.Drom));
 
         try
         {
