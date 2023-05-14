@@ -306,7 +306,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         catch (Exception e)
         {
             _logger.LogWarning(
-                $"Method GetCarsFromAutoRuAsync: {e.Message}");
+                $"Method GetCarsFromAutoRuAsync: {e}");
         }
     }
 }
