@@ -40,6 +40,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             var filterQuery = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:GetAutoByFilterQuery"));
 
             using var driver = _webDriverService.CreateChromeDriver();
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: {httpRequestMessage.RequestUri?.ToString()}");
             driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
 
             await _webDriverService.ClickElementByCssSelectorAsync(
