@@ -8,6 +8,7 @@ public class CheckSuccessfulStatusCodeMessageHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"!!!!!!!!!!!!!!!!!!!!!!!!! : {request.RequestUri}");
         var response = await base.SendAsync(request, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
