@@ -183,7 +183,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         {
             using (var httpClient = new HttpClient())
             {
-                Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: {imageUrl}");
+                _logger.LogInformation($"Captcha image url: {imageUrl}");
                 var response = await httpClient.GetAsync(imageUrl, stoppingToken);
                 response.EnsureSuccessStatusCode();
                 
