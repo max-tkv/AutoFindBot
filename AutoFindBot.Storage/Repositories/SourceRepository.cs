@@ -14,7 +14,9 @@ public class SourceRepository : ISourceRepository
         _context = context;
     }
 
-    public async Task<Source> GetByTypeAsync(SourceType sourceType) =>
+    public async Task<Source> GetByTypeAsync(
+        SourceType sourceType, 
+        CancellationToken stoppingToken = default) =>
         await _context.Sources.AsNoTracking()
-            .SingleAsync(x => x.Id == (long)sourceType);
+            .SingleAsync(x => x.Id == (long)sourceType, cancellationToken: stoppingToken);
 }

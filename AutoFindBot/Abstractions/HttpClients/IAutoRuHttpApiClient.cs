@@ -4,5 +4,5 @@ namespace AutoFindBot.Abstractions.HttpClients;
 
 public interface IAutoRuHttpApiClient
 {
-    Task<AutoRuResult> GetAllNewAutoAsync();
+    Task<AutoRuResult> GetAllNewAutoAsync(CancellationToken stoppingToken = default);
 }

@@ -38,16 +38,16 @@ public class TradeDealerHttpApiClient : HttpApiClient, ITradeDealerHttpApiClient
         _sourceRepository = sourceRepository;
     }
 
-    public async Task<TradeDealerResult> GetAllNewAutoAsync()
+    public async Task<TradeDealerResult> GetAllNewAutoAsync(CancellationToken stoppingToken = default)
     {
         NotActiveSourceException.ThrowIfNotActive(
-            await _sourceRepository.GetByTypeAsync(SourceType.TradeDealer));
+            await _sourceRepository.GetByTypeAsync(SourceType.TradeDealer, stoppingToken));
 
         var path = _options.BaseUrl + _options.GetAutoByFilterQuery
             .Replace(TradeDealerHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
             .Replace(TradeDealerHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
-        var response = await SendAsync(path, HttpMethod.Get);
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await HttpClient.GetAsync(path, stoppingToken);
+        var content = await response.Content.ReadAsStringAsync(stoppingToken);
         if (response.IsSuccessStatusCode == false)
         {
             throw new TradeDealerClientException($"Произошла ошибка: {content}");

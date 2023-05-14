@@ -38,16 +38,16 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
         _sourceRepository = sourceRepository;
     }
 
-    public async Task<List<AvitoResult>> GetAllNewAutoAsync()
+    public async Task<List<AvitoResult>> GetAllNewAutoAsync(CancellationToken stoppingToken = default)
     {
         NotActiveSourceException.ThrowIfNotActive(
-            await _sourceRepository.GetByTypeAsync(SourceType.Avito));
+            await _sourceRepository.GetByTypeAsync(SourceType.Avito, stoppingToken));
 
         var path = _options.BaseUrl + _options.GetAutoByFilterQuery
             .Replace(AvitoHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
             .Replace(AvitoHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
-        var response = await SendAsync(path, HttpMethod.Get);
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await HttpClient.GetAsync(path, stoppingToken);
+        var content = await response.Content.ReadAsStringAsync(stoppingToken);
         if (response.IsSuccessStatusCode == false)
         {
             throw new Exception($"Произошла ошибка: {content}");
@@ -60,19 +60,21 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
         return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
     }
 
-    public async Task<List<AvitoResult>> GetAutoByFilterAsync(AvitoFilter filter)
+    public async Task<List<AvitoResult>> GetAutoByFilterAsync(
+        AvitoFilter filter, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
             NotActiveSourceException.ThrowIfNotActive(
-                await _sourceRepository.GetByTypeAsync(SourceType.Avito));
+                await _sourceRepository.GetByTypeAsync(SourceType.Avito, stoppingToken));
             ArgumentNullException.ThrowIfNull(filter);
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery
                 .Replace(AvitoHttpApiClientInvariants.PriceMin, filter.PriceMin)
                 .Replace(AvitoHttpApiClientInvariants.PriceMax, filter.PriceMax);
-            var response = await SendAsync(path, HttpMethod.Get);
-            var content = await response.Content.ReadAsStringAsync();
+            var response = await HttpClient.GetAsync(path, stoppingToken);
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
             if (response.IsSuccessStatusCode == false)
             {
                 throw new Exception($"Произошла ошибка: {content}");

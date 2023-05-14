@@ -29,28 +29,24 @@ namespace AutoFindBot.Commands
             _botClient = telegramBotService.GetBotAsync().Result;
         }
 
-        public override async Task ExecuteAsync(Update update, AppUser user)
+        public override async Task ExecuteAsync(
+            Update update, 
+            AppUser user, 
+            CancellationToken stoppingToken = default)
         {
             try
             {
-                // if (user.ChatId != 983077680)
-                // {
-                //     await _messageService.SendErrorMessageAsync(_botClient, user, "Sorry. Bot is in development.");
-                // }
-                // else
-                // {
-                //     await _messageService.SendStartMessage(_botClient, user);   
-                // }
-                await _messageService.SendStartMessage(_botClient, user);
+                await _messageService.SendStartMessageAsync(_botClient, user, stoppingToken);
                 await _actionService.AddAsync(new Entities.Action()
                 {
                     UserId = user.Id,
                     CommandName = Name
-                });
+                }, stoppingToken);
             }
             catch (Exception e)
             {
-                await _messageService.SendErrorMessageAsync(_botClient, user, CommandHelpers.GetErrorMessage(Name));
+                await _messageService.SendErrorMessageAsync(
+                    _botClient, user, CommandHelpers.GetErrorMessage(Name), stoppingToken);
                 _logger.LogError($"UserID: {user.Id} CommandName: {Name} Error: {e.Message} Trace: {e.StackTrace}");
             }
         }

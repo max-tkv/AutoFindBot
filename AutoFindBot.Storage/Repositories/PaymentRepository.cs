@@ -12,10 +12,12 @@ public class PaymentRepository : IPaymentRepository
         _context = context;
     }
 
-    public async Task<Payment> AddAsync(Payment newPayment)
+    public async Task<Payment> AddAsync(
+        Payment newPayment, 
+        CancellationToken stoppingToken = default)
     {
-        var result = await _context.Payments.AddAsync(newPayment);
-        await CommitAsync();
+        var result = await _context.Payments.AddAsync(newPayment, stoppingToken);
+        await CommitAsync(stoppingToken);
         return result.Entity;
     }
     

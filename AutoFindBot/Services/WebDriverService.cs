@@ -20,7 +20,10 @@ public class WebDriverService : IWebDriverService, IDisposable
         return _driver;
     }
 
-    public async Task ClickElementByIdAsync(string id, bool throwIfNotFound = true)
+    public async Task ClickElementByIdAsync(
+        string id, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -35,7 +38,7 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
@@ -47,7 +50,11 @@ public class WebDriverService : IWebDriverService, IDisposable
         }
     }
 
-    public async Task SendKeysByIdAsync(string id, string key, bool throwIfNotFound = true)
+    public async Task SendKeysByIdAsync(
+        string id, 
+        string key, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -62,7 +69,7 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
@@ -74,7 +81,10 @@ public class WebDriverService : IWebDriverService, IDisposable
         }
     }
 
-    public async Task ClickElementByCssSelectorAsync(string selector, bool throwIfNotFound = true)
+    public async Task ClickElementByCssSelectorAsync(
+        string selector, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -89,7 +99,7 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
@@ -101,7 +111,10 @@ public class WebDriverService : IWebDriverService, IDisposable
         }
     }
     
-    public async Task<IWebElement?> FindElementByCssSelectorAsync(string selector, bool throwIfNotFound = true)
+    public async Task<IWebElement?> FindElementByCssSelectorAsync(
+        string selector, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -113,7 +126,7 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
@@ -127,7 +140,10 @@ public class WebDriverService : IWebDriverService, IDisposable
         return null;
     }
     
-    public async Task<IWebElement?> FindElementByIdAsync(string id, bool throwIfNotFound = true)
+    public async Task<IWebElement?> FindElementByIdAsync(
+        string id, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -139,7 +155,7 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 

@@ -23,7 +23,7 @@ public class CheckCaptchaHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        string requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
+        string requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
         
         var response = await base.SendAsync(request, cancellationToken);
         
@@ -32,7 +32,7 @@ public class CheckCaptchaHandler : DelegatingHandler
             content.IndexOf(AutoRuHttpApiClientInvariants.CaptchaFlagTwo, StringComparison.Ordinal) > 0 ||
             !response.IsSuccessStatusCode)
         {
-            await _captchaSolutionsService.SolutionAutoRuAsync(request);
+            await _captchaSolutionsService.SolutionAutoRuAsync(request, cancellationToken);
             request.Content = new StringContent(requestBody);
             
             var checkResponse = await base.SendAsync(request, cancellationToken);

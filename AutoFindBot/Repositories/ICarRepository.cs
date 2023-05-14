@@ -1,10 +1,14 @@
 ﻿using System.Linq.Expressions;
-using AutoFindBot.Entities;
 
 namespace AutoFindBot.Repositories;
 
 public interface ICarRepository
 {
-    Task<Entities.Car> AddAsync(Car newCar);
-    Task<Entities.Car?> GetByFilterAsync(Expression<Func<Car, bool>> predicate);
+    Task<Entities.Car> AddAsync(
+        Entities.Car newCar, 
+        CancellationToken stoppingToken = default);
+    
+    Task<Entities.Car?> GetByFilterAsync(
+        Expression<Func<Entities.Car, bool>> predicate, 
+        CancellationToken stoppingToken = default);
 }

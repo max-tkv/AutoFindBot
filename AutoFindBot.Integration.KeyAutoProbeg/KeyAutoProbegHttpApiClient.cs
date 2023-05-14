@@ -35,10 +35,10 @@ public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiCl
         _sourceRepository = sourceRepository;
     }
 
-    public async Task<List<KeyAutoProbegResult>> GetAllNewAutoAsync()
+    public async Task<List<KeyAutoProbegResult>> GetAllNewAutoAsync(CancellationToken stoppingToken = default)
     {
         NotActiveSourceException.ThrowIfNotActive(
-            await _sourceRepository.GetByTypeAsync(SourceType.KeyAutoProbeg));
+            await _sourceRepository.GetByTypeAsync(SourceType.KeyAutoProbeg, stoppingToken));
 
         try
         {
@@ -46,12 +46,8 @@ public class KeyAutoProbegHttpApiClient : HttpApiClient, IKeyAutoProbegHttpApiCl
                 .Replace(KeyAutoProbegHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
                 .Replace(KeyAutoProbegHttpApiClientInvariants.PriceMax,
                     _defaultFilterOptions.Value.PriceMax.ToString());
-            var response = await HttpClient.SendAsync(new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(path)
-            });
-            var content = await response.Content.ReadAsStringAsync();
+            var response = await HttpClient.GetAsync(path, stoppingToken);
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
             if (response.IsSuccessStatusCode == false)
             {
                 throw new Exception(

@@ -4,5 +4,5 @@ namespace AutoFindBot.Abstractions.HttpClients;
 
 public interface IDromHttpApiClient
 {
-    Task<List<DromResult>> GetAllNewAutoAsync();
+    Task<List<DromResult>> GetAllNewAutoAsync(CancellationToken stoppingToken = default);
 }

@@ -22,24 +22,31 @@ namespace AutoFindBot.Services
             _paymentService = paymentService;
         }
         
-        public async Task ExecuteAsync(Update update, string? commandName = null)
+        public async Task ExecuteAsync(
+            Update update, 
+            string? commandName = null, 
+            CancellationToken stoppingToken = default)
         {
             var appUser = _appUserService.GetByUpdate(update);
-            var user = await _appUserService.GetOrCreateAsync(appUser);
-            await RunAsync(update, user, commandName);
+            var user = await _appUserService.GetOrCreateAsync(appUser, stoppingToken);
+            await RunAsync(update, user, commandName, stoppingToken);
         }
 
-        private async Task RunAsync(Update update, AppUser user, string? commandName = null)
+        private async Task RunAsync(
+            Update update,
+            AppUser user, 
+            string? commandName = null, 
+            CancellationToken stoppingToken = default)
         {
             if (commandName != null)
             {
-                await ExecuteCommand(commandName, update, user);
+                await ExecuteCommandAsync(commandName, update, user, stoppingToken);
                 return;
             }
 
             if (update.PreCheckoutQuery != null)
             {
-                await _paymentService.SavePaymentAsync(update, user);
+                await _paymentService.SavePaymentAsync(update, user, stoppingToken);
                 return;
             }
             
@@ -50,37 +57,37 @@ namespace AutoFindBot.Services
             {
                 if (update.Message.Text.StartsWith(CommandNames.StartCommand))
                 {
-                    await ExecuteCommand(CommandNames.StartCommand, update, user);
+                    await ExecuteCommandAsync(CommandNames.StartCommand, update, user, stoppingToken);
                     return;
                 }
                 
                 if (update.Message.Text.StartsWith(CommandNames.CheckNewAutoCommand))
                 {
-                    await ExecuteCommand(CommandNames.CheckNewAutoCommand, update, user);
+                    await ExecuteCommandAsync(CommandNames.CheckNewAutoCommand, update, user, stoppingToken);
                     return;
                 }
                 
                 if (update.Message.Text.StartsWith(CommandNames.SettingsCommand))
                 {
-                    await ExecuteCommand(CommandNames.SettingsCommand, update, user);
+                    await ExecuteCommandAsync(CommandNames.SettingsCommand, update, user, stoppingToken);
                     return;
                 }
             }
             
             if (update.CallbackQuery?.Data is CommandNames.FiltersCommand)
             {
-                await ExecuteCommand(CommandNames.FiltersCommand, update, user);
+                await ExecuteCommandAsync(CommandNames.FiltersCommand, update, user, stoppingToken);
                 return;
             }
             
             if (update.CallbackQuery?.Data is CommandNames.SourcesCommand)
             {
-                await ExecuteCommand(CommandNames.SourcesCommand, update, user);
+                await ExecuteCommandAsync(CommandNames.SourcesCommand, update, user, stoppingToken);
                 return;
             }
             
-            var lastAction = await _actionService.GetLastByUserAsync(user);
-            switch ((lastAction.CommandName, lastAction.Category))
+            var lastAction = await _actionService.GetLastByUserAsync(user, stoppingToken);
+            switch ((lastAction?.CommandName, lastAction?.Category))
             {
                 // case (CommandNames.BackCommand, Categories.Films):
                 // {
@@ -90,10 +97,14 @@ namespace AutoFindBot.Services
             }
         }
 
-        private async Task ExecuteCommand(string commandName, Update update, AppUser user)
+        private async Task ExecuteCommandAsync(
+            string commandName, 
+            Update update, 
+            AppUser user, 
+            CancellationToken stoppingToken = default)
         {
            await _commands.First(x => x.Name == commandName)
-               .ExecuteAsync(update, user);
+               .ExecuteAsync(update, user, stoppingToken);
         }
     }
 }

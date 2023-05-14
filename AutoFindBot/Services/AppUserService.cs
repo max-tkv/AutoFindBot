@@ -34,28 +34,32 @@ public class AppUserService : IAppUserService
         _requiredSubscriptionsOptions = requiredSubscriptionsOptions;
     }
     
-    public async Task<AppUser> GetOrCreateAsync(Update update)
+    public async Task<AppUser> GetOrCreateAsync(
+        Update update, 
+        CancellationToken stoppingToken = default)
     {
         var newUser = GetByUpdate(update);
-        var user = await _appUserRepository.GetByChatIdAsync(newUser.ChatId);
+        var user = await _appUserRepository.GetByChatIdAsync(newUser.ChatId, stoppingToken);
         if (user != null)
         {
             return user;
         }
 
-        await _appUserRepository.AddAsync(newUser);
+        await _appUserRepository.AddAsync(newUser, stoppingToken);
         return newUser;
     }
     
-    public async Task<AppUser> GetOrCreateAsync(AppUser newUser)
+    public async Task<AppUser> GetOrCreateAsync(
+        AppUser newUser, 
+        CancellationToken stoppingToken = default)
     {
-        var user = await _appUserRepository.GetByChatIdAsync(newUser.ChatId);
+        var user = await _appUserRepository.GetByChatIdAsync(newUser.ChatId, stoppingToken);
         if (user != null)
         {
             return user;
         }
 
-        await _appUserRepository.AddAsync(newUser);
+        await _appUserRepository.AddAsync(newUser, stoppingToken);
         return newUser;
     }
     
@@ -89,7 +93,9 @@ public class AppUserService : IAppUserService
         };
     }
 
-    public async Task CheckFreeRequestAsync(AppUser user)
+    public async Task CheckFreeRequestAsync(
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         if (user.Tarif == Tarif.Premium)
         {
@@ -98,7 +104,7 @@ public class AppUserService : IAppUserService
         
         if (_paymentsOptions.Value.Active)
         {
-            var numberOfRequests = await _actionRepository.GetNumberOfRequestsByUserAsync(user);
+            var numberOfRequests = await _actionRepository.GetNumberOfRequestsByUserAsync(user, stoppingToken);
             if (numberOfRequests >= _paymentsOptions.Value.MaxFreeNumberRequests)
             {
                 throw new FreeRequestsDidNotException();
@@ -106,7 +112,10 @@ public class AppUserService : IAppUserService
         }
     }
     
-    public async Task CheckRequiredSubscriptionsAsync(TelegramBotClient botClient, AppUser user)
+    public async Task CheckRequiredSubscriptionsAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
@@ -115,7 +124,7 @@ public class AppUserService : IAppUserService
             {
                 foreach (var group in value.Groups)
                 {
-                    var chatMember = await botClient.GetChatMemberAsync(group.Id, user.ChatId);
+                    var chatMember = await botClient.GetChatMemberAsync(group.Id, user.ChatId, stoppingToken);
                     if (chatMember.Status != ChatMemberStatus.Left)
                     {
                         continue;
@@ -137,13 +146,15 @@ public class AppUserService : IAppUserService
         }
     }
 
-    public async Task<List<AppUser>> GetAllAsync()
+    public async Task<List<AppUser>> GetAllAsync(CancellationToken stoppingToken = default)
     {
-        return await _appUserRepository.GetAllAsync();
+        return await _appUserRepository.GetAllAsync(stoppingToken);
     }
 
-    public async Task SetConfirmAsync(long currentFilterUserId)
+    public async Task SetConfirmAsync(
+        long currentFilterUserId, 
+        CancellationToken stoppingToken = default)
     {
-        await _appUserRepository.ConfirmAsync(currentFilterUserId);
+        await _appUserRepository.ConfirmAsync(currentFilterUserId, stoppingToken);
     }
 }

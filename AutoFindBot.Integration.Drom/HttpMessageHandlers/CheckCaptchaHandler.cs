@@ -29,7 +29,7 @@ public class CheckCaptchaHandler : DelegatingHandler
         if (content.IndexOf(DromHttpApiClientInvariants.CaptchaFlag, StringComparison.Ordinal) > 0 || 
             !response.IsSuccessStatusCode)
         {
-            await _captchaSolutionsService.SolutionDromAsync(request);
+            await _captchaSolutionsService.SolutionDromAsync(request, cancellationToken);
 
             var checkResponse = await base.SendAsync(request, cancellationToken);
             var checkContent = await checkResponse.Content.ReadAsStringAsync(cancellationToken);

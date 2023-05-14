@@ -25,8 +25,12 @@ public class SettingsCommand : BaseCommand
         _logger = logger;
     }
     
-    public override async Task ExecuteAsync(Update update, AppUser user)
+    public override async Task ExecuteAsync(
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
-        await _messageService.SendSettingsCommands(_botClient, update, user);
+        await _messageService.SendSettingsCommandsAsync(
+            _botClient, update, user, stoppingToken);
     }
 }

@@ -13,7 +13,7 @@ namespace AutoFindBot.Services
             _configuration = configuration;
         }
 
-        public async Task<TelegramBotClient> GetBotAsync()
+        public async Task<TelegramBotClient> GetBotAsync(CancellationToken stoppingToken = default)
         {
             if (_botClient != null)
             {
@@ -23,7 +23,7 @@ namespace AutoFindBot.Services
             _botClient = new TelegramBotClient(_configuration["Token"]);
 
             var hook = $"{_configuration["Url"]}{_configuration["UpdatePath"]}";
-            await _botClient.SetWebhookAsync(hook);
+            await _botClient.SetWebhookAsync(hook, cancellationToken: stoppingToken);
 
             return _botClient;
         }

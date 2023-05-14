@@ -7,13 +7,29 @@ public interface IWebDriverService
 {
     ChromeDriver CreateChromeDriver(bool headless = true);
 
-    Task ClickElementByIdAsync(string id, bool throwIfNotFound = true);
+    Task ClickElementByIdAsync(
+        string id, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default);
     
-    Task SendKeysByIdAsync(string id, string key, bool throwIfNotFound = true);
+    Task SendKeysByIdAsync(
+        string id, 
+        string key, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default);
     
-    Task ClickElementByCssSelectorAsync(string selector, bool throwIfNotFound = true);
+    Task ClickElementByCssSelectorAsync(
+        string selector, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default);
 
-    Task<IWebElement?> FindElementByCssSelectorAsync(string selector, bool throwIfNotFound = true);
+    Task<IWebElement?> FindElementByCssSelectorAsync(
+        string selector, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default);
 
-    Task<IWebElement?> FindElementByIdAsync(string id, bool throwIfNotFound = true);
+    Task<IWebElement?> FindElementByIdAsync(
+        string id, 
+        bool throwIfNotFound = true, 
+        CancellationToken stoppingToken = default);
 }

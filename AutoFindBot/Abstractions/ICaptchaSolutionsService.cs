@@ -2,9 +2,15 @@
 
 public interface ICaptchaSolutionsService
 {
-    Task SolutionAutoRuAsync(HttpRequestMessage httpRequestMessage);
+    Task SolutionAutoRuAsync(
+        HttpRequestMessage httpRequestMessage, 
+        CancellationToken stoppingToken = default);
 
-    Task SolutionKeyAutoProbegAsync(HttpRequestMessage httpRequestMessage);
+    Task SolutionKeyAutoProbegAsync(
+        HttpRequestMessage httpRequestMessage, 
+        CancellationToken stoppingToken = default);
     
-    Task SolutionDromAsync(HttpRequestMessage request);
+    Task SolutionDromAsync(
+        HttpRequestMessage request, 
+        CancellationToken stoppingToken = default);
 }

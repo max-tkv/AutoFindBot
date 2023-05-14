@@ -14,11 +14,15 @@ public class ActionService : IActionService
         _actionRepository = actionRepository;
     }
 
-    public async Task<Entities.Action> GetLastByUserAsync(AppUser appUser) =>
-        await _actionRepository.GetLastByUserAsync(appUser);
+    public async Task<Entities.Action?> GetLastByUserAsync(
+        AppUser appUser, 
+        CancellationToken stoppingToken = default) =>
+        await _actionRepository.GetLastByUserAsync(appUser, stoppingToken);
 
-    public async Task AddAsync(Entities.Action newAction)
+    public async Task AddAsync(
+        Entities.Action newAction, 
+        CancellationToken stoppingToken = default)
     {
-        await _actionRepository.AddAsync(newAction);
+        await _actionRepository.AddAsync(newAction, stoppingToken);
     }
 }

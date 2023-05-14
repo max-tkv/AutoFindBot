@@ -31,42 +31,80 @@ public class MessageService : IMessageService
         _userFilterRepository = userFilterRepository;
     }
     
-    public async Task SendStartMessage(TelegramBotClient botClient, AppUser user)
+    public async Task SendStartMessageAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         var keyboard = _keyboardService.GetStartMenuKeyboard();
-        await botClient.SendTextMessageAsync(user.ChatId, Messages.Start, 
-            ParseMode.Markdown, replyMarkup: keyboard);
+        await botClient.SendTextMessageAsync(
+            user.ChatId, 
+            Messages.Start, 
+            ParseMode.Markdown, 
+            replyMarkup: keyboard, 
+            cancellationToken: stoppingToken);
     }
 
-    public async Task SendErrorMessageAsync(TelegramBotClient botClient, AppUser user, string message)
+    public async Task SendErrorMessageAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        string message, 
+        CancellationToken stoppingToken = default)
     {
         await botClient.SendTextMessageAsync(user.ChatId, 
-            $"{Invariants.Emoji.Cross} " + message, ParseMode.Markdown);
+            $"{Invariants.Emoji.Cross} " + message, 
+            ParseMode.Markdown, 
+            cancellationToken: stoppingToken);
     }
     
-    public async Task SendErrorMessageAsync(TelegramBotClient botClient, AppUser user, int messageId, string message)
+    public async Task SendErrorMessageAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        int messageId, 
+        string message, 
+        CancellationToken stoppingToken = default)
     {
-        await botClient.EditMessageTextAsync(user.ChatId, 
-            messageId, $"{Invariants.Emoji.Cross} " + message, ParseMode.Markdown);
+        await botClient.EditMessageTextAsync(
+            user.ChatId, 
+            messageId, $"{Invariants.Emoji.Cross} " + message, 
+            ParseMode.Markdown, 
+            cancellationToken: stoppingToken);
     }
 
-    public async Task SendRequiredSubscriptionsAsync(TelegramBotClient botClient, AppUser user)
+    public async Task SendRequiredSubscriptionsAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         var keyboard = _keyboardService.GetRequiredSubscriptionsKeyboard();
-        await botClient.SendTextMessageAsync(user.ChatId, Messages.RequiredSubscriptions, 
-            ParseMode.Markdown, replyMarkup: keyboard);
+        await botClient.SendTextMessageAsync(
+            user.ChatId, 
+            Messages.RequiredSubscriptions, 
+            ParseMode.Markdown, 
+            replyMarkup: keyboard, 
+            cancellationToken: stoppingToken);
     }
 
-    public async Task SendPopupMessageAsync(TelegramBotClient botClient, AppUser user, Update update, string message)
+    public async Task SendPopupMessageAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        Update update, 
+        string message, 
+        CancellationToken stoppingToken = default)
     {
-        await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, message, true);
+        await botClient.AnswerCallbackQueryAsync(
+            update.CallbackQuery.Id, 
+            message, 
+            true, 
+            cancellationToken: stoppingToken);
     }
 
     public async Task SendNewAutoMessageAsync(
         TelegramBotClient botClient, 
         AppUser user, 
         UserFilter userFilter, 
-        List<Car> newCarList)
+        List<Car> newCarList, 
+        CancellationToken stoppingToken = default)
     {
         if (!newCarList.Any())
         {
@@ -75,7 +113,8 @@ public class MessageService : IMessageService
                 Messages.NewCarNotFound
                     .Replace(":filterTitle", userFilter.Title), 
                 ParseMode.Markdown, 
-                replyMarkup: new ReplyKeyboardRemove());
+                replyMarkup: new ReplyKeyboardRemove(), 
+                cancellationToken: stoppingToken);
             return;
         }
         
@@ -94,7 +133,8 @@ public class MessageService : IMessageService
                 var media = GetMediaMessage(newCar.ImageUrls, message);
                 await botClient.SendMediaGroupAsync(
                     user.ChatId, 
-                    media);
+                    media, 
+                    cancellationToken: stoppingToken);
             }
             else
             {
@@ -102,11 +142,72 @@ public class MessageService : IMessageService
                     user.ChatId, 
                     message, 
                     ParseMode.Markdown, 
-                    replyMarkup: new ReplyKeyboardRemove());   
+                    replyMarkup: new ReplyKeyboardRemove(), 
+                    cancellationToken: stoppingToken);   
             }
         }
     }
 
+    public async Task SendSettingsCommandsAsync(
+        TelegramBotClient botClient, 
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
+    {
+        var keyboard = _keyboardService.GetUserSettingsKeyboard();
+        await botClient.SendTextMessageAsync(
+            user.ChatId, 
+            Messages.UserSettingsTitle, 
+            ParseMode.Markdown, 
+            replyMarkup: keyboard, 
+            cancellationToken: stoppingToken);
+    }
+
+    public async Task SendUserFiltersMessageAsync(
+        TelegramBotClient botClient, 
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
+    {
+        var userFilters = await _userFilterRepository.GetByUserAsync(user, stoppingToken);
+        var keyboard = _keyboardService.GetUserFiltersKeyboard(userFilters);
+        await botClient.SendTextMessageAsync(
+            user.ChatId, 
+            Messages.UserFiltersTitle.Replace(":filtersCount", userFilters.Count.ToString()), 
+            ParseMode.Markdown, 
+            replyMarkup: keyboard, 
+            cancellationToken: stoppingToken);
+    }
+
+    public async Task SendUserConfirmationMessageAsync(
+        TelegramBotClient botClient, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
+    {
+        var keyboard = _keyboardService.GetStartMenuKeyboard();
+        await botClient.SendTextMessageAsync(
+            user.ChatId, 
+            Messages.UserConfirmation, 
+            ParseMode.Markdown, 
+            replyMarkup: keyboard, 
+            cancellationToken: stoppingToken);
+    }
+
+    #region Приватные методы
+
+    private string GetUrlBySource(Car car)
+    {
+        return car.SourceType switch
+        {
+            SourceType.Avito => $"{_configuration[SourceCarBaseUrlPaths.Avito]}{car.Url}",
+            SourceType.TradeDealer => $"{_configuration[SourceCarBaseUrlPaths.TradeDealer]}/{car.Url}",
+            SourceType.AutoRu => $"{_configuration[SourceCarBaseUrlPaths.AutoRu]}{car.Url}",
+            SourceType.KeyAutoProbeg => $"{car.Url}",
+            SourceType.Drom => $"{car.Url}",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+    
     private IEnumerable<IAlbumInputMedia> GetMediaMessage(List<Image> newCarImageUrls, string message)
     {
         var media = new List<IAlbumInputMedia>();
@@ -150,46 +251,6 @@ public class MessageService : IMessageService
         }
 
         return media;
-    }
-
-    public async Task SendSettingsCommands(TelegramBotClient botClient, Update update, AppUser user)
-    {
-        var keyboard = _keyboardService.GetUserSettingsKeyboard();
-        await botClient.SendTextMessageAsync(user.ChatId, Messages.UserSettingsTitle, 
-            ParseMode.Markdown, replyMarkup: keyboard);
-    }
-
-    public async Task SendUserFiltersMessageAsync(TelegramBotClient botClient, Update update, AppUser user)
-    {
-        var userFilters = await _userFilterRepository.GetByUserAsync(user);
-        var keyboard = _keyboardService.GetUserFiltersKeyboard(userFilters);
-        await botClient.SendTextMessageAsync(
-            user.ChatId, 
-            Messages.UserFiltersTitle.Replace(":filtersCount", userFilters.Count.ToString()), 
-            ParseMode.Markdown, 
-            replyMarkup: keyboard);
-    }
-
-    public async Task SendUserConfirmationMessageAsync(TelegramBotClient botClient, AppUser user)
-    {
-        var keyboard = _keyboardService.GetStartMenuKeyboard();
-        await botClient.SendTextMessageAsync(user.ChatId, Messages.UserConfirmation, 
-            ParseMode.Markdown, replyMarkup: keyboard);
-    }
-
-    #region Приватные методы
-
-    private string GetUrlBySource(Car car)
-    {
-        return car.SourceType switch
-        {
-            SourceType.Avito => $"{_configuration[SourceCarBaseUrlPaths.Avito]}{car.Url}",
-            SourceType.TradeDealer => $"{_configuration[SourceCarBaseUrlPaths.TradeDealer]}/{car.Url}",
-            SourceType.AutoRu => $"{_configuration[SourceCarBaseUrlPaths.AutoRu]}{car.Url}",
-            SourceType.KeyAutoProbeg => $"{car.Url}",
-            SourceType.Drom => $"{car.Url}",
-            _ => throw new ArgumentOutOfRangeException()
-        };
     }
 
     #endregion

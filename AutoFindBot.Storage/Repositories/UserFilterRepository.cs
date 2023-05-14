@@ -13,24 +13,34 @@ public class UserFilterRepository : IUserFilterRepository
         _context = context;
     }
     
-    public async Task<UserFilter> AddAsync(UserFilter newUserFilter)
+    public async Task<UserFilter> AddAsync(
+        UserFilter newUserFilter, 
+        CancellationToken stoppingToken = default)
     {
-        var result = await _context.UserFilters.AddAsync(newUserFilter);
-        await CommitAsync();
+        var result = await _context.UserFilters.AddAsync(newUserFilter, stoppingToken);
+        await CommitAsync(stoppingToken);
         return result.Entity;
     }
     
-    public async Task<UserFilter> DeleteAsync(UserFilter userFilterForDelete)
+    public async Task<UserFilter> DeleteAsync(
+        UserFilter userFilterForDelete, 
+        CancellationToken stoppingToken = default)
     {
-        var userFilter = await _context.UserFilters.Where(x => x.Id == userFilterForDelete.Id).SingleAsync();
-        var result = await _context.UserFilters.AddAsync(userFilter);
-        await CommitAsync();
+        var userFilter = await _context.UserFilters
+            .Where(x => x.Id == userFilterForDelete.Id)
+            .SingleAsync(cancellationToken: stoppingToken);
+        var result = await _context.UserFilters.AddAsync(userFilter, stoppingToken);
+        await CommitAsync(stoppingToken);
         return result.Entity;
     }
     
-    public async Task<List<UserFilter>> GetByUserAsync(AppUser user)
+    public async Task<List<UserFilter>> GetByUserAsync(
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
-        var result = await _context.UserFilters.Where(x => x.UserId == user.Id).ToListAsync();
+        var result = await _context.UserFilters
+            .Where(x => x.UserId == user.Id)
+            .ToListAsync(cancellationToken: stoppingToken);
         return result;
     }
     

@@ -35,10 +35,10 @@ public class DromHttpApiClient : HttpApiClient, IDromHttpApiClient
         _sourceRepository = Guard.Against.Null(sourceRepository, nameof(sourceRepository));
     }
     
-    public async Task<List<DromResult>> GetAllNewAutoAsync()
+    public async Task<List<DromResult>> GetAllNewAutoAsync(CancellationToken stoppingToken = default)
     {
         NotActiveSourceException.ThrowIfNotActive(
-            await _sourceRepository.GetByTypeAsync(SourceType.Drom));
+            await _sourceRepository.GetByTypeAsync(SourceType.Drom, stoppingToken));
 
         try
         {
@@ -46,12 +46,8 @@ public class DromHttpApiClient : HttpApiClient, IDromHttpApiClient
                 .Replace(DromHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
                 .Replace(DromHttpApiClientInvariants.PriceMax,
                     _defaultFilterOptions.Value.PriceMax.ToString());
-            var response = await HttpClient.SendAsync(new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(path)
-            });
-            var content = await response.Content.ReadAsStringAsync();
+            var response = await HttpClient.GetAsync(path, stoppingToken);
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
 
             var doc = new HtmlDocument();
             doc.LoadHtml(content);

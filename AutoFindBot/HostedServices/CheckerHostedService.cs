@@ -27,22 +27,23 @@ public class CheckerHostedService : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"Is running StartAsync ...");
-
         var checkTimer = _configuration.GetValue<int>("CheckTimer");
-        _timer = new Timer(DoWork, null, TimeSpan.Zero,
+        _timer = new Timer(
+            DoWorkAsync, 
+            stoppingToken, 
+            TimeSpan.Zero,
             TimeSpan.FromSeconds(checkTimer));
 
         return Task.CompletedTask;
     }
 
-    private async void DoWork(object? state)
+    private async void DoWorkAsync(object? stoppingToken)
     {
         try
         {
             _logger.LogInformation($"Start DoWork method.");
 
-            await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient);
+            await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, null, (CancellationToken)stoppingToken!);
             
             _logger.LogInformation($"End DoWork method.");
         }

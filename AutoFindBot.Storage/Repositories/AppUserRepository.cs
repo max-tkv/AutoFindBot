@@ -1,5 +1,4 @@
-﻿using AutoFindBot.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using AutoFindBot.Repositories;
 
 namespace AutoFindBot.Storage.Repositories;
@@ -13,36 +12,47 @@ public class AppUserRepository : IAppUserRepository
         _context = context;
     }
 
-    public async Task<Entities.AppUser> AddAsync(Entities.AppUser newUser)
+    public async Task<Entities.AppUser> AddAsync(
+        Entities.AppUser newUser, 
+        CancellationToken stoppingToken = default)
     {
-        var userEntity = await _context.Users.AddAsync(newUser);
+        var userEntity = await _context.Users.AddAsync(newUser, stoppingToken);
         return userEntity.Entity;
     }
     
-    public async Task ConfirmAsync(long userId)
+    public async Task ConfirmAsync(
+        long userId, 
+        CancellationToken stoppingToken = default)
     {
-        var user = await _context.Users.SingleAsync(x => x.Id == userId);
+        var user = await _context.Users
+            .SingleAsync(x => x.Id == userId, cancellationToken: stoppingToken);
         user.Confirm = true;
         user.UpdatedDateTime = DateTime.Now;
 
-        await CommitAsync();
+        await CommitAsync(stoppingToken);
     }
     
-    public async Task<Entities.AppUser?> GetByChatIdAsync(long chatId)
+    public async Task<Entities.AppUser?> GetByChatIdAsync(
+        long chatId, 
+        CancellationToken stoppingToken = default)
     {
-        return await _context.Users.AsNoTracking().Where(x => x.ChatId == chatId)
-            .SingleOrDefaultAsync();
+        return await _context.Users.AsNoTracking()
+            .Where(x => x.ChatId == chatId)
+            .SingleOrDefaultAsync(cancellationToken: stoppingToken);
     }
 
-    public async Task<List<AppUser>> GetAllAsync()
+    public async Task<List<Entities.AppUser>> GetAllAsync(CancellationToken stoppingToken = default)
     {
-        return await _context.Users.AsNoTracking().ToListAsync();
+        return await _context.Users.AsNoTracking()
+            .ToListAsync(cancellationToken: stoppingToken);
     }
 
-    public async Task UpdateAsync(AppUser user)
+    public async Task UpdateAsync(
+        Entities.AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         _context.Users.Update(user);
-        await CommitAsync();
+        await CommitAsync(stoppingToken);
     }
 
     private async Task CommitAsync(CancellationToken cancellationToken = default) =>

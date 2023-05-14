@@ -25,8 +25,12 @@ public class FiltersCommand : BaseCommand
         _logger = logger;
     }
     
-    public override async Task ExecuteAsync(Update update, AppUser user)
+    public override async Task ExecuteAsync(
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
-        await _messageService.SendUserFiltersMessageAsync(_botClient, update, user);
+        await _messageService.SendUserFiltersMessageAsync(
+            _botClient, update, user, stoppingToken);
     }
 }

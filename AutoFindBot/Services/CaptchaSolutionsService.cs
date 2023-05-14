@@ -31,7 +31,9 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         _webDriverService = webDriverService;
     }
 
-    public async Task SolutionAutoRuAsync(HttpRequestMessage httpRequestMessage)
+    public async Task SolutionAutoRuAsync(
+        HttpRequestMessage httpRequestMessage, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
@@ -40,13 +42,16 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             using var driver = _webDriverService.CreateChromeDriver();
             driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
 
-            await _webDriverService.ClickElementByCssSelectorAsync("button[data-id='button-all']", false);
-            await _webDriverService.ClickElementByIdAsync("js-button", false);
+            await _webDriverService.ClickElementByCssSelectorAsync(
+                "button[data-id='button-all']", false, stoppingToken);
+            await _webDriverService.ClickElementByIdAsync(
+                "js-button", false, stoppingToken);
 
             string imageCaptchaUrl = "";
             try
             {
-                await _webDriverService.ClickElementByIdAsync("confirm-button");
+                await _webDriverService.ClickElementByIdAsync(
+                    "confirm-button", stoppingToken: stoppingToken);
                 imageCaptchaUrl = GetCaptchaImageUrl(driver.PageSource);
             }
             catch (NotFoundWebElementException)
@@ -70,14 +75,17 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 }
             }
             
-            var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl);
+            var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl, stoppingToken);
         
             var captchaId = await _ruCaptchaHttpApiClient.SendCaptchaAsync(imageCaptcha);
             var code = await _ruCaptchaHttpApiClient.GetResultCaptchaAsync(captchaId);
 
-            await _webDriverService.SendKeysByIdAsync("xuniq-0-1", code);
-            await _webDriverService.ClickElementByCssSelectorAsync("button[data-testid='submit']");
-            await _webDriverService.ClickElementByIdAsync("confirm-button");
+            await _webDriverService.SendKeysByIdAsync(
+                "xuniq-0-1", code, stoppingToken: stoppingToken);
+            await _webDriverService.ClickElementByCssSelectorAsync(
+                "button[data-testid='submit']", stoppingToken: stoppingToken);
+            await _webDriverService.ClickElementByIdAsync(
+                "confirm-button", stoppingToken: stoppingToken);
 
             if (!driver.Url.Contains(filterQuery))
             {
@@ -94,29 +102,38 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         }
     }
     
-    public async Task SolutionKeyAutoProbegAsync(HttpRequestMessage httpRequestMessage)
+    public async Task SolutionKeyAutoProbegAsync(
+        HttpRequestMessage httpRequestMessage, 
+        CancellationToken stoppingToken = default)
     {
         using var driver = _webDriverService.CreateChromeDriver();
         driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
 
-        await _webDriverService.FindElementByIdAsync("app");
+        await _webDriverService.FindElementByIdAsync(
+            "app", stoppingToken: stoppingToken);
 
         SetNewCookies(httpRequestMessage, driver.Manage().Cookies.AllCookies);
     }
 
-    public async Task SolutionDromAsync(HttpRequestMessage request)
+    public async Task SolutionDromAsync(
+        HttpRequestMessage request, 
+        CancellationToken stoppingToken = default)
     {
         using var driver = _webDriverService.CreateChromeDriver();
         driver.Navigate().GoToUrl(request.RequestUri?.ToString());
 
-        await _webDriverService.FindElementByCssSelectorAsync("div[data-app-root='bulls-list-auto']");
+        await _webDriverService.FindElementByCssSelectorAsync(
+            "div[data-app-root='bulls-list-auto']", stoppingToken: stoppingToken);
 
         SetNewCookies(request, driver.Manage().Cookies.AllCookies);
     }
 
     #region Приватные методы
 
-    private void SetRedirect(HttpRequestMessage httpRequest, HttpMethod newMethod, string newUrl)
+    private void SetRedirect(
+        HttpRequestMessage httpRequest, 
+        HttpMethod newMethod, 
+        string newUrl)
     {
         Guard.Against.Null(httpRequest, nameof(httpRequest));
         Guard.Against.Null(newMethod, nameof(newMethod));
@@ -155,7 +172,9 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         httpRequestMessage.Headers.Add("Cookie", cookieValue);
     }
 
-    private async Task<byte[]> DownloadImageAsync(string imageUrl)
+    private async Task<byte[]> DownloadImageAsync(
+        string imageUrl, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
@@ -164,7 +183,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
                 var response = await httpClient.SendAsync(request, new CancellationToken());
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsByteArrayAsync();   
+                
+                return await response.Content.ReadAsByteArrayAsync(stoppingToken);   
             }
         }
         catch (HttpRequestException ex) when (ex.InnerException is SocketException socketEx)

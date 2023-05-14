@@ -25,12 +25,15 @@ public class CheckNewAutoCommand : BaseCommand
         _logger = logger;
     }
     
-    public override async Task ExecuteAsync(Update update, AppUser user)
+    public override async Task ExecuteAsync(
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
             _logger.LogInformation($"Current User ID: {user.Id}");
-            await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user);
+            await _checkingNewAutoService.CheckAndSendMessageAsync(_botClient, user, stoppingToken);
         }
         catch (Exception e)
         {

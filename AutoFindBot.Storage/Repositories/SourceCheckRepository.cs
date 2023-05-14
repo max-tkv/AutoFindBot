@@ -15,37 +15,49 @@ public class SourceCheckRepository : ISourceCheckRepository
         _context = context;
     }
 
-    public async Task<SourceCheck> AddAsync(SourceCheck newSourceCheck)
+    public async Task<SourceCheck> AddAsync(
+        SourceCheck newSourceCheck, 
+        CancellationToken stoppingToken = default)
     {
-        var result = await _context.SourceChecks.AddAsync(newSourceCheck);
-        await CommitAsync();
+        var result = await _context.SourceChecks.AddAsync(newSourceCheck, stoppingToken);
+        await CommitAsync(stoppingToken);
         return result.Entity;
     }
 
-    public async Task<SourceCheck?> GetLastByFilterAsync(Expression<Func<SourceCheck, bool>> predicate) =>
+    public async Task<SourceCheck?> GetLastByFilterAsync(
+        Expression<Func<SourceCheck, bool>> predicate, 
+        CancellationToken stoppingToken = default) =>
         await _context.SourceChecks.AsNoTracking()
             .Where(predicate)
             .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken: stoppingToken);
 
-    public async Task<bool> ExistsAsync(UserFilter filter, SourceType sourceType)
+    public async Task<bool> ExistsAsync(
+        UserFilter filter, 
+        SourceType sourceType, 
+        CancellationToken stoppingToken = default)
     {
         return await GetLastByFilterAsync(x => 
                 x.UserFilterId == filter.Id &&
-                x.SourceType == sourceType) switch
+                x.SourceType == sourceType, stoppingToken) switch
             {
                 null => false,
                 _ => true
             };
     }
 
-    public async Task<bool> UpdateDateTimeAsync(UserFilter filter, SourceType sourceType)
+    public async Task<bool> UpdateDateTimeAsync(
+        UserFilter filter, 
+        SourceType sourceType, 
+        CancellationToken stoppingToken = default)
     {
-        var sourceCheck = await _context.SourceChecks.SingleOrDefaultAsync(x => x.SourceType == sourceType && x.UserFilterId == filter.Id);
+        var sourceCheck = await _context.SourceChecks
+            .SingleOrDefaultAsync(x => x.SourceType == sourceType && 
+                                       x.UserFilterId == filter.Id, cancellationToken: stoppingToken);
         if (sourceCheck != null)
         {
             sourceCheck.UpdatedDateTime = DateTime.Now;
-            await CommitAsync();
+            await CommitAsync(stoppingToken);
             return true;
         }
 

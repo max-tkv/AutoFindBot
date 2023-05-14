@@ -22,16 +22,17 @@ public class CarService : ICarService
     public async Task<bool> CheckExistNewCarAndSaveAsync(
         Car newCar, 
         UserFilter userFilter,
-        SourceType sourceType)
+        SourceType sourceType, 
+        CancellationToken stoppingToken = default)
     {
         var car = await _carRepository
             .GetByFilterAsync(x => x.OriginId == newCar.OriginId
                                    && x.UserFilterId == userFilter.Id
-                                   && x.SourceType == sourceType);
+                                   && x.SourceType == sourceType, stoppingToken);
         if (car == null)
         {
             newCar.UserFilterId = userFilter.Id;
-            await _carRepository.AddAsync(newCar);
+            await _carRepository.AddAsync(newCar, stoppingToken);
 
             return true;
         }

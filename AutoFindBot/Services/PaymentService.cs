@@ -20,8 +20,12 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _paymentRepository;
     private readonly IAppUserRepository _appUserRepository;
 
-    public PaymentService(IOptions<PaymentsOptions> paymentsOptions, TelegramBotService telegramBotService, 
-        ILogger<PaymentService> logger, IPaymentRepository paymentRepository, IAppUserRepository appUserRepository)
+    public PaymentService(
+        IOptions<PaymentsOptions> paymentsOptions, 
+        TelegramBotService telegramBotService, 
+        ILogger<PaymentService> logger, 
+        IPaymentRepository paymentRepository, 
+        IAppUserRepository appUserRepository)
     {
         _logger = logger;
         _botClient = telegramBotService.GetBotAsync().Result;
@@ -30,7 +34,9 @@ public class PaymentService : IPaymentService
         _appUserRepository = appUserRepository;
     }
 
-    public async Task SendInvoiceAsync(AppUser user)
+    public async Task SendInvoiceAsync(
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         await _botClient.SendInvoiceAsync(user.ChatId,
             _paymentsOptions.Value.Title,
@@ -46,10 +52,14 @@ public class PaymentService : IPaymentService
                     Amount = _paymentsOptions.Value.Price.Amount,
                 }
             },
-            needEmail: true);
+            needEmail: true, 
+            cancellationToken: stoppingToken);
     }
 
-    public async Task SavePaymentAsync(Update update, AppUser user)
+    public async Task SavePaymentAsync(
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
@@ -64,17 +74,22 @@ public class PaymentService : IPaymentService
                 OptionId = update.PreCheckoutQuery.ShippingOptionId,
                 Currency = update.PreCheckoutQuery.Currency,
                 Amount = update.PreCheckoutQuery.TotalAmount
-            });
+            }, stoppingToken);
 
             user.Tarif = Tarif.Premium;
-            await _appUserRepository.UpdateAsync(user);
+            await _appUserRepository.UpdateAsync(user, stoppingToken);
         }
         catch (Exception e)
         {
-            await _botClient.AnswerPreCheckoutQueryAsync(update.PreCheckoutQuery.Id, Messages.ErrorPayed);
+            await _botClient.AnswerPreCheckoutQueryAsync(
+                update.PreCheckoutQuery.Id, 
+                Messages.ErrorPayed, 
+                stoppingToken);
             throw;
         }
         
-        await _botClient.AnswerPreCheckoutQueryAsync(update.PreCheckoutQuery.Id);
+        await _botClient.AnswerPreCheckoutQueryAsync(
+            update.PreCheckoutQuery.Id, 
+            stoppingToken);
     }
 }

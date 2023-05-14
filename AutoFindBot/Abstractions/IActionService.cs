@@ -4,7 +4,11 @@ namespace AutoFindBot.Abstractions;
 
 public interface IActionService
 {
-    Task<Entities.Action> GetLastByUserAsync(AppUser appUser);
+    Task<Entities.Action?> GetLastByUserAsync(
+        AppUser appUser, 
+        CancellationToken stoppingToken = default);
     
-    Task AddAsync(Entities.Action newAction);
+    Task AddAsync(
+        Entities.Action newAction, 
+        CancellationToken stoppingToken = default);
 }

@@ -4,5 +4,5 @@ namespace AutoFindBot.Abstractions.HttpClients;
 
 public interface ITradeDealerHttpApiClient
 {
-    Task<TradeDealerResult> GetAllNewAutoAsync();
+    Task<TradeDealerResult> GetAllNewAutoAsync(CancellationToken stoppingToken = default);
 }

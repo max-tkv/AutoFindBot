@@ -2,5 +2,7 @@
 
 public interface IPaymentRepository
 {
-    Task<Entities.Payment> AddAsync(Entities.Payment newPayment);
+    Task<Entities.Payment> AddAsync(
+        Entities.Payment newPayment, 
+        CancellationToken stoppingToken = default);
 }

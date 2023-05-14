@@ -31,19 +31,22 @@ public class CheckRequiredSubscriptionsCommand : BaseCommand
         _botClient = telegramBotService.GetBotAsync().Result;
     }
     
-    public override async Task ExecuteAsync(Update update, AppUser user)
+    public override async Task ExecuteAsync(
+        Update update, 
+        AppUser user, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
-            await _appUserService.CheckRequiredSubscriptionsAsync(_botClient, user);
-            await _messageService.SendStartMessage(_botClient, user);
+            await _appUserService.CheckRequiredSubscriptionsAsync(_botClient, user, stoppingToken);
+            await _messageService.SendStartMessageAsync(_botClient, user, stoppingToken);
         }
         catch (RequiredSubscriptionsException)
         {
             try
             {
-                await _messageService.SendPopupMessageAsync(_botClient, user, update, 
-                    Messages.RequiredSubscriptionsPopupError);
+                await _messageService.SendPopupMessageAsync(
+                    _botClient, user, update, Messages.RequiredSubscriptionsPopupError, stoppingToken);
             }
             catch (Exception e)
             {
@@ -52,7 +55,8 @@ public class CheckRequiredSubscriptionsCommand : BaseCommand
         }
         catch (Exception e)
         {
-            await _messageService.SendErrorMessageAsync(_botClient, user, CommandHelpers.GetErrorMessage(Name, update.Message.Text));
+            await _messageService.SendErrorMessageAsync(
+                _botClient, user, CommandHelpers.GetErrorMessage(Name, update.Message.Text), stoppingToken);
             _logger.LogError($"UserID: {user.Id} CommandName: {Name} Error: {e.Message} Trace: {e.StackTrace}");
         }
     }

@@ -1,8 +1,5 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
-using AutoFindBot.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using AutoFindBot.Repositories;
-using Action = AutoFindBot.Entities.Action;
 
 namespace AutoFindBot.Storage.Repositories;
 
@@ -15,37 +12,28 @@ public class ActionRepository : IActionRepository
         _context = context;
     }
 
-    public async Task<Entities.Action> AddAsync(Entities.Action newAction)
+    public async Task<Entities.Action> AddAsync(
+        Entities.Action newAction, 
+        CancellationToken stoppingToken = default)
     {
-        var result = await _context.Actions.AddAsync(newAction);
-        await CommitAsync();
+        var result = await _context.Actions.AddAsync(newAction, stoppingToken);
+        await CommitAsync(stoppingToken);
         return result.Entity;
     }
 
-    public async Task<Entities.Action> GetLastAsync(long id) =>
-        await _context.Actions.AsNoTracking().Where(x => x.Id == id)
-            .OrderByDescending(x => x.CreatedAt)
-            .SingleOrDefaultAsync();
-
-    public async Task<Entities.Action> GetLastByUserAsync(AppUser user) =>
-        await _context.Actions.AsNoTracking().Where(x => x.User == user)
-            .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync();
-
-    public async Task<Entities.Action> GetLastByUserAsync(AppUser user, string command) =>
-        await _context.Actions.AsNoTracking().Where(x => x.User == user)
-            .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync();
-
-    public async Task<Entities.Action> GetLastByFilterAsync(Expression<Func<Action, bool>> predicate) =>
+    public async Task<Entities.Action?> GetLastByUserAsync(
+        Entities.AppUser user, 
+        CancellationToken stoppingToken = default) =>
         await _context.Actions.AsNoTracking()
-            .Where(predicate)
+            .Where(x => x.User == user)
             .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken: stoppingToken);
 
-    public async Task<int> GetNumberOfRequestsByUserAsync(AppUser user) =>
+    public async Task<int> GetNumberOfRequestsByUserAsync(
+        Entities.AppUser user, 
+        CancellationToken stoppingToken = default) =>
         await _context.Actions.AsNoTracking()
-            .CountAsync(x => x.User == user);
+            .CountAsync(x => x.User == user, cancellationToken: stoppingToken);
     
     private async Task CommitAsync(CancellationToken cancellationToken = default) =>
         await _context.SaveChangesAsync(cancellationToken);

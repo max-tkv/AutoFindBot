@@ -39,15 +39,15 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
         _sourceRepository = sourceRepository;
     }
 
-    public async Task<AutoRuResult> GetAllNewAutoAsync()
+    public async Task<AutoRuResult> GetAllNewAutoAsync(CancellationToken stoppingToken = default)
     {
         try
         {
             NotActiveSourceException.ThrowIfNotActive(
-                await _sourceRepository.GetByTypeAsync(SourceType.AutoRu));
+                await _sourceRepository.GetByTypeAsync(SourceType.AutoRu, stoppingToken));
 
             var path = _options?.BaseUrl + _options?.GetAutoByFilterQuery;
-            var request = new AutoRuRequest()
+            var body = new AutoRuRequest()
             {
                 Category = "cars",
                 Section = "used",
@@ -60,12 +60,9 @@ public class AutoRuHttpApiClient : HttpApiClient, IAutoRuHttpApiClient
                     8
                 }
             };
-
-            var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, path)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
-            });
-            var content = await response.Content.ReadAsStringAsync();
+            var request = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            var response = await HttpClient.PostAsync(path, request, stoppingToken);
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
             var autoRuResponse = JsonConvert.DeserializeObject<AutoRuResponse>(content);
             ArgumentNullException.ThrowIfNull(autoRuResponse);
 

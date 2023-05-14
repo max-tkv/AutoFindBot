@@ -53,9 +53,12 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         _dromHttpApiClient = dromHttpApiClient;
     }
 
-    public async Task CheckAndSendMessageAsync(TelegramBotClient botClient, AppUser? user = null)
+    public async Task CheckAndSendMessageAsync(
+        TelegramBotClient botClient, 
+        AppUser? user = null, 
+        CancellationToken stoppingToken = default)
     {
-        var newCars = await GetNewAutoAsync();
+        var newCars = await GetNewAutoAsync(stoppingToken);
         if (!newCars.Any())
         {
             _logger.LogInformation("New auto not found");
@@ -64,21 +67,27 @@ public class CheckingNewAutoService : ICheckingNewAutoService
 
         if (user != null)
         {
-            await CheckAutoAndSendMessageByUserAsync(botClient, user, newCars, true);
+            await CheckAutoAndSendMessageByUserAsync(
+                botClient, user, newCars, true, stoppingToken);
             return;
         }
         
-        var users = await _appUserService.GetAllAsync();
+        var users = await _appUserService.GetAllAsync(stoppingToken);
         foreach (var currentUser in users)
         {
-            await CheckAutoAndSendMessageByUserAsync(botClient, currentUser, newCars);
+            await CheckAutoAndSendMessageByUserAsync(
+                botClient, currentUser, newCars, false, stoppingToken);
         }
     }
 
     private async Task CheckAutoAndSendMessageByUserAsync(
-        TelegramBotClient botClient, AppUser currentUser, List<Car> newCars, bool sendEmptyResultMessage = false)
+        TelegramBotClient botClient, 
+        AppUser currentUser, 
+        List<Car> newCars, 
+        bool sendEmptyResultMessage = false, 
+        CancellationToken stoppingToken = default)
     {
-        var filters = await _userFilterRepository.GetByUserAsync(currentUser);
+        var filters = await _userFilterRepository.GetByUserAsync(currentUser, stoppingToken);
         _logger.LogInformation($"User ID: {currentUser.Id}. Find {filters.Count} filters.");
         foreach (var currentFilter in filters)
         {
@@ -89,13 +98,16 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             {
                 var currentSource = newCarsGroupBySource.Key;
                 var newCarsSource = newCarsGroupBySource.ToList();
-                var checkedNewCars = await CheckAutoAsync(newCarsSource, currentFilter, currentSource);
+                var checkedNewCars = await CheckAutoAsync(
+                    newCarsSource, currentFilter, currentSource, stoppingToken);
                 if (checkedNewCars.Any())
                 {
-                    var existsSuccess = await _sourceCheckRepository.ExistsAsync(currentFilter, currentSource);
+                    var existsSuccess = await _sourceCheckRepository.ExistsAsync(
+                        currentFilter, currentSource, stoppingToken);
                     if (existsSuccess)
                     {
-                        await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, checkedNewCars);
+                        await _messageService.SendNewAutoMessageAsync(
+                            botClient, currentUser, currentFilter, checkedNewCars, stoppingToken);
                         isFoundNewAutoByFilter = true;
                     }
                     else
@@ -104,11 +116,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
                         {
                             SourceType = currentSource,
                             UserFilterId = currentFilter.Id
-                        });
+                        }, stoppingToken);
                         if (!currentUser.Confirm)
                         {
-                            await _messageService.SendUserConfirmationMessageAsync(botClient, currentUser);
-                            await _appUserService.SetConfirmAsync(currentUser.Id);
+                            await _messageService.SendUserConfirmationMessageAsync(
+                                botClient, currentUser, stoppingToken);
+                            await _appUserService.SetConfirmAsync(
+                                currentUser.Id, stoppingToken);
                             currentUser.Confirm = true;
                         }
                     }
@@ -117,12 +131,17 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             
             if (!isFoundNewAutoByFilter && sendEmptyResultMessage)                                                           
             {                                                                                                        
-                await _messageService.SendNewAutoMessageAsync(botClient, currentUser, currentFilter, new List<Car>());
+                await _messageService.SendNewAutoMessageAsync(
+                    botClient, currentUser, currentFilter, new List<Car>(), stoppingToken);
             }                                                                                                           
         }
     }
 
-    private async Task<List<Car>> CheckAutoAsync(List<Car> newCars, UserFilter currentFilter, SourceType sourceType)
+    private async Task<List<Car>> CheckAutoAsync(
+        List<Car> newCars, 
+        UserFilter currentFilter, 
+        SourceType sourceType, 
+        CancellationToken stoppingToken = default)
     {
         var result = new List<Car>();
         foreach (var newCar in newCars)
@@ -130,7 +149,8 @@ public class CheckingNewAutoService : ICheckingNewAutoService
             var filterSuccess = CheckAutoByUserFilter(currentFilter, newCar);
             if (filterSuccess)
             {
-                var checkedNewCar = await _carService.CheckExistNewCarAndSaveAsync(newCar, currentFilter, sourceType);
+                var checkedNewCar = await _carService.CheckExistNewCarAndSaveAsync(
+                    newCar, currentFilter, sourceType, stoppingToken);
                 if (checkedNewCar)
                 {
                     result.Add(newCar);
@@ -157,24 +177,26 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     }
    
 
-    private async Task<List<Car>> GetNewAutoAsync()
+    private async Task<List<Car>> GetNewAutoAsync(CancellationToken stoppingToken = default)
     {
         var cars = new List<Car>();
 
-        await GetCarsFromAutoRuAsync(cars);
-        await GetCarsFromTradeDealerAsync(cars);
-        await GetCarsFromKeyAutoProbegAsync(cars);
-        await GetCarsFromAvitoAsync(cars);
-        await GetCarsFromDromAsync(cars);
+        await GetCarsFromAutoRuAsync(cars, stoppingToken);
+        await GetCarsFromTradeDealerAsync(cars, stoppingToken);
+        await GetCarsFromKeyAutoProbegAsync(cars, stoppingToken);
+        await GetCarsFromAvitoAsync(cars, stoppingToken);
+        await GetCarsFromDromAsync(cars, stoppingToken);
 
         return cars;
     }
 
-    private async Task GetCarsFromDromAsync(List<Car> cars)
+    private async Task GetCarsFromDromAsync(
+        List<Car> cars, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
-            var avitoResult = await _dromHttpApiClient.GetAllNewAutoAsync();
+            var avitoResult = await _dromHttpApiClient.GetAllNewAutoAsync(stoppingToken);
             var newCars = _mapper.Map<List<Car>>(avitoResult);
             cars.AddRange(newCars);
             
@@ -192,11 +214,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
 
-    private async Task GetCarsFromAvitoAsync(List<Car> cars)
+    private async Task GetCarsFromAvitoAsync(
+        List<Car> cars, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
-            var avitoResult = await _avitoHttpApiClient.GetAllNewAutoAsync();
+            var avitoResult = await _avitoHttpApiClient.GetAllNewAutoAsync(stoppingToken);
             var newCars = _mapper.Map<List<Car>>(avitoResult);
             cars.AddRange(newCars);
             
@@ -214,11 +238,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
     
-    private async Task GetCarsFromKeyAutoProbegAsync(List<Car> cars)
+    private async Task GetCarsFromKeyAutoProbegAsync(
+        List<Car> cars, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
-            var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAllNewAutoAsync();
+            var keyAutoProbegResult = await _keyAutoProbegHttpApiClient.GetAllNewAutoAsync(stoppingToken);
             var newCars = _mapper.Map<List<Car>>(keyAutoProbegResult);
             cars.AddRange(newCars);
             
@@ -236,11 +262,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
     
-    private async Task GetCarsFromTradeDealerAsync(List<Car> cars)
+    private async Task GetCarsFromTradeDealerAsync(
+        List<Car> cars, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
-            var tradeDealerResult = await _tradeDealerHttpApiClient.GetAllNewAutoAsync();
+            var tradeDealerResult = await _tradeDealerHttpApiClient.GetAllNewAutoAsync(stoppingToken);
             var newCars = _mapper.Map<List<Car>>(tradeDealerResult.CarInfos);
             cars.AddRange(newCars);
             
@@ -258,11 +286,13 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         }
     }
     
-    private async Task GetCarsFromAutoRuAsync(List<Car> cars)
+    private async Task GetCarsFromAutoRuAsync(
+        List<Car> cars, 
+        CancellationToken stoppingToken = default)
     {
         try
         {
-            var autoRuResult = await _autoRuHttpApiClient.GetAllNewAutoAsync();
+            var autoRuResult = await _autoRuHttpApiClient.GetAllNewAutoAsync(stoppingToken);
             var newCars = _mapper.Map<List<Car>>(autoRuResult.Offers);
             cars.AddRange(newCars);
             
