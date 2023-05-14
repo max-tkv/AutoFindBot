@@ -52,7 +52,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             try
             {
                 await _webDriverService.ClickElementByIdAsync(
-                    "confirm-button", stoppingToken: stoppingToken);
+                    "confirm-button", false, stoppingToken: stoppingToken);
                 imageCaptchaUrl = GetCaptchaImageUrl(driver.PageSource);
             }
             catch (NotFoundWebElementException)
