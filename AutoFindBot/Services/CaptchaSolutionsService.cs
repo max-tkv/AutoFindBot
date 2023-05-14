@@ -64,6 +64,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
 
                     return;
                 }
+                
+                throw;
             }
             catch (CaptchaSolutionsServiceException)
             {
