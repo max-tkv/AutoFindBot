@@ -10,5 +10,5 @@ public class CaptchaInvariants
     
     public const string ImageLoadingError = "Произошла ошибка при загрузке изображения: :errorMessage";
 
-    public const string DetectionErrorInHtml = "HTML не содержит капчу";
+    public const string DetectionErrorInHtml = "HTML не содержит капчу: :html";
 }

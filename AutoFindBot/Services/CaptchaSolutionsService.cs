@@ -40,7 +40,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             var filterQuery = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:GetAutoByFilterQuery"));
 
             using var driver = _webDriverService.CreateChromeDriver();
-            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: {httpRequestMessage.RequestUri}");
+            driver.ResetInputState();
             driver.Navigate().GoToUrl(httpRequestMessage.RequestUri);
 
             await _webDriverService.ClickElementByCssSelectorAsync(
@@ -74,6 +74,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
 
                     return;
                 }
+
+                throw;
             }
             
             var imageCaptcha = await DownloadImageAsync(imageCaptchaUrl, stoppingToken);
@@ -181,8 +183,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         {
             using (var httpClient = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
-                var response = await httpClient.SendAsync(request, new CancellationToken());
+                var response = await httpClient.GetAsync(imageUrl, stoppingToken);
                 response.EnsureSuccessStatusCode();
                 
                 return await response.Content.ReadAsByteArrayAsync(stoppingToken);   
@@ -209,7 +210,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             return match.Groups[1].Value;
         }
         
-        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml);
+        throw new CaptchaSolutionsServiceException(CaptchaInvariants.DetectionErrorInHtml.Replace(":html", html));
     }
 
     #endregion
