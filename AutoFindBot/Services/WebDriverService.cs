@@ -1,7 +1,9 @@
 ﻿using System.Runtime.InteropServices;
+using Ardalis.GuardClauses;
 using AutoFindBot.Abstractions;
 using AutoFindBot.Exceptions;
 using AutoFindBot.Invariants;
+using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -10,7 +12,13 @@ namespace AutoFindBot.Services;
 public class WebDriverService : IWebDriverService, IDisposable
 {
     private ChromeDriver _driver;
+    private readonly ILogger<IWebDriver> _logger;
 
+    public WebDriverService(ILogger<IWebDriver> logger)
+    {
+        _logger = Guard.Against.Null(logger, nameof(logger));
+    }
+    
     public ChromeDriver CreateChromeDriver(bool headless = true)
     {
         var options = GetChromeOptions(headless);
@@ -29,6 +37,7 @@ public class WebDriverService : IWebDriverService, IDisposable
         {
             try
             {
+                _logger.LogInformation($"ClickElementByIdAsync for id='{id}'. Retry: {i}.");
                 var element = _driver
                     .FindElements(By.Id(id))
                     .Single();
@@ -60,6 +69,7 @@ public class WebDriverService : IWebDriverService, IDisposable
         {
             try
             {
+                _logger.LogInformation($"SendKeysByIdAsync for id='{id}' key='{key}'. Retry: {i}.");
                 var element = _driver
                     .FindElements(By.Id(id))
                     .Single();
@@ -90,6 +100,7 @@ public class WebDriverService : IWebDriverService, IDisposable
         {
             try
             {
+                _logger.LogInformation($"ClickElementByCssSelectorAsync for selector='{selector}'. Retry: {i}.");
                 var element = _driver
                     .FindElements(By.CssSelector(selector))
                     .Single();
@@ -120,6 +131,7 @@ public class WebDriverService : IWebDriverService, IDisposable
         {
             try
             {
+                _logger.LogInformation($"FindElementByCssSelectorAsync for selector='{selector}'. Retry: {i}.");
                 return _driver
                     .FindElements(By.CssSelector(selector))
                     .Single();
@@ -149,6 +161,7 @@ public class WebDriverService : IWebDriverService, IDisposable
         {
             try
             {
+                _logger.LogInformation($"FindElementByCssSelectorAsync for id='{id}'. Retry: {i}.");
                 return _driver
                     .FindElements(By.Id(id))
                     .Single();
