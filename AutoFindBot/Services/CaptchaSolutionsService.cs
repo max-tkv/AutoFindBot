@@ -206,7 +206,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
     {
         string pattern = "<div class=\"AdvancedCaptcha-View\"><img src=\"(.*?)\".*?><\\/div>";
         var match = Regex.Match(html, pattern);
-        if (match.Success)
+        if (match.Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value))
         {
             return match.Groups[1].Value;
         }

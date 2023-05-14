@@ -12,9 +12,9 @@ namespace AutoFindBot.Services;
 public class WebDriverService : IWebDriverService, IDisposable
 {
     private ChromeDriver _driver;
-    private readonly ILogger<IWebDriver> _logger;
+    private readonly ILogger<IWebDriverService> _logger;
 
-    public WebDriverService(ILogger<IWebDriver> logger)
+    public WebDriverService(ILogger<IWebDriverService> logger)
     {
         _logger = Guard.Against.Null(logger, nameof(logger));
     }
