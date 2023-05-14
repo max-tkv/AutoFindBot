@@ -16,5 +16,5 @@ public class SourceRepository : ISourceRepository
 
     public async Task<Source> GetByTypeAsync(SourceType sourceType) =>
         await _context.Sources.AsNoTracking()
-            .SingleAsync(x => x.SourceType == sourceType);
+            .SingleAsync(x => x.Id == (long)sourceType);
 }

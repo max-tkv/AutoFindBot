@@ -21,8 +21,6 @@ public class SourceConfiguration : IEntityTypeConfiguration<Entities.Source>
 
         builder.Property(x => x.Name)
             .IsRequired();
-        builder.Property(x => x.SourceType)
-            .IsRequired();
         builder.Property(x => x.Active)
             .IsRequired();
     }
