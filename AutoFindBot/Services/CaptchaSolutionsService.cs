@@ -40,8 +40,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             var filterQuery = Guard.Against.Null(_configuration.GetValue<string>("Integration:AutoRu:GetAutoByFilterQuery"));
 
             using var driver = _webDriverService.CreateChromeDriver();
-            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: {httpRequestMessage.RequestUri?.ToString()}");
-            driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: {httpRequestMessage.RequestUri}");
+            driver.Navigate().GoToUrl(httpRequestMessage.RequestUri);
 
             await _webDriverService.ClickElementByCssSelectorAsync(
                 "button[data-id='button-all']", false, stoppingToken);
@@ -108,7 +108,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         CancellationToken stoppingToken = default)
     {
         using var driver = _webDriverService.CreateChromeDriver();
-        driver.Navigate().GoToUrl(httpRequestMessage.RequestUri?.ToString());
+        driver.Navigate().GoToUrl(httpRequestMessage.RequestUri);
 
         await _webDriverService.FindElementByIdAsync(
             "app", stoppingToken: stoppingToken);
