@@ -1,8 +1,8 @@
 ﻿using AutoFindBot.Lookups;
 
-namespace AutoFindBot.Models.Avito;
+namespace AutoFindBot.Models.Youla;
 
-public class AvitoResult
+public class YoulaResultAuto
 {
     public SourceType SourceType { get; set; }
     
@@ -22,5 +22,5 @@ public class AvitoResult
     
     public string Vin { get; set; }
     
-    public List<AvitoImage> Images { get; set; }
+    public List<string> Images { get; set; }
 }

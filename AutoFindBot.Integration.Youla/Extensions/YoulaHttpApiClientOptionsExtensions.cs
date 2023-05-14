@@ -1,8 +1,9 @@
-﻿using AutoFindBot.Abstractions.HttpClients;
-using AutoFindBot.Helpers;
-using AutoFindBot.Integration.RuCaptcha.HttpMessageHandlers;
-using AutoFindBot.Integration.RuCaptcha.Invariants;
-using AutoFindBot.Integration.RuCaptcha.Options;
+﻿using System.Net;
+using Ardalis.GuardClauses;
+using AutoFindBot.Abstractions.HttpClients;
+using AutoFindBot.Integration.Youla.HttpMessageHandlers;
+using AutoFindBot.Integration.Youla.Invariants;
+using AutoFindBot.Integration.Youla.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,37 +11,37 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
 
-namespace AutoFindBot.Integration.RuCaptcha.Extensions;
+namespace AutoFindBot.Integration.Youla.Extensions;
 
-public static class RuCaptchaHttpApiClientOptionsExtensions
+public static class YoulaHttpApiClientOptionsExtensions
 {
-    public static IServiceCollection AddRuCaptchaHttpApiClient(
+    public static IServiceCollection AddYoulaHttpApiClient(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        Guard.NotNull(services, nameof(services));
-        Guard.NotNull(configuration, nameof(configuration));
+        Guard.Against.Null(services, nameof(services));
+        Guard.Against.Null(configuration, nameof(configuration));
 
         return services
-            .RegisterRuCaptchaApiClient()
-            .RegisterRuCaptchaHttpApiClientOptions(
+            .RegisterYoulaApiClient()
+            .RegisterYoulaHttpApiClientOptions(
                 configuration,
-                RegisterRuCaptchaHttpApiClientInvariants.OptionsSectionPath);
+                RegisterYoulaHttpApiClientInvariants.OptionsSectionPath);
     }
 
-    private static IServiceCollection RegisterRuCaptchaHttpApiClientOptions(
+    private static IServiceCollection RegisterYoulaHttpApiClientOptions(
         this IServiceCollection services,
         IConfiguration configuration,
         string optionsSectionPath)
     {
         var options = configuration
             .GetSection(optionsSectionPath)
-            .Get<RuCaptchaHttpApiClientOptions>();
+            .Get<YoulaHttpApiClientOptions>();
         
         if (options is null)
         {
             throw new InvalidOperationException(
-                RegisterRuCaptchaHttpApiClientInvariants.OptionsSectionNotDefined);
+                RegisterYoulaHttpApiClientInvariants.OptionsSectionNotDefined);
         }
         
         options.Validate();
@@ -48,14 +49,14 @@ public static class RuCaptchaHttpApiClientOptionsExtensions
         return services.AddSingleton(options);
     }
 
-    private static IServiceCollection RegisterRuCaptchaApiClient(
+    private static IServiceCollection RegisterYoulaApiClient(
         this IServiceCollection services)
     {
         services
             .AddTransient<CheckSuccessfulStatusCodeMessageHandler>()
-            .AddHttpClient<IRuCaptchaHttpApiClient, RuCaptchaHttpApiClient>((serviceProvider, httpClient) => 
+            .AddHttpClient<IYoulaHttpApiClient, YoulaHttpApiClient>((serviceProvider, httpClient) => 
             {
-                var options = serviceProvider.GetRequiredService<RuCaptchaHttpApiClientOptions>();
+                var options = serviceProvider.GetRequiredService<YoulaHttpApiClientOptions>();
                 httpClient.BaseAddress = new Uri(options.BaseUrl);
             })
             .AddHttpMessageHandlers(new List<Func<IServiceProvider, DelegatingHandler>>
@@ -71,7 +72,7 @@ public static class RuCaptchaHttpApiClientOptionsExtensions
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
-            .OrResult(response => response.Content.ReadAsStringAsync().Result.Contains("CAPCHA_NOT_READY"))
+            .OrResult(response => response.StatusCode == HttpStatusCode.NotFound)
             .WaitAndRetryAsync(new[]
             {
                 TimeSpan.FromSeconds(3),
@@ -80,10 +81,10 @@ public static class RuCaptchaHttpApiClientOptionsExtensions
             }, (exception, timeSpan, retryCount, context) =>
             {
                 var serviceProvider = services.BuildServiceProvider();
-                var logger = serviceProvider.GetService<ILogger<RuCaptchaHttpApiClient>>();
+                var logger = serviceProvider.GetService<ILogger<YoulaHttpApiClient>>();
                 logger!.LogInformation(
                     $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: " +
-                    $"{RuCaptchaHttpApiClientInvariants.CaptchaNotReadyMessage}");
+                    $"{YoulaHttpApiClientInvariants.CaptchaNotReadyMessage}");
             });
     }
 }

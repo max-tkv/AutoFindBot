@@ -48,11 +48,6 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
             .Replace(AvitoHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
         var response = await HttpClient.GetAsync(path, stoppingToken);
         var content = await response.Content.ReadAsStringAsync(stoppingToken);
-        if (response.IsSuccessStatusCode == false)
-        {
-            throw new Exception($"Произошла ошибка: {content}");
-        }
-            
         var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
 
         ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);

@@ -10,5 +10,7 @@ public enum SourceType
     
     AutoRu = 4,
     
-    Drom = 5
+    Drom = 5,
+    
+    Youla = 6
 }

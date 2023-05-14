@@ -1,4 +1,5 @@
-﻿using AutoFindBot.Abstractions;
+﻿using Ardalis.GuardClauses;
+using AutoFindBot.Abstractions;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Entities;
 using AutoFindBot.Exceptions;
@@ -24,6 +25,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
     private readonly IAppUserService _appUserService;
     private readonly ISourceCheckRepository _sourceCheckRepository;
     private readonly IDromHttpApiClient _dromHttpApiClient;
+    private readonly IYoulaHttpApiClient _youlaHttpApiClient;
 
     public CheckingNewAutoService(
         ILogger<CheckingNewAutoService> logger,
@@ -37,20 +39,22 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         IMapper mapper,
         IAppUserService appUserService,
         ISourceCheckRepository sourceCheckRepository,
-        IDromHttpApiClient dromHttpApiClient)
+        IDromHttpApiClient dromHttpApiClient,
+        IYoulaHttpApiClient youlaHttpApiClient)
     {
-        _logger = logger;
-        _keyAutoProbegHttpApiClient = keyAutoProbegHttpApiClient;
-        _tradeDealerHttpApiClient = tradeDealerHttpApiClient;
-        _autoRuHttpApiClient = autoRuHttpApiClient;
-        _avitoHttpApiClient = avitoHttpApiClient;
-        _userFilterRepository = userFilterRepository;
-        _messageService = messageService;
-        _carService = carService;
-        _mapper = mapper;
-        _appUserService = appUserService;
-        _sourceCheckRepository = sourceCheckRepository;
-        _dromHttpApiClient = dromHttpApiClient;
+        _logger = Guard.Against.Null(logger, nameof(logger));
+        _keyAutoProbegHttpApiClient = Guard.Against.Null(keyAutoProbegHttpApiClient, nameof(keyAutoProbegHttpApiClient));
+        _tradeDealerHttpApiClient = Guard.Against.Null(tradeDealerHttpApiClient, nameof(tradeDealerHttpApiClient));
+        _autoRuHttpApiClient = Guard.Against.Null(autoRuHttpApiClient, nameof(autoRuHttpApiClient));
+        _avitoHttpApiClient = Guard.Against.Null(avitoHttpApiClient, nameof(avitoHttpApiClient));
+        _userFilterRepository = Guard.Against.Null(userFilterRepository, nameof(userFilterRepository));
+        _messageService = Guard.Against.Null(messageService, nameof(messageService));
+        _carService = Guard.Against.Null(carService, nameof(carService));
+        _mapper = Guard.Against.Null(mapper, nameof(mapper));
+        _appUserService = Guard.Against.Null(appUserService, nameof(appUserService));
+        _sourceCheckRepository = Guard.Against.Null(sourceCheckRepository, nameof(sourceCheckRepository));
+        _dromHttpApiClient = Guard.Against.Null(dromHttpApiClient, nameof(dromHttpApiClient));
+        _youlaHttpApiClient = Guard.Against.Null(youlaHttpApiClient, nameof(youlaHttpApiClient));
     }
 
     public async Task CheckAndSendMessageAsync(
@@ -186,6 +190,7 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         await GetCarsFromKeyAutoProbegAsync(cars, stoppingToken);
         await GetCarsFromAvitoAsync(cars, stoppingToken);
         await GetCarsFromDromAsync(cars, stoppingToken);
+        await GetCarsFromYoulaAsync(cars, stoppingToken);
 
         return cars;
     }
@@ -307,6 +312,30 @@ public class CheckingNewAutoService : ICheckingNewAutoService
         {
             _logger.LogWarning(
                 $"Method GetCarsFromAutoRuAsync: {e}");
+        }
+    }
+    
+    private async Task GetCarsFromYoulaAsync(
+        List<Car> cars, 
+        CancellationToken stoppingToken = default)
+    {
+        try
+        {
+            var autoRuResult = await _youlaHttpApiClient.GetAllNewAutoAsync(stoppingToken);
+            var newCars = _mapper.Map<List<Car>>(autoRuResult.Cars);
+            cars.AddRange(newCars);
+            
+            _logger.LogInformation($"Request by GetCarsFromYoulaAsync is success. " +
+                                   $"Found: {newCars.Count}");
+        }
+        catch (NotActiveSourceException e)
+        {
+            _logger.LogWarning(e.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(
+                $"Method GetCarsFromYoulaAsync: {e}");
         }
     }
 }

@@ -5,6 +5,7 @@ using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.Drom;
 using AutoFindBot.Models.KeyAutoProbeg;
 using AutoFindBot.Models.TradeDealer;
+using AutoFindBot.Models.Youla;
 using AutoMapper;
 
 namespace AutoFindBot.Mappings;
@@ -133,6 +134,25 @@ public class CheckerNewAutoServiceMappingProfile : Profile
         
         CreateMap<AutoRuResultOfferStateImageUrl, Entities.Image>()
             .ForMember(x => x.Urls, o => o.MapFrom(x => x.Sizes));
+        
+        CreateMap<YoulaResultAuto, Entities.Car>()
+            .ForMember(x => x.Price, o => o.MapFrom(x => x.Price))
+            .ForMember(x => x.SourceType, o => o.MapFrom(x => x.SourceType))
+            .ForMember(x => x.Title, o => o.MapFrom(x => x.Title))
+            .ForMember(x => x.Vin, o => o.MapFrom(x => x.Vin))
+            .ForMember(x => x.Year, o => o.MapFrom(x => x.Year))
+            .ForMember(x => x.OriginId, o => o.MapFrom(x => x.OriginId))
+            .ForMember(x => x.Id, o => o.MapFrom(x => 0))
+            .ForMember(x => x.Сity, o => o.MapFrom(x => x.Сity))
+            .ForMember(x => x.PublishedAt, o => o.MapFrom(x => x.PublishedAt))
+            .ForMember(x => x.Url, o => o.MapFrom(x => x.Url))
+            .ForMember(x => x.ImageUrls, o => o.MapFrom(x => x.Images));
+        
+        CreateMap<string, Entities.Image>()
+            .ForMember(x => x.Urls, o => o.MapFrom(x => new Dictionary<string, string>()
+            {
+                { "1", x }
+            }));
     }
 
     private string ConvertPrice(decimal price)

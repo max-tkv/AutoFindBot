@@ -21,6 +21,8 @@ using AutoFindBot.Integration.Extensions;
 using AutoFindBot.Integration.KeyAutoProbeg.Extensions;
 using AutoFindBot.Integration.Mappings;
 using AutoFindBot.Integration.RuCaptcha.Extensions;
+using AutoFindBot.Integration.Youla.Extensions;
+using AutoFindBot.Integration.Youla.Mappings;
 using AutoFindBot.Mappings;
 using AutoFindBot.Services;
 using AutoFindBot.Storage;
@@ -57,6 +59,7 @@ namespace AutoFindBot.Web
                 mc.AddProfile(new AvitoHttpApiClientMappingProfile());
                 mc.AddProfile(new AutoRuHttpApiClientMappingProfile());
                 mc.AddProfile(new DromHttpApiClientMappingProfile());
+                mc.AddProfile(new YoulaHttpApiClientMappingProfile());
             }).CreateMapper());
 
             services.RegisterDomain(_configuration);
@@ -68,6 +71,7 @@ namespace AutoFindBot.Web
             services.AddAutoRuHttpApiClient(_configuration);
             services.AddRuCaptchaHttpApiClient(_configuration);
             services.AddDromHttpApiClient(_configuration);
+            services.AddYoulaHttpApiClient(_configuration);
 
             services.RegisterApiWithSwagger(_configuration);
 

@@ -48,7 +48,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             await _webDriverService.ClickElementByIdAsync(
                 "js-button", false, stoppingToken);
 
-            string imageCaptchaUrl = "";
+            string imageCaptchaUrl;
             try
             {
                 await _webDriverService.ClickElementByIdAsync(

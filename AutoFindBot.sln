@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFindBot.Integration.RuC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFindBot.Integration.Drom", "AutoFindBot.Integration.Drom\AutoFindBot.Integration.Drom.csproj", "{C2E98A1E-6D9A-45D0-B530-DD005FF37206}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFindBot.Integration.Youla", "AutoFindBot.Integration.Youla\AutoFindBot.Integration.Youla.csproj", "{CECADECD-40FD-452F-917D-8BE04DD95EA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{C2E98A1E-6D9A-45D0-B530-DD005FF37206}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2E98A1E-6D9A-45D0-B530-DD005FF37206}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2E98A1E-6D9A-45D0-B530-DD005FF37206}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CECADECD-40FD-452F-917D-8BE04DD95EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CECADECD-40FD-452F-917D-8BE04DD95EA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CECADECD-40FD-452F-917D-8BE04DD95EA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CECADECD-40FD-452F-917D-8BE04DD95EA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

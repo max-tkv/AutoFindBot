@@ -204,6 +204,7 @@ public class MessageService : IMessageService
             SourceType.AutoRu => $"{_configuration[SourceCarBaseUrlPaths.AutoRu]}{car.Url}",
             SourceType.KeyAutoProbeg => $"{car.Url}",
             SourceType.Drom => $"{car.Url}",
+            SourceType.Youla => $"{_configuration[SourceCarBaseUrlPaths.Youla]}{car.Url}",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
