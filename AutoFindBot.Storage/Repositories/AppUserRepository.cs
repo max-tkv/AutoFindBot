@@ -17,6 +17,7 @@ public class AppUserRepository : IAppUserRepository
         CancellationToken stoppingToken = default)
     {
         var userEntity = await _context.Users.AddAsync(newUser, stoppingToken);
+        await CommitAsync(stoppingToken);
         return userEntity.Entity;
     }
     
