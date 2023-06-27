@@ -53,7 +53,7 @@ public static class RegisterAvitoDependenciesExtension
         this IServiceCollection services)
     {
         services
-            .AddTransient<CheckSuccessfulStatusCodeMessageHandler>()
+            .AddTransient<CheckCaptchaHandler>()
             .AddHttpClient<IAvitoHttpApiClient, AvitoHttpApiClient>((serviceProvider, httpClient) =>
             {
                 var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
@@ -62,7 +62,7 @@ public static class RegisterAvitoDependenciesExtension
             })
             .AddHttpMessageHandlers(new List<Func<IServiceProvider, DelegatingHandler>>
             {
-                container => container.GetRequiredService<CheckSuccessfulStatusCodeMessageHandler>()
+                container => container.GetRequiredService<CheckCaptchaHandler>()
             })
             .AddPolicyHandler(CreateRetryPolicy(services));
 
