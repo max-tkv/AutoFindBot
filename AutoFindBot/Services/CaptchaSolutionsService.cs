@@ -138,6 +138,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         CancellationToken stoppingToken = default)
     {
         using var driver = _webDriverService.CreateChromeDriver();
+        driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(5);
         driver.Navigate().GoToUrl("https://www.avito.ru/");
 
         await _webDriverService.FindElementByCssSelectorAsync(
