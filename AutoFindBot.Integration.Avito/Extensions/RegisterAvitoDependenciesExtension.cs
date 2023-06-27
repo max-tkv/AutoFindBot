@@ -64,36 +64,26 @@ public static class RegisterAvitoDependenciesExtension
             {
                 container => container.GetRequiredService<CheckSuccessfulStatusCodeMessageHandler>()
             })
-            .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
-            {
-                var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
-
-                var handler = new HttpClientHandler();
-                handler.CookieContainer = new CookieContainer();
-                handler.CookieContainer.Add(new Cookie("u", options.Cookie.U) { Domain = "avito.ru" });
-                handler.CookieContainer.Add(new Cookie("v", options.Cookie.V) { Domain = "avito.ru" });
-                return handler;
-            })
             .AddPolicyHandler(CreateRetryPolicy(services));
 
         return services;
     }
-    
+
     private static AsyncRetryPolicy<HttpResponseMessage> CreateRetryPolicy(IServiceCollection services)
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
-            .OrResult(response => response.StatusCode == HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(new[]
             {
+                TimeSpan.FromSeconds(3),
+                TimeSpan.FromSeconds(3),
                 TimeSpan.FromSeconds(3)
-            }, async (exception, timeSpan, retryCount, context) =>
+            }, (exception, timeSpan, retryCount, context) =>
             {
                 var serviceProvider = services.BuildServiceProvider();
                 var logger = serviceProvider.GetService<ILogger<AvitoHttpApiClient>>();
                 logger!.LogWarning(
-                    $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: " +
-                    $"{exception?.Exception?.Message ?? await exception?.Result?.Content.ReadAsStringAsync()}");
+                    $"Retry {retryCount} of {context.PolicyKey} at {timeSpan.TotalSeconds} seconds due to: {exception.Exception.Message}");
             });
     }
 }

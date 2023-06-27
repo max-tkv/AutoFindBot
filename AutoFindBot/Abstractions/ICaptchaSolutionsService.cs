@@ -13,4 +13,8 @@ public interface ICaptchaSolutionsService
     Task SolutionDromAsync(
         HttpRequestMessage request, 
         CancellationToken stoppingToken = default);
+
+    Task SolutionAvitoAsync(
+        HttpRequestMessage request, 
+        CancellationToken stoppingToken = default);
 }

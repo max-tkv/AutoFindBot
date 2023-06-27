@@ -6,12 +6,14 @@ using AutoFindBot.Integration.Avito.Options;
 using AutoFindBot.Lookups;
 using AutoFindBot.Models.Avito;
 using AutoFindBot.Models.ConfigurationOptions;
+using AutoFindBot.Models.Drom;
 using AutoFindBot.Repositories;
 using AutoFindBot.Utils.Http;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace AutoFindBot.Integration.Avito;
 
@@ -43,16 +45,25 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
         NotActiveSourceException.ThrowIfNotActive(
             await _sourceRepository.GetByTypeAsync(SourceType.Avito, stoppingToken));
 
-        var path = _options.BaseUrl + _options.GetAutoByFilterQuery
-            .Replace(AvitoHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
-            .Replace(AvitoHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
-        var response = await HttpClient.GetAsync(path, stoppingToken);
-        var content = await response.Content.ReadAsStringAsync(stoppingToken);
-        var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
+        try
+        {
+            var path = _options.BaseUrl + _options.GetAutoByFilterQuery
+                .Replace(AvitoHttpApiClientInvariants.PriceMin, _defaultFilterOptions.Value.PriceMin.ToString())
+                .Replace(AvitoHttpApiClientInvariants.PriceMax, _defaultFilterOptions.Value.PriceMax.ToString());
+            var response = await HttpClient.GetAsync(path, stoppingToken);
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
+            var avitoResponse = JsonConvert.DeserializeObject<AvitoRootResponse>(content);
 
-        ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
+            ArgumentNullException.ThrowIfNull(avitoResponse.Result.Items);
 
-        return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
+            return _mapper.Map<List<AvitoResult>>(avitoResponse.Result.Items);
+        }
+        catch (SuccessSolutionException ex)
+        {
+            SetDefaultHeadersToHttpClient(ex.Headers);
+            _logger.LogInformation("Капча успешно решена.");
+            return new List<AvitoResult>();
+        }
     }
 
     public async Task<List<AvitoResult>> GetAutoByFilterAsync(
@@ -85,6 +96,25 @@ public class AvitoHttpApiClient : HttpApiClient, IAvitoHttpApiClient
         {
             _logger.LogError(e.Message);
             throw;
+        }
+    }
+
+    private void SetDefaultHeadersToHttpClient(HttpResponseHeaders headers)
+    {
+        if (HttpClient.DefaultRequestHeaders.Any(x => x.Key == "X-XSS-Protection"))
+        {
+            return;
+        }
+
+        HttpClient.DefaultRequestHeaders.Clear();
+        foreach (var header in headers)
+        {
+            if(header.Key == "Transfer-Encoding")
+            {
+                continue;
+            }
+
+            HttpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
         }
     }
 }

@@ -133,6 +133,19 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         SetNewCookies(request, driver.Manage().Cookies.AllCookies);
     }
 
+    public async Task SolutionAvitoAsync(
+        HttpRequestMessage request, 
+        CancellationToken stoppingToken = default)
+    {
+        using var driver = _webDriverService.CreateChromeDriver();
+        driver.Navigate().GoToUrl("https://www.avito.ru/");
+
+        await _webDriverService.FindElementByCssSelectorAsync(
+            "h2[data-marker='bx-recommendations-block-title']", stoppingToken: stoppingToken);
+
+        SetNewCookies(request, driver.Manage().Cookies.AllCookies);
+    }
+
     #region Приватные методы
 
     private void SetRedirect(
