@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using AutoFindBot.Abstractions.HttpClients;
 using AutoFindBot.Helpers;
+using AutoFindBot.Integration.Avito.HttpMessageHandlers;
 using AutoFindBot.Integration.Avito.Invariants;
 using AutoFindBot.Integration.Avito.Options;
 using Microsoft.Extensions.Configuration;
@@ -52,11 +53,16 @@ public static class RegisterAvitoDependenciesExtension
         this IServiceCollection services)
     {
         services
+            .AddTransient<CheckSuccessfulStatusCodeMessageHandler>()
             .AddHttpClient<IAvitoHttpApiClient, AvitoHttpApiClient>((serviceProvider, httpClient) =>
             {
                 var options = serviceProvider.GetRequiredService<AvitoHttpApiClientOptions>();
                 httpClient.BaseAddress = new Uri(options.BaseUrl);
                 httpClient.DefaultRequestHeaders.Add("Host", options.Host);
+            })
+            .AddHttpMessageHandlers(new List<Func<IServiceProvider, DelegatingHandler>>
+            {
+                container => container.GetRequiredService<CheckSuccessfulStatusCodeMessageHandler>()
             })
             .ConfigurePrimaryHttpMessageHandler((serviceProvider) =>
             {
