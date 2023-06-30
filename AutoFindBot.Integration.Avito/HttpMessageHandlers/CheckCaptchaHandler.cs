@@ -37,7 +37,7 @@ namespace AutoFindBot.Integration.Avito.HttpMessageHandlers
                     response.Headers.Add(requestHeader.Key, requestHeader.Value);
                 }
 
-                throw new SuccessSolutionException(response.Headers);
+                throw new SuccessSolutionException(response.Headers); // todo: need refactoring
             }
 
             return response;
