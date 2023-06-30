@@ -137,7 +137,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         HttpRequestMessage request, 
         CancellationToken stoppingToken = default)
     {
-        using var driver = _webDriverService.CreateChromeDriver(false);
+        using var driver = _webDriverService.CreateChromeDriver();
         driver.Navigate().GoToUrl("https://www.avito.ru/all/transport");
         await _webDriverService.FindElementByCssSelectorAsync(
             "h2[data-marker='bx-recommendations-block-title']", stoppingToken: stoppingToken);
