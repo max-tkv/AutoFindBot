@@ -191,6 +191,7 @@ public class WebDriverService : IWebDriverService, IDisposable
         }
         options.AddArgument("--no-sandbox");
         options.AddArgument("--disable-dev-shm-usage");
+        options.AddArgument("--no-cache");
 
         return options;
     }
