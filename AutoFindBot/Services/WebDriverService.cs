@@ -41,13 +41,19 @@ public class WebDriverService : IWebDriverService, IDisposable
                 var element = _driver
                     .FindElements(By.Id(id))
                     .Single();
-                
+
                 element.Click();
                 return;
             }
             catch (InvalidOperationException)
             {
+                _logger.LogInformation($"Page HTML: {_driver.PageSource}");
                 await Task.Delay(1000, stoppingToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, $"Необработаное исключение. Message: {e.Message}");
+                throw;
             }
         }
 
@@ -79,7 +85,13 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
+                _logger.LogInformation($"Page HTML: {_driver.PageSource}");
                 await Task.Delay(1000, stoppingToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, $"Необработаное исключение. Message: {e.Message}");
+                throw;
             }
         }
 
@@ -110,7 +122,13 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
+                _logger.LogInformation($"Page HTML: {_driver.PageSource}");
                 await Task.Delay(1000, stoppingToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, $"Необработаное исключение. Message: {e.Message}");
+                throw;
             }
         }
 
@@ -138,7 +156,13 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
+                _logger.LogInformation($"Page HTML: {_driver.PageSource}");
                 await Task.Delay(1000, stoppingToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, $"Необработаное исключение. Message: {e.Message}");
+                throw;
             }
         }
 
@@ -168,7 +192,13 @@ public class WebDriverService : IWebDriverService, IDisposable
             }
             catch (InvalidOperationException)
             {
+                _logger.LogInformation($"Page HTML: {_driver.PageSource}");
                 await Task.Delay(1000, stoppingToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, $"Необработаное исключение. Message: {e.Message}");
+                throw;
             }
         }
 

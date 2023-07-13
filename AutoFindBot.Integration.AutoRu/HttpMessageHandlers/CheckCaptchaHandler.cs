@@ -39,7 +39,8 @@ public class CheckCaptchaHandler : DelegatingHandler
             var checkContent = await checkResponse.Content.ReadAsStringAsync(cancellationToken);
             if (!checkContent.Contains("SUCCESS"))
             {
-                throw new AutoRuHttpApiClientException(checkContent);
+                throw new AutoRuHttpApiClientException($"Повторный запрос с новыми куками вернул не корректный ответ.\n" +
+                                                       $"Ответ: {checkContent}");
             }
 
             foreach (var requestHeader in request.Headers)

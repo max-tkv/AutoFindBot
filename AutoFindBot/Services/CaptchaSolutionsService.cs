@@ -25,9 +25,9 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         ILogger<CaptchaSolutionsService> logger,
         IWebDriverService webDriverService)
     {
+        _logger = logger;
         _configuration = configuration;
         _ruCaptchaHttpApiClient = ruCaptchaHttpApiClient;
-        _logger = logger;
         _webDriverService = webDriverService;
     }
 
@@ -92,7 +92,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             {
                 throw new CaptchaSolutionsServiceException(CaptchaInvariants.ErrorCaptchaSolveMessage);
             }
-
+            
             SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
             SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
         }
@@ -154,6 +154,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
         
         httpRequest.Method = newMethod;
         httpRequest.RequestUri = new Uri(newUrl);
+        
+        _logger.LogInformation($"Set Redirect. Meyhod: {newMethod}. RequestUri: {newUrl}");
     }
 
     private void SetAutoRuCookiesAndToken(
@@ -168,9 +170,21 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             "cycada=8jSDnd6bpcmIU+hlcyNrire9a+uIKehYp+cFw1YoWmI=; _ym_d=1683636760; count-visits=4; " +
             "from_lifetime=1683637032901";
         SetNewCookies(httpRequest, driverCookies, additionalCookies);
-        httpRequest.Headers.Add("x-csrf-token", driverCookies.Single(x => x.Name == "_csrf_token").Value);
+        SetNewToken(httpRequest, driverCookies);
     }
-    
+
+    private void SetNewToken(
+        HttpRequestMessage httpRequest, 
+        ReadOnlyCollection<Cookie> driverCookies)
+    {
+        var token = driverCookies.SingleOrDefault(x => x.Name == "_csrf_token");
+        if (token != null)
+        {
+            httpRequest.Headers.Add("x-csrf-token", token.Value);
+            _logger.LogInformation($"New Token: '{token.Value}'");
+        }
+    }
+
     private void SetNewCookies(
         HttpRequestMessage httpRequestMessage, 
         ReadOnlyCollection<Cookie> cookiesAllCookies, 
@@ -183,6 +197,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             cookieValue += $"; {additionalCookies}";
         }
         httpRequestMessage.Headers.Add("Cookie", cookieValue);
+        _logger.LogInformation($"New Cookies: '{cookieValue}'");
     }
 
     private async Task<byte[]> DownloadImageAsync(
