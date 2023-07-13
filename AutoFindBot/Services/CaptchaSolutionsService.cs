@@ -61,10 +61,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 {
                     SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
                     SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
-
                     return;
                 }
-                
                 throw;
             }
             catch (CaptchaSolutionsServiceException)
@@ -73,10 +71,8 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
                 {
                     SetAutoRuCookiesAndToken(httpRequestMessage, driver.Manage().Cookies.AllCookies);
                     SetRedirect(httpRequestMessage, HttpMethod.Post, driver.Url);
-
                     return;
                 }
-
                 throw;
             }
             
@@ -90,7 +86,7 @@ public class CaptchaSolutionsService : ICaptchaSolutionsService
             await _webDriverService.ClickElementByCssSelectorAsync(
                 "button[data-testid='submit']", stoppingToken: stoppingToken);
             await _webDriverService.ClickElementByIdAsync(
-                "confirm-button", stoppingToken: stoppingToken);
+                "confirm-button", false, stoppingToken: stoppingToken);
 
             if (!driver.Url.Contains(filterQuery))
             {
